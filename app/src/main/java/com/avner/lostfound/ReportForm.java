@@ -1,14 +1,16 @@
 package com.avner.lostfound;
 
+import android.app.Dialog;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 
-public class ReportForm extends ActionBarActivity {
+public class ReportForm extends ActionBarActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,5 +49,14 @@ public class ReportForm extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        
+        Dialog dialog = new Dialog(getApplicationContext());
+
+        dialog.setContentView(R.layout.time_date_picker);
+        dialog.setTitle("Custom Dialog");
     }
 }

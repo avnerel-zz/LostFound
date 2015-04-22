@@ -12,4 +12,7 @@
     <string name="title_section3">Section 3</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="location_colon">Location:</string>
+    <string name="description_colon">Description:</string>
+    <string name="time_of_loss_colon">Time of Loss:</string>
 </resources>

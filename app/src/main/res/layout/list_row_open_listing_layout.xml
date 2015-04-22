@@ -34,7 +34,7 @@
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/tv_itemListingName"
         android:layout_toRightOf="@+id/tv_itemListingName"
-        android:hint="<X time ago>"
+        android:hint="X time ago"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:textSize="14sp" />
