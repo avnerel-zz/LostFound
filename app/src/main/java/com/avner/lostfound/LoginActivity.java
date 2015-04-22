@@ -1,5 +1,6 @@
 package com.avner.lostfound;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -47,5 +48,6 @@ public class LoginActivity extends ActionBarActivity implements Button.OnClickLi
     @Override
     public void onClick(View v) {
 
+//        Intent intent = new
     }
 }

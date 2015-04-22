@@ -12,5 +12,10 @@
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
+    <string name="max_password_length">12</string>
+    <string name="user_name_hint">Email</string>
+    <string name="or_login_with">-or Login with-</string>
+    <string name="login_with_email">Login</string>
+    <string name="sign_up">Sign up</string>
 
 </resources>
