@@ -1,5 +1,6 @@
 package com.avner.lostfound;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -11,9 +12,12 @@ import android.widget.Button;
 import com.facebook.FacebookSdk;
 
 
-public class LoginActivity extends ActionBarActivity implements Button.OnClickListener{
+public class LoginActivity extends Activity implements Button.OnClickListener{
 
     Button signUpButton;
+
+    Button emailLoginButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +27,10 @@ public class LoginActivity extends ActionBarActivity implements Button.OnClickLi
 
         signUpButton = (Button) findViewById(R.id.b_sign_up);
         signUpButton.setOnClickListener(this);
+
+        emailLoginButton= (Button) findViewById(R.id.b_email_login);
+        emailLoginButton.setOnClickListener(this);
+
     }
 
 
@@ -57,5 +65,13 @@ public class LoginActivity extends ActionBarActivity implements Button.OnClickLi
 
             startActivity(intent);
         }
+
+        if(v.getId() == R.id.b_email_login){
+
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
+            startActivity(intent);
+        }
+
     }
 }

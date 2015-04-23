@@ -16,9 +16,10 @@
     <string name="user_name_hint">Email</string>
     <string name="or_login_with">-or Login with-</string>
     <string name="login_with_email">Login</string>
-    <string name="sign_up">Sign Up  \></string>
+    <string name="sign_up">Sign Up ></string>
     <string name="title_activity_sign_up">SignUpActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_top_rated_fragment">TopRatedFragment</string>
 
 </resources>

@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:text="@string/login_with_email"
             android:textAllCaps="false"
+            android:id="@+id/b_email_login"
             android:background="#ff72ff99"/>
 
         <TextView
