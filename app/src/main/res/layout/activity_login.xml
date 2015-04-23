@@ -13,7 +13,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
+            android:id="@+id/iv_lost_found"
             android:src="@drawable/lf_background"
             android:adjustViewBounds="true" />
 
@@ -35,7 +35,9 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/login_with_email"/>
+            android:text="@string/login_with_email"
+            android:textAllCaps="false"
+            android:background="#ff72ff99"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -48,7 +50,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
 
 
             <com.google.android.gms.common.SignInButton
@@ -56,14 +59,17 @@
                 android:layout_height="40dp"
                 android:layout_weight="1"
                 android:id="@+id/b_login_google"
+                android:foregroundGravity="fill"
                 />
 
             <com.facebook.login.widget.LoginButton
                 android:layout_width="match_parent"
-                android:layout_height="38dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
                 android:id="@+id/b_login_facebook"
+                android:adjustViewBounds="true"
                 />
+
 
 
         </LinearLayout>
@@ -84,8 +90,8 @@
             android:layout_height="wrap_content"
             android:text="@string/sign_up"
             android:id="@+id/b_sign_up"
-            android:layout_gravity="end"
-            />
+            android:textAllCaps="false"
+            android:background="#ff91abff" />
     </LinearLayout>
 
 

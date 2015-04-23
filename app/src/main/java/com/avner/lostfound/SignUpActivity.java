@@ -1,35 +1,24 @@
 package com.avner.lostfound;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-
-import com.facebook.FacebookSdk;
 
 
-public class LoginActivity extends ActionBarActivity implements Button.OnClickListener{
+public class SignUpActivity extends ActionBarActivity {
 
-    Button signUpButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-
-        setContentView(R.layout.activity_login);
-
-        signUpButton = (Button) findViewById(R.id.b_sign_up);
-        signUpButton.setOnClickListener(this);
+        setContentView(R.layout.activity_sign_up);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
+        getMenuInflater().inflate(R.menu.menu_sign_up, menu);
         return true;
     }
 
@@ -46,16 +35,5 @@ public class LoginActivity extends ActionBarActivity implements Button.OnClickLi
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onClick(View v) {
-
-        if(v.getId() == R.id.b_sign_up){
-
-            Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-
-            startActivity(intent);
-        }
     }
 }
