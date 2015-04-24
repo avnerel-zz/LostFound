@@ -1,6 +1,7 @@
 package com.avner.lostfound;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,13 +15,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.software.shell.fab.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class LostListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class LostListFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private ListView lv_myList;
+
+    private FloatingActionButton button;
 
     private View rootView;
 
@@ -34,6 +39,9 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
         ArrayList<Integer> imageResourceNumbers = new ArrayList<>();
 
         lv_myList = (ListView) rootView.findViewById(R.id.lv_myList);
+
+        button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
+        button.setOnClickListener(this);
 
         List<Item> items = new ArrayList<>();
 
@@ -56,6 +64,17 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.b_add_item){
+
+            Intent intent = new Intent(rootView.getContext(),ReportForm.class);
+
+            startActivity(intent);
+        }
     }
 
 

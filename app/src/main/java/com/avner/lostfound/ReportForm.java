@@ -1,5 +1,6 @@
 package com.avner.lostfound;
 
+import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 
-public class ReportForm extends ActionBarActivity {
+public class ReportForm extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

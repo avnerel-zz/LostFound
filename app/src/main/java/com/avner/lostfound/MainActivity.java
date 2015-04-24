@@ -18,7 +18,7 @@ public class MainActivity extends FragmentActivity implements
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     // Tab titles
-    private String[] tabsStrings = { "My World", "Lost", "Found", "Stats", "Settings" };
+    private String[] tabsStrings = { "My World", "Lost", "Found", "Stats" };
 
     // Tab icons
     private int[] tabsIcons = {
@@ -26,7 +26,6 @@ public class MainActivity extends FragmentActivity implements
             R.drawable.question_mark_red1,
             R.drawable.chequered_flags,
             R.drawable.graph,
-            R.drawable.settings
     };
 
     @Override

@@ -11,7 +11,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
             new LostListFragment(),
             new FoundListFragment(),
             new StatsFragment(),
-            new SettingsFragment()
+//            new SettingsFragment()
     };
 
     public TabsPagerAdapter(FragmentManager fm) {
@@ -46,7 +46,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // get item count - equal to number of tabs
-        return 5;
+        return fragments.length;
     }
 
 }
