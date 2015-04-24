@@ -14,7 +14,16 @@ public class MainActivity extends FragmentActivity implements
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     // Tab titles
-    private String[] tabs = { "My World", "Lost", "Found", "Stats", "Settings" };
+    private String[] tabsStrings = { "My World", "Lost", "Found", "Stats", "Settings" };
+
+    // Tab icons
+    private int[] tabsIcons = {
+            R.drawable.earth,
+            R.drawable.question_mark_red1,
+            R.drawable.chequered_flags,
+            R.drawable.graph,
+            R.drawable.settings
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +39,14 @@ public class MainActivity extends FragmentActivity implements
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Adding Tabs
-        for (String tab_name : tabs) {
-            actionBar.addTab(actionBar.newTab().setText(tab_name)
+
+        // Adding Tabs with icons
+        for (int i = 0; i < tabsStrings.length; ++i) {
+            actionBar.addTab(actionBar.newTab()
+                    .setText(tabsStrings[i])
+                    .setIcon(tabsIcons[i])
                     .setTabListener(this));
+
         }
 
         /**
