@@ -16,7 +16,7 @@
         android:src="@drawable/image_unavailable" />
 
     <TextView
-        android:id="@+id/tv_itemListingName"
+        android:id="@+id/tv_item_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -32,8 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/tv_itemListingName"
-        android:layout_toRightOf="@+id/tv_itemListingName"
+        android:layout_toEndOf="@+id/tv_item_name"
+        android:layout_toRightOf="@+id/tv_item_name"
 
         android:paddingLeft="10dp"
         android:paddingRight="10dp"

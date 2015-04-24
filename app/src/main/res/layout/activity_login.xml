@@ -21,8 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/et_user_name"
+            android:inputType="textEmailAddress"
             android:hint="@string/user_name_hint"
-            android:textColorHint="@color/wallet_hint_foreground_holo_light"
+            android:textColorHint="@color/primary_dark_material_dark"
             android:textCursorDrawable="@null"
              />
 
@@ -32,7 +33,7 @@
             android:inputType="textPassword"
             android:hint="Password"
             android:id="@+id/et_user_password"
-            android:textColorHint="@color/wallet_hint_foreground_holo_light"
+            android:textColorHint="@color/primary_dark_material_dark"
             android:maxLength="@string/max_password_length"
             android:textCursorDrawable="@null"
             />
