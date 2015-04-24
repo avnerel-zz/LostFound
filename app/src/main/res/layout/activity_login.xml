@@ -22,6 +22,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/et_user_name"
             android:hint="@string/user_name_hint"
+            android:textColorHint="@color/wallet_hint_foreground_holo_light"
+            android:textCursorDrawable="@null"
              />
 
         <EditText
@@ -30,7 +32,10 @@
             android:inputType="textPassword"
             android:hint="Password"
             android:id="@+id/et_user_password"
-            android:maxLength="@string/max_password_length" />
+            android:textColorHint="@color/wallet_hint_foreground_holo_light"
+            android:maxLength="@string/max_password_length"
+            android:textCursorDrawable="@null"
+            />
 
         <Button
             android:layout_width="match_parent"
@@ -82,17 +87,17 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom|right"
+        android:gravity="end"
         android:layout_alignParentBottom="true"
         >
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/sign_up"
             android:id="@+id/b_sign_up"
             android:textAllCaps="false"
-            android:background="#ff91abff" />
+            android:background="#ff91abff"/>
     </LinearLayout>
 
 

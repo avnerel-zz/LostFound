@@ -1,16 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#fa6a6a" >
-    
-    <TextView android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="My World"
-        android:textSize="20dp"
-        android:layout_centerInParent="true"/>
-    
+    android:background="#ff009ab6"
+    android:gravity="center">
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="30dp">
+
+        <Button
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:text="@string/lost_item"
+            android:id="@+id/b_lost_item"
+             />
+
+        <Button
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:text="@string/found_item"
+            android:id="@+id/b_found_item"
+             />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:text="@string/messages"
+            android:id="@+id/b_messages"
+            />
+
+        <Button
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:text="@string/my_history"
+            android:id="@+id/b_my_history"
+            />
+
+
+    </LinearLayout>
+
+</LinearLayout>

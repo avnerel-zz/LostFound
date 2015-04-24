@@ -24,10 +24,10 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
                 return new FoundListFragment();
             case 3:
                 // Games fragment activity
-                return new LostListFragment();
+                return new StatsFragment();
             case 4:
                 // Movies fragment activity
-                return new FoundListFragment();
+                return new SettingsFragment();
         }
 
         return null;
