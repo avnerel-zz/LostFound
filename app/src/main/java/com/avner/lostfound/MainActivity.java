@@ -6,6 +6,9 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener {
@@ -39,15 +42,35 @@ public class MainActivity extends FragmentActivity implements
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-
         // Adding Tabs with icons
         for (int i = 0; i < tabsStrings.length; ++i) {
-            actionBar.addTab(actionBar.newTab()
-                    .setText(tabsStrings[i])
-                    .setIcon(tabsIcons[i])
-                    .setTabListener(this));
+            Tab tab = actionBar.newTab()
+                    .setCustomView(R.layout.action_bar_tab_layout)
+                    .setTabListener(this);
 
+            ImageView imageView = (ImageView) tab.getCustomView().findViewById(R.id.iv_tabIcon);
+            imageView.setImageResource(tabsIcons[i]);
+            imageView.setPadding(0, 0, 0, 0);
+            imageView.setMaxWidth(20);
+
+            TextView textView = (TextView) tab.getCustomView().findViewById(R.id.tv_tabText);
+            textView.setText(tabsStrings[i]);
+            textView.setPadding(0, 0, 0, 0);
+            textView.setMaxWidth(20);
+
+            tab.getCustomView().setPadding(0, 0, 0, 0);
+
+
+            actionBar.addTab(tab);
+
+//            actionBar.addTab(actionBar.newTab()
+//                    .setCustomView(R.layout.action_bar_tab_layout)
+//                    .setText(tabsStrings[i])
+//                    .setIcon(tabsIcons[i])
+//                    .setTabListener(this));
         }
+
+        setTabsWidth();
 
         /**
          * on swiping the viewpager make respective tab selected
@@ -70,6 +93,17 @@ public class MainActivity extends FragmentActivity implements
             }
         });
     }
+
+    private void setTabsWidth() {
+//        final Tab tab = actionBar.getTabAt(0);
+//        final View text1 = tab.
+//        final View tabView = tab.getCustomView();
+//        tabView.setPadding(0, 0, 0, 0);
+//        final View tabContainerView = (View) tabView.getParent();
+//        tabContainerView.setPadding(0, 0, 0, 0);
+
+    }
+
 
     @Override
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
