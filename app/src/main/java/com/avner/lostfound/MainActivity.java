@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,6 +31,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -39,8 +41,13 @@ public class MainActivity extends FragmentActivity implements
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(mAdapter);
-        actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//        actionBar.setHomeButtonEnabled(false);
+//        actionBar.setDisplayShowTitleEnabled(false);
+//        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setDisplayOptions(0);
+
+
 
         // Adding Tabs with icons
         for (int i = 0; i < tabsStrings.length; ++i) {
@@ -50,15 +57,15 @@ public class MainActivity extends FragmentActivity implements
 
             ImageView imageView = (ImageView) tab.getCustomView().findViewById(R.id.iv_tabIcon);
             imageView.setImageResource(tabsIcons[i]);
-            imageView.setPadding(0, 0, 0, 0);
-            imageView.setMaxWidth(20);
+//            imageView.setPadding(0, 0, 0, 0);
+//            imageView.setMaxWidth(20);
 
             TextView textView = (TextView) tab.getCustomView().findViewById(R.id.tv_tabText);
             textView.setText(tabsStrings[i]);
-            textView.setPadding(0, 0, 0, 0);
-            textView.setMaxWidth(20);
+//            textView.setPadding(0, 0, 0, 0);
+//            textView.setMaxWidth(20);
 
-            tab.getCustomView().setPadding(0, 0, 0, 0);
+//            tab.getCustomView().setPadding(0, 0, 0, 0);
 
 
             actionBar.addTab(tab);
