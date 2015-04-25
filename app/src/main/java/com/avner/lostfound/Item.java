@@ -43,9 +43,9 @@ public class Item {
         return description;
     }
 
-    public long getDiff() {
+    public int getDiff() {
         long diff = System.currentTimeMillis() - calender.getTimeInMillis();
-        return (diff / (1000 * 60 * 60 * 24));
+        return (int)(diff / (1000 * 60 * 60 * 24));
     }
 
     public Location getLocation() {
@@ -59,5 +59,20 @@ public class Item {
             return R.drawable.image_unavailable;
         }
         return imageId;
+    }
+
+    public String getLocationString() {
+        return Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
+    }
+
+    public String timeAgo() {
+        String returnValue = "";
+        long diff = System.currentTimeMillis() - calender.getTimeInMillis();
+        diff /= 1000; // seconds ago
+
+        int days = (int)(diff / (60 * 60 * 24));
+        returnValue += days + " days ago";
+
+        return returnValue;
     }
 }

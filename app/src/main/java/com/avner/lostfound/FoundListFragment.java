@@ -1,5 +1,6 @@
 package com.avner.lostfound;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -55,7 +57,35 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_item_details_layout);
 
+        Item item = (Item) parent.getItemAtPosition(position);
+        if (null == item) {
+            Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
+            return;
+        }
+
+        setDialogContents(dialog, item);
+
+        dialog.show();
+    }
+
+    private void setDialogContents(Dialog dialog, Item item) {
+        TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
+        itemLocation.setText(item.getLocationString());
+        itemLocation.setMaxLines(2);
+
+        TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
+        itemTime.setText(item.timeAgo());
+
+        ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
+        itemImage.setImageResource(item.getImage());
+
+        TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
+        itemDescription.setText(item.getDescription());
+
+        dialog.setTitle("Found Item: " + item.getName());
     }
 
 
