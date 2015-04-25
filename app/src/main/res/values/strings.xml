@@ -19,7 +19,6 @@
     <string name="sign_up">Sign Up</string>
     <string name="title_activity_sign_up">SignUpActivity</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_top_rated_fragment">TopRatedFragment</string>
     <string name="app_background_color">#ff009ab6</string>
     <string name="lost_item">Lost Item</string>
@@ -35,5 +34,12 @@
     <string name="near">near: </string>
     <string name="default_city">Rehovot</string>
     <string name="default_description">very nice item</string>
+    <string name="descriptionTitle">Description:</string>
+    <string name="showOnMapContentDescription">Show on map</string>
+    <string name="itemImageContentDescription">Item Image</string>
+    <string name="messageButtonContentDescription" />
+    <string name="lossTimeDefaultHint">[[ Loss time ]]</string>
+    <string name="locationDefaultHint">[[ Location ]]</string>
+    <string name="itemDescriptionDefaultHint">bla bla bla</string>
 
 </resources>

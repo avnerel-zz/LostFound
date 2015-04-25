@@ -19,15 +19,15 @@
         android:id="@+id/tv_item_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/iv_itemListingImage"
+        android:layout_marginLeft="31dp"
+        android:layout_marginStart="31dp"
+        android:layout_toEndOf="@+id/iv_itemListingImage"
+        android:layout_toRightOf="@+id/iv_itemListingImage"
         android:hint="Item name"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:textSize="20sp"
-        android:layout_alignTop="@+id/iv_itemListingImage"
-        android:layout_toRightOf="@+id/iv_itemListingImage"
-        android:layout_toEndOf="@+id/iv_itemListingImage"
-        android:layout_marginLeft="31dp"
-        android:layout_marginStart="31dp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/tv_itemListingAge"
@@ -36,7 +36,6 @@
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/tv_item_name"
         android:layout_toRightOf="@+id/tv_item_name"
-
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:textSize="14sp" />
@@ -53,54 +52,53 @@
         android:src="@android:drawable/ic_menu_edit" />
 
     <TextView
+        android:id="@+id/tv_number_of_days_ago"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="#"
-        android:id="@+id/tv_number_of_days_ago"
-        android:layout_alignTop="@+id/textView"
         android:layout_alignLeft="@+id/tv_item_name"
         android:layout_alignStart="@+id/tv_item_name"
-        android:textColor="@color/abc_search_url_text"/>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/days_ago"
-        android:id="@+id/textView"
-        android:layout_below="@+id/iv_itemListingImage"
-        android:layout_toRightOf="@+id/tv_number_of_days_ago"
-        android:layout_toEndOf="@+id/tv_number_of_days_ago" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/near"
-        android:id="@+id/textView1"
-        android:layout_alignTop="@+id/tv_near_address"
-        android:layout_alignRight="@+id/tv_item_name"
-        android:layout_alignEnd="@+id/tv_item_name"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/default_city"
-        android:id="@+id/tv_near_address"
         android:layout_alignTop="@+id/textView"
+        android:text="#"
+        android:textColor="@color/abc_search_url_text" />
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_itemListingImage"
+        android:layout_toEndOf="@+id/tv_number_of_days_ago"
+        android:layout_toRightOf="@+id/tv_number_of_days_ago"
+        android:text="@string/days_ago" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/tv_item_name"
+        android:layout_alignRight="@+id/tv_item_name"
+        android:layout_alignTop="@+id/tv_near_address"
+        android:text="@string/near" />
+
+    <TextView
+        android:id="@+id/tv_near_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/tv_itemListingAge"
         android:layout_alignStart="@+id/tv_itemListingAge"
-        android:textColor="@color/abc_search_url_text"/>
+        android:layout_alignTop="@+id/textView"
+        android:text="@string/default_city"
+        android:textColor="@color/abc_search_url_text" />
 
     <TextView
+        android:id="@+id/tv_item_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/default_description"
-        android:singleLine="true"
-        android:id="@+id/tv_item_description"
         android:layout_above="@+id/tv_number_of_days_ago"
         android:layout_alignLeft="@+id/tv_number_of_days_ago"
-        android:layout_alignStart="@+id/tv_number_of_days_ago" />
+        android:layout_alignStart="@+id/tv_number_of_days_ago"
+        android:singleLine="true"
+        android:text="@string/default_description" />
 
 
 </RelativeLayout>
