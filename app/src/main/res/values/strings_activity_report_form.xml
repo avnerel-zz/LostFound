@@ -10,4 +10,10 @@
         <!--<item>Uranus</item>-->
         <!--<item>Neptune</item>-->
     </string-array>
+    <string name="send_report">Send Report!</string>
+    <string name="time_of_loss">Time of Loss:</string>
+    <string name="location_colon">Location:</string>
+    <string name="default_time_now">Default: Now</string>
+    <string name="default_location_here">Default: Here</string>
+    <string name="description_colom">Description:</string>
 </resources>
