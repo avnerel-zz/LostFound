@@ -2,6 +2,8 @@
     <string name="app_name">LostFound</string>
     <string name="title_activity_report_form">ReportForm</string>
 
+    <string name="facebook_app_id">824125644291970</string>
+
     <string name="action_settings">Settings</string>
     <string name="profile_name">Israel Israeli</string>
     <string name="title_activity_main">MainActivity</string>
@@ -10,9 +12,34 @@
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
+    <string name="max_password_length">12</string>
+    <string name="user_name_hint">Email</string>
+    <string name="or_login_with">-or Login with-</string>
+    <string name="login_with_email">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="location_colon">Location:</string>
-    <string name="description_colon">Description:</string>
-    <string name="time_of_loss_colon">Time of Loss:</string>
+    <string name="title_activity_top_rated_fragment">TopRatedFragment</string>
+    <string name="app_background_color">#ff009ab6</string>
+    <string name="lost_item">Lost Item</string>
+    <string name="found_item">Found Item</string>
+    <string name="messages">Messages</string>
+    <string name="my_history">My History</string>
+    <string name="delete_user">Delete User</string>
+    <string name="change_password">Change Password</string>
+    <string name="history_length">History Length:</string>
+    <string name="push_notifications">Enable Push Notifications</string>
+    <string name="number_messages">Messages</string>
+    <string name="days_ago"> days ago</string>
+    <string name="near">near: </string>
+    <string name="default_city">Rehovot</string>
+    <string name="default_description">very nice item</string>
+    <string name="descriptionTitle">Description:</string>
+    <string name="showOnMapContentDescription">Show on map</string>
+    <string name="itemImageContentDescription">Item Image</string>
+    <string name="messageButtonContentDescription" />
+    <string name="lossTimeDefaultHint">[[ Loss time ]]</string>
+    <string name="locationDefaultHint">[[ Location ]]</string>
+    <string name="itemDescriptionDefaultHint">bla bla bla</string>
+
 </resources>
