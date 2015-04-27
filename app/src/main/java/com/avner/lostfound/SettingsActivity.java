@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class SettingsActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
@@ -21,16 +22,21 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-
         messageHistory = (Spinner)findViewById(R.id.sp_history_length);
 
         String[] items = new String[]{"30", "50", "100", INFINITY};
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.message_history_spinner_item, items);
 
         messageHistory.setAdapter(adapter);
 
         messageHistory.setOnItemSelectedListener(this);
+
+        TextView userName = (TextView) findViewById(R.id.tv_userName);
+
+        LostFoundApplication app = (LostFoundApplication) getApplication();
+
+        userName.setText(app.getUserName());
 
     }
 

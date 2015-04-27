@@ -23,6 +23,8 @@
             android:id="@+id/et_user_name"
             android:hint="@string/user_name_hint"
             android:textColorHint="@color/primary_dark_material_dark"
+            android:textCursorDrawable="@null"
+
 
             />
 
@@ -33,7 +35,9 @@
             android:hint="Password - up to 12 characters"
             android:id="@+id/et_user_password"
             android:textColorHint="@color/primary_dark_material_dark"
-            android:maxLength="@string/max_password_length" />
+            android:maxLength="@string/max_password_length"
+            android:textCursorDrawable="@null"
+            />
 
         <EditText
             android:layout_width="match_parent"
@@ -42,12 +46,15 @@
             android:hint="Retype Password"
             android:id="@+id/et_user_retype_password"
             android:textColorHint="@color/primary_dark_material_dark"
-            android:maxLength="@string/max_password_length" />
+            android:maxLength="@string/max_password_length"
+            android:textCursorDrawable="@null"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/sign_up"
+            android:id="@+id/b_sign_up"
             android:background="#ff91abff" />
 
 
