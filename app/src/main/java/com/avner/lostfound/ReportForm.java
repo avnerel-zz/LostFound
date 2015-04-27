@@ -1,15 +1,24 @@
 package com.avner.lostfound;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 
-public class ReportForm extends Activity {
+public class ReportForm extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+
+    private Spinner spinner;
+    private EditText et_itemName;
+    private ImageButton b_pick_time_and_date;
+    private ImageButton b_pick_location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,7 +26,13 @@ public class ReportForm extends Activity {
         setContentView(R.layout.activity_report_form);
 
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        b_pick_time_and_date = (ImageButton) findViewById(R.id.b_pick_time_date);
+        b_pick_time_and_date.setOnClickListener(this);
+
+        b_pick_location = (ImageButton) findViewById(R.id.b_pick_location);
+        b_pick_time_and_date.setOnClickListener(this);
+
+        spinner = (Spinner) findViewById(R.id.s_choose_item);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.default_items, android.R.layout.simple_spinner_item);
@@ -25,6 +40,9 @@ public class ReportForm extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
+        et_itemName = (EditText) findViewById(R.id.et_itemName);
     }
 
 
@@ -48,5 +66,36 @@ public class ReportForm extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.b_pick_time_date) {
+
+            Dialog dialog = new Dialog(getApplicationContext());
+            dialog.setContentView(R.layout.time_date_picker);
+            dialog.setTitle("Custom Dialog");
+
+        } else if (v.getId() == R.id.b_pick_location) {
+
+//            Dialog dialog = new Dialog(getApplicationContext());
+//            dialog.setContentView(R.layout.location_picker);
+//            dialog.setTitle("Custom Dialog");
+
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if ("Other..".equals(spinner.getSelectedItem().toString())) {
+            et_itemName.setVisibility(View.VISIBLE);
+        } else {
+            et_itemName.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
