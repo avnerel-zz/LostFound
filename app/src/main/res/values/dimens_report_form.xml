@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="column_margin_span">5dp</dimen>
+    <dimen name="row_margin_span">5dp</dimen>
+</resources>

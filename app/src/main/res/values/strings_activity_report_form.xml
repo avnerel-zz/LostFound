@@ -16,4 +16,9 @@
     <string name="default_time_now">Default: Now</string>
     <string name="default_location_here">Default: Here</string>
     <string name="description_colom">Description:</string>
+    <string name="date">Date:</string>
+    <string name="today">Today</string>
+    <string name="time">Time:</string>
+    <string name="now">Now</string>
+    <string name="pick_location">Pick Location</string>
 </resources>

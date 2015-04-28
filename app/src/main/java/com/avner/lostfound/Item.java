@@ -62,7 +62,8 @@ public class Item {
     }
 
     public String getLocationString() {
-        return Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
+//        return Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
+        return "Rehovot";
     }
 
     public String timeAgo() {

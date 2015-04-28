@@ -1,23 +1,32 @@
 package com.avner.lostfound;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
+
+import java.util.Calendar;
 
 
 public class ReportForm extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private Spinner spinner;
-    private EditText et_itemName;
-    private ImageButton b_pick_time_and_date;
+    private TextView et_itemName;
+    private ImageButton b_pick_date;
+    private TextView tv_date_picker;
+    private ImageButton b_pick_time;
+    private TextView tv_time_picker;
+    private TextView tv_location_picker;
     private ImageButton b_pick_location;
 
     @Override
@@ -26,11 +35,17 @@ public class ReportForm extends Activity implements View.OnClickListener, Adapte
         setContentView(R.layout.activity_report_form);
 
 
-        b_pick_time_and_date = (ImageButton) findViewById(R.id.b_pick_time_date);
-        b_pick_time_and_date.setOnClickListener(this);
+        b_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
+        b_pick_date.setOnClickListener(this);
+        tv_date_picker = (TextView) findViewById(R.id.tv_date_picker);
+
+        b_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
+        b_pick_time.setOnClickListener(this);
+        tv_time_picker = (TextView) findViewById(R.id.tv_time_picker);
 
         b_pick_location = (ImageButton) findViewById(R.id.b_pick_location);
-        b_pick_time_and_date.setOnClickListener(this);
+        b_pick_location.setOnClickListener(this);
+        tv_location_picker = (TextView) findViewById(R.id.tv_location_picker);
 
         spinner = (Spinner) findViewById(R.id.s_choose_item);
 // Create an ArrayAdapter using the string array and a default spinner layout
@@ -42,7 +57,7 @@ public class ReportForm extends Activity implements View.OnClickListener, Adapte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
-        et_itemName = (EditText) findViewById(R.id.et_itemName);
+        et_itemName = (TextView) findViewById(R.id.et_itemName);
     }
 
 
@@ -54,34 +69,49 @@ public class ReportForm extends Activity implements View.OnClickListener, Adapte
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.b_pick_time_date) {
+        if (v.getId() == R.id.b_pick_date) {
 
-            Dialog dialog = new Dialog(getApplicationContext());
-            dialog.setContentView(R.layout.time_date_picker);
-            dialog.setTitle("Custom Dialog");
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR);
+            int mMonth = c.get(Calendar.MONTH);
+            int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog dpd = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year,
+                                              int monthOfYear, int dayOfMonth) {
+                            tv_date_picker.setText(dayOfMonth + "-"
+                                    + (monthOfYear + 1) + "-" + year);
+
+                        }
+                    }, mYear, mMonth, mDay);
+            dpd.show();
+
+        } else if (v.getId() == R.id.b_pick_time) {
+
+            final Calendar c = Calendar.getInstance();
+            int mHour = c.get(Calendar.HOUR_OF_DAY);
+            int mMinute = c.get(Calendar.MINUTE);
+
+            TimePickerDialog tpd = new TimePickerDialog(this,
+                    new TimePickerDialog.OnTimeSetListener() {
+
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay,
+                                              int minute) {
+                            tv_time_picker.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                        }
+                    }, mHour, mMinute, false);
+            tpd.show();
 
         } else if (v.getId() == R.id.b_pick_location) {
-
-//            Dialog dialog = new Dialog(getApplicationContext());
-//            dialog.setContentView(R.layout.location_picker);
-//            dialog.setTitle("Custom Dialog");
-
+            Dialog placePicker = new Dialog(this);
+            placePicker.setContentView(R.layout.location_picker_dialog);
+            placePicker.setTitle("Hi");
+            placePicker.show();
         }
     }
 
