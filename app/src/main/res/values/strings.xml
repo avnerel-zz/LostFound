@@ -45,6 +45,9 @@
     <string name="title_activity_users_list">UsersListActivity</string>
     <string name="message_elipsis">Message...</string>
     <string name="default_user_name">Israel Israeli</string>
+    <string name="default_user_email">Israel Israeli@gmail.com</string>
     <string name="search_title">Search</string>
+    <string name="userEmail">Email:</string>
+    <string name="password_hint">Password</string>
 
 </resources>

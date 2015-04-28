@@ -128,7 +128,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
                     ((LostFoundApplication)getApplication()).setUserName(userName);
                 } else {
                     Toast.makeText(getApplicationContext(),
-                            "There was an error logging in.",
+                           e.getLocalizedMessage(),
                             Toast.LENGTH_SHORT).show();
                 }
             }

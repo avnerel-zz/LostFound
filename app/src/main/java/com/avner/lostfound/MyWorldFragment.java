@@ -62,6 +62,8 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
             startActivity(intent);
 
+            getActivity().finish();
+
         }
     }
 }

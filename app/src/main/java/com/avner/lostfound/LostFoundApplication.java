@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.parse.Parse;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 /**
@@ -26,6 +27,8 @@ public class LostFoundApplication extends Application {
 
         Parse.initialize(this, PARSE_APPLICATION_ID, PARSE_CLIENT_KEY);
 
+        ParseInstallation.getCurrentInstallation().saveInBackground();
+
         ParseUser user = ParseUser.getCurrentUser();
 
         if(user!= null){
@@ -46,4 +49,10 @@ public class LostFoundApplication extends Application {
 
         return userName.split("@")[0];
     }
+
+    public String getUserEmail() {
+
+        return userName;
+    }
+
 }

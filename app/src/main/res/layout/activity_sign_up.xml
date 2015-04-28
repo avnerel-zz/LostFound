@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:hint="Password - up to 12 characters"
+            android:hint="Password - 6-12 characters"
             android:id="@+id/et_user_password"
             android:textColorHint="@color/primary_dark_material_dark"
             android:maxLength="@string/max_password_length"

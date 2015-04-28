@@ -36,7 +36,7 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
 
         LostFoundApplication app = (LostFoundApplication) getApplication();
 
-        userName.setText(app.getUserName());
+        userName.setText(app.getUserEmail());
 
     }
 
