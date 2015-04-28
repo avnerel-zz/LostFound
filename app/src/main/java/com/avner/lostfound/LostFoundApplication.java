@@ -2,6 +2,7 @@ package com.avner.lostfound;
 
 import android.app.Application;
 import android.content.Intent;
+import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseInstallation;
@@ -18,6 +19,8 @@ public class LostFoundApplication extends Application {
 
     private String userName;
 
+    private ParseInstallation installation;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -27,14 +30,20 @@ public class LostFoundApplication extends Application {
 
         Parse.initialize(this, PARSE_APPLICATION_ID, PARSE_CLIENT_KEY);
 
-        ParseInstallation.getCurrentInstallation().saveInBackground();
+        installation = ParseInstallation.getCurrentInstallation();
 
         ParseUser user = ParseUser.getCurrentUser();
 
         if(user!= null){
 
             setUserName(user.getUsername());
+
+            installation.put("user",user.getObjectId());
+
+            Log.d("messaging","put installation user id: " + user.getObjectId());
         }
+
+        installation.saveInBackground();
 
     }
 
@@ -42,6 +51,17 @@ public class LostFoundApplication extends Application {
     public void setUserName(String username){
 
         this.userName = username;
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        if(user!=null){
+
+            installation.put("user",user.getObjectId());
+
+            installation.saveInBackground();
+
+            Log.d("messaging","put installation user id: " + user.getObjectId());
+        }
 
     }
 

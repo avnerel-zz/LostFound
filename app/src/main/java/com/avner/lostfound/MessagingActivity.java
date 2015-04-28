@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.sinch.android.rtc.PushPair;
@@ -109,6 +112,7 @@ public class MessagingActivity extends Activity {
     }
 
     private class MyMessageClientListener implements MessageClientListener {
+
         //Notify the user if their message failed to send
         @Override
         public void onMessageFailed(MessageClient client, Message message,
@@ -126,9 +130,12 @@ public class MessagingActivity extends Activity {
         public void onMessageSent(MessageClient client, Message message, String recipientId) {
 
             final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+
             //only add message to parse database if it doesn't already exist there
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
+
             query.whereEqualTo("sinchId", message.getMessageId());
+
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> messageList, com.parse.ParseException e) {
@@ -146,6 +153,15 @@ public class MessagingActivity extends Activity {
                     }
                 }
             });
+
+            ParseQuery pushQuery = ParseInstallation.getQuery();
+            pushQuery.whereEqualTo("user", recipientId);
+            ParsePush push = new ParsePush();
+            push.setQuery(pushQuery); // Set our Installation query
+            push.setMessage("received a new message from user:" + ((LostFoundApplication)getApplication()).getUserName());
+            push.sendInBackground();
+
+            Log.d("messaging", "sent to user id: " + recipientId);
         }
         //Do you want to notify your user when the message is delivered?
         @Override
