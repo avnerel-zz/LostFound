@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -74,6 +75,18 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
             Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
             return;
         }
+
+        ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
+        ib_showMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView.getContext(), MapsActivity.class);
+                intent.putExtra("Location_LAT", 0); // TODO get current location LAT
+                intent.putExtra("Location_LONG", 0); // TODO get current location LONG
+                startActivity(intent);
+            }
+        });
+
 
         setDialogContents(dialog, item);
 
