@@ -10,6 +10,25 @@
         <!--<item>Uranus</item>-->
         <!--<item>Neptune</item>-->
     </string-array>
+
+    <string-array name="default_time">
+        <item>All times</item>
+        <item>Today</item>
+        <item>Last week</item>
+        <item>Last month</item>
+        <item>Last year</item>
+
+    </string-array>
+
+    <string-array name="default_locations">
+        <item>All distances</item>
+        <item>500m radius</item>
+        <item>1km radius</item>
+        <item>5km radius</item>
+
+    </string-array>
+
+
     <string name="send_report">Send Report!</string>
     <string name="time_of_loss">Time of Loss:</string>
     <string name="location_colon">Location:</string>

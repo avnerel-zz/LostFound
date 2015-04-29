@@ -59,9 +59,9 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         foundItems.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), new Location("stam"),R.drawable.headphones2));
 
-        LostFoundListAdapter myLosesAdapter = new LostFoundListAdapter(lostItems, rootView);
+        OpenItemsAdapter myLosesAdapter = new OpenItemsAdapter(lostItems, rootView);
 
-        LostFoundListAdapter myFindsAdapter = new LostFoundListAdapter(foundItems, rootView);
+        OpenItemsAdapter myFindsAdapter = new OpenItemsAdapter(foundItems, rootView);
 
         lv_myLoses.setAdapter(myLosesAdapter);
 
