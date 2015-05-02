@@ -10,4 +10,5 @@ public class Constants {
     public static final int SIGN_UP_SUCCESSFUL = 2;
     public static final String USER_NAME= "user_name";
     public static final String PASSWORD = "password";
+    public static final int FACEBOOK_LOGIN_REQUEST_ID = 3;
 }

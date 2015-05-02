@@ -3,15 +3,29 @@ package com.avner.lostfound;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.login.widget.LoginButton;
 import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
+
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.List;
+
 
 
 public class LoginActivity extends Activity implements Button.OnClickListener{
@@ -20,11 +34,14 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
 
     private Button emailLoginButton;
 
+    private LoginButton facebookLoginButton;
+
     private EditText userName;
     private EditText password;
     private ProgressDialog progressDialog;
 
-
+    private static final List<String> PERMISSIONS = Arrays.asList(
+            "email");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +66,9 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
 
         emailLoginButton= (Button) findViewById(R.id.b_email_login);
         emailLoginButton.setOnClickListener(this);
+
+        facebookLoginButton = (LoginButton) findViewById(R.id.b_login_facebook);
+        facebookLoginButton.setOnClickListener(this);
 
         userName = (EditText) findViewById(R.id.et_user_name);
         password = (EditText) findViewById(R.id.et_user_password);
@@ -83,8 +103,11 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
 
             String password = data.getStringExtra(Constants.PASSWORD);
 
-            logInToParse(userName,password);
+            logInToParseWithAppLogin(userName, password);
 
+        }else if(requestCode == Constants.FACEBOOK_LOGIN_REQUEST_ID){
+
+            ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -97,20 +120,58 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
             Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
 
             startActivityForResult(intent, Constants.SIGN_UP_REQUEST_ID);
-        }
 
-        if(v.getId() == R.id.b_email_login){
+        } else if(v.getId() == R.id.b_email_login){
 
 
             String username = userName.getText().toString().toLowerCase();
             String pass = password.getText().toString();
 
-            logInToParse(username,pass);
+            logInToParseWithAppLogin(username, pass);
+        } else if(v.getId() == R.id.b_login_facebook){
+
+            ParseFacebookUtils.logInWithReadPermissionsInBackground(this, null, new LogInCallback() {
+                @Override
+                public void done(ParseUser user, ParseException err) {
+                    if (user == null) {
+                        Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
+                    } else if (user.isNew()) {
+                        Log.d("MyApp", "User signed up and logged in through Facebook!");
+
+                        if(ParseUser.getCurrentUser()==null){
+                            Log.d("MyApp", "User logged in through Facebook but no Current Parse user!");
+                        }
+                        logInToParseWithFacebook();
+                    } else {
+                        Log.d("MyApp", "User logged in through Facebook!");
+                        logInToParseWithFacebook();
+                    }
+                }
+            });
         }
 
     }
 
-    private void logInToParse(final String userName, String password) {
+    private void logInToParseWithFacebook() {
+        getUserDetails();
+        finishLogin();
+    }
+
+    private void getUserDetails() {
+
+        String name = Profile.getCurrentProfile().getName();
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        user.put("name", name);
+
+        //TODO get email.
+
+        user.saveInBackground();
+
+    }
+
+    private void logInToParseWithAppLogin(final String userName, String password) {
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Loading");
@@ -125,6 +186,9 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
                 if (user != null) {
 
                     finishLogin();
+                    user.setEmail(userName);
+                    user.put("name", userName.split("@")[0]);
+                    user.saveInBackground();
                     ((LostFoundApplication)getApplication()).setUserName(userName);
                 } else {
                     Toast.makeText(getApplicationContext(),

@@ -71,7 +71,6 @@ public class OpenItemsAdapter extends BaseAdapter {
         viewHolder.itemName.setText(item.getName());
 
         viewHolder.timeAdded.setText("" + item.getDiff() + " days ago");
-//            viewHolder.locationAdded.setText(item.getLocation().describeContents());
         viewHolder.itemImage.setImageResource(item.getImage());
 
         return view;

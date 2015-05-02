@@ -33,6 +33,4 @@ dependencies {
     compile 'com.github.shell-software:fab:1.0.1'
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
-    compile files('C:/Users/avner/Dropbox/technion/AndroidWS/LostFound/LostFound/libs/sinch-android-rtc-3.6.0.jar')
-    compile files('C:/Users/avner/Dropbox/technion/AndroidWS/LostFound/LostFound/libs/Parse-1.9.1.jar')
 }

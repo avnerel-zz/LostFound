@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#ff009ab6"
     android:orientation="vertical"
-    tools:context="com.example.etayhn.elad">
+    tools:context=".ReportForm">
 
     <ScrollView
         android:layout_width="match_parent"

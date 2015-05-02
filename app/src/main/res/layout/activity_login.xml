@@ -75,6 +75,16 @@
                 android:id="@+id/b_login_facebook"
                 android:minHeight="40dp"
                 android:layout_marginTop="6dp"/>
+            <!--<ImageButton-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:id="@+id/b_login_facebook"-->
+                <!--android:src="@drawable/facebook_login"-->
+                <!--android:scaleType="fitStart"-->
+                <!--android:scaleX="1"-->
+
+            <!--/>-->
 
 
 

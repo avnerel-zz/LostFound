@@ -2,11 +2,18 @@ package com.avner.lostfound;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.util.Base64;
 import android.util.Log;
 
 import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by avner on 25/04/2015.
@@ -29,6 +36,8 @@ public class LostFoundApplication extends Application {
         Parse.enableLocalDatastore(this);
 
         Parse.initialize(this, PARSE_APPLICATION_ID, PARSE_CLIENT_KEY);
+
+        ParseFacebookUtils.initialize(this, Constants.FACEBOOK_LOGIN_REQUEST_ID);
 
         installation = ParseInstallation.getCurrentInstallation();
 
@@ -67,12 +76,12 @@ public class LostFoundApplication extends Application {
 
     public String getUserName() {
 
-        return userName.split("@")[0];
+        return (String)ParseUser.getCurrentUser().get("name");
     }
 
     public String getUserEmail() {
 
-        return userName;
+        return (String)ParseUser.getCurrentUser().getEmail();
     }
 
 }

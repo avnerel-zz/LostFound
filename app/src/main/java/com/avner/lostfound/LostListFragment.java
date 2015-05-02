@@ -143,7 +143,7 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
     public void onClick(View v) {
         if(v.getId() == R.id.b_add_item){
 
-            Intent intent = new Intent(rootView.getContext(),ReportForm.class);
+            Intent intent = new Intent(rootView.getContext(),ReportFormActivity.class);
 
             startActivity(intent);
         }

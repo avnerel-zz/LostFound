@@ -1,6 +1,10 @@
 package com.avner.lostfound;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,6 +16,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.facebook.Profile;
+import com.parse.ParseUser;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +32,8 @@ public class StatsFragment extends Fragment {
     private ListView lv_topLosers;
 
     private ListView lv_topFinders;
+
+    private ImageView userPicture;
 
     private View rootView;
 
@@ -30,8 +44,14 @@ public class StatsFragment extends Fragment {
 
 		rootView = inflater.inflate(R.layout.fragment_stats, container, false);
 
-        setUserName();
+        setUserDetails();
 
+        updateLists();
+
+        return rootView;
+	}
+
+    private void updateLists() {
         lv_topLosers = (ListView) rootView.findViewById(R.id.lv_topLosers);
 
         lv_topFinders = (ListView) rootView.findViewById(R.id.lv_topFinders);
@@ -53,20 +73,59 @@ public class StatsFragment extends Fragment {
         lv_topLosers.setAdapter(topLosersAdapter);
 
         lv_topFinders.setAdapter(topFindersAdapter);
+    }
 
-        return rootView;
-	}
+    private void setUserDetails() {
 
-    private void setUserName() {
         TextView userName = (TextView) rootView.findViewById(R.id.tv_userName);
 
         LostFoundApplication app = (LostFoundApplication) getActivity().getApplication();
 
         userName.setText(app.getUserName());
+
+        userPicture = (ImageView) rootView.findViewById(R.id.iv_profileImage);
+
+        final Uri imageUri = Profile.getCurrentProfile().getProfilePictureUri(150, 150);
+
+        if(imageUri!= null){
+
+            AsyncTask task = new AsyncTask() {
+                @Override
+                protected Object doInBackground(Object[] params) {
+
+                    return getFacebookProfilePicture(imageUri.toString());
+                }
+
+                @Override
+                protected void onPostExecute(Object o) {
+                    super.onPostExecute(o);
+                    userPicture.setImageBitmap((Bitmap) o);
+                }
+            };
+            task.execute();
+//            userPicture.setImageURI(imageUri);
+        }
     }
 
+    public static Bitmap getFacebookProfilePicture(String imageUri) {
 
-    public class TopUsersAdapter extends BaseAdapter {
+        URL imageURL = null;
+
+        Bitmap bitmap = null;
+        try {
+//            imageURL = new URL("https://graph.facebook.com/" + userID + "/picture?type=large");
+            imageURL = new URL(imageUri);
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+        public class TopUsersAdapter extends BaseAdapter {
 
         private List<User> users;
 
