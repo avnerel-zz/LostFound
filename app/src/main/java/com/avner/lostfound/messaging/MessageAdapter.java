@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.messaging;
 
 import android.app.Activity;
 import android.util.Pair;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.avner.lostfound.R;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
 import java.util.ArrayList;

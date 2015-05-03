@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.messaging;
 
 import android.app.Service;
 import android.content.Intent;
@@ -26,7 +26,7 @@ public class MessageService extends Service implements SinchClientListener {
     private MessageClient messageClient = null;
     private String currentUserId;
 
-    private Intent broadcastIntent = new Intent("com.avner.lostfound.UsersListActivity");
+    private Intent broadcastIntent = new Intent("com.avner.lostfound.messaging.UsersListActivity");
     private LocalBroadcastManager broadcaster;
 
 

@@ -1,8 +1,13 @@
-package com.avner.lostfound;
+package com.avner.lostfound.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.avner.lostfound.FoundListFragment;
+import com.avner.lostfound.LostListFragment;
+import com.avner.lostfound.MyWorldFragment;
+import com.avner.lostfound.StatsFragment;
 
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 

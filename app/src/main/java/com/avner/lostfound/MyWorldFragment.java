@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.avner.lostfound.adapters.OpenItemsAdapter;
+import com.avner.lostfound.messaging.UsersListActivity;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;

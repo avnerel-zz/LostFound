@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.software.shell.fab.FloatingActionButton;
 
 import java.util.ArrayList;

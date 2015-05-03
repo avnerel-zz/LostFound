@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.avner.lostfound.Item;
+import com.avner.lostfound.R;
 
 import java.util.List;
 

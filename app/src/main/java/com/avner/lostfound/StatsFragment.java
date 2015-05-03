@@ -85,7 +85,9 @@ public class StatsFragment extends Fragment {
 
         userPicture = (ImageView) rootView.findViewById(R.id.iv_profileImage);
 
-        final Uri imageUri = Profile.getCurrentProfile().getProfilePictureUri(150, 150);
+        Profile currentProfile = Profile.getCurrentProfile();
+
+        final Uri imageUri = currentProfile != null ? currentProfile.getProfilePictureUri(150, 150): null;
 
         if(imageUri!= null){
 
@@ -103,7 +105,6 @@ public class StatsFragment extends Fragment {
                 }
             };
             task.execute();
-//            userPicture.setImageURI(imageUri);
         }
     }
 

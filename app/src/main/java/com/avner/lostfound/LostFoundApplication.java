@@ -32,13 +32,14 @@ public class LostFoundApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // Enable Local Datastore.
+        // Enable Local Data store to save things locally.
         Parse.enableLocalDatastore(this);
 
         Parse.initialize(this, PARSE_APPLICATION_ID, PARSE_CLIENT_KEY);
 
         ParseFacebookUtils.initialize(this, Constants.FACEBOOK_LOGIN_REQUEST_ID);
 
+       // installation used for sending push notifications.
         installation = ParseInstallation.getCurrentInstallation();
 
         ParseUser user = ParseUser.getCurrentUser();
@@ -56,7 +57,7 @@ public class LostFoundApplication extends Application {
 
     }
 
-    //TODO need to get userNAme and password from local DB, if present.
+    //TODO need to get userName and password from local DB, if present.
     public void setUserName(String username){
 
         this.userName = username;

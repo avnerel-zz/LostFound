@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.messaging;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.avner.lostfound.LostFoundApplication;
+import com.avner.lostfound.R;
 import com.parse.FindCallback;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
