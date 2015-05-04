@@ -96,6 +96,7 @@ public class MessagingActivity extends Activity {
     //unbind the service when the activity is destroyed
     @Override
     public void onDestroy() {
+        serviceConnection.onServiceDisconnected(null);
         unbindService(serviceConnection);
         super.onDestroy();
     }
@@ -119,7 +120,7 @@ public class MessagingActivity extends Activity {
         @Override
         public void onMessageFailed(MessageClient client, Message message,
                                     MessageFailureInfo failureInfo) {
-            Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_LONG).show();
+            Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_SHORT).show();
         }
         @Override
         public void onIncomingMessage(MessageClient client, Message message) {

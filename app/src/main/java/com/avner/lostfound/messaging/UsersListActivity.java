@@ -83,21 +83,21 @@ public class UsersListActivity extends Activity implements FindCallback<ParseUse
 
         //broadcast receiver to listen for the broadcast
         //from MessageService
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d("LostFound", "received success/failure on connecting to user");
-                Boolean success = intent.getBooleanExtra("success", false);
-//                progressDialog.dismiss();
-
-                //show a toast message if the Sinch
-                //service failed to start
-                if (!success) {
-                    Toast.makeText(getApplicationContext(), "Messaging service failed to start", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.avner.lostfound.messaging.UsersListActivity"));
+//        BroadcastReceiver receiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                Log.d("LostFound", "received success/failure on connecting to user");
+//                Boolean success = intent.getBooleanExtra("success", false);
+////                progressDialog.dismiss();
+//
+//                //show a toast message if the Sinch
+//                //service failed to start
+//                if (!success) {
+//                    Toast.makeText(getApplicationContext(), "Messaging service failed to start", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        };
+//        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.avner.lostfound.messaging.UsersListActivity"));
     }
 
     private void initUserList() {

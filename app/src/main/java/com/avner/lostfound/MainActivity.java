@@ -36,7 +36,7 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initilization
+        // Initialization
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
@@ -58,27 +58,13 @@ public class MainActivity extends FragmentActivity implements
 
             ImageView imageView = (ImageView) tab.getCustomView().findViewById(R.id.iv_tabIcon);
             imageView.setImageResource(tabsIcons[i]);
-//            imageView.setPadding(0, 0, 0, 0);
-//            imageView.setMaxWidth(20);
 
             TextView textView = (TextView) tab.getCustomView().findViewById(R.id.tv_tabText);
             textView.setText(tabsStrings[i]);
-//            textView.setPadding(0, 0, 0, 0);
-//            textView.setMaxWidth(20);
-
-//            tab.getCustomView().setPadding(0, 0, 0, 0);
-
 
             actionBar.addTab(tab);
 
-//            actionBar.addTab(actionBar.newTab()
-//                    .setCustomView(R.layout.action_bar_tab_layout)
-//                    .setText(tabsStrings[i])
-//                    .setIcon(tabsIcons[i])
-//                    .setTabListener(this));
         }
-
-        setTabsWidth();
 
         /**
          * on swiping the viewpager make respective tab selected
@@ -122,16 +108,6 @@ public class MainActivity extends FragmentActivity implements
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setTabsWidth() {
-//        final Tab tab = actionBar.getTabAt(0);
-//        final View text1 = tab.
-//        final View tabView = tab.getCustomView();
-//        tabView.setPadding(0, 0, 0, 0);
-//        final View tabContainerView = (View) tabView.getParent();
-//        tabContainerView.setPadding(0, 0, 0, 0);
-
     }
 
 
