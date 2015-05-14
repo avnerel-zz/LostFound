@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.avner.lostfound.LostFoundApplication;
+import com.avner.lostfound.R;
 
 public class SettingsActivity extends Activity implements AdapterView.OnItemSelectedListener{
 

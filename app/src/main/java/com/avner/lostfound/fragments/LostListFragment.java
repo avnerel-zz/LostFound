@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -17,6 +17,10 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.avner.lostfound.activities.MapsActivity;
+import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.R;
+import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.software.shell.fab.FloatingActionButton;
 
@@ -70,21 +74,15 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
         List<Item> items = new ArrayList<>();
 
         items.add(new Item("Ring", "very nice ring", new GregorianCalendar(), new Location("stam"), R.drawable.ring1));
-
         items.add(new Item("Necklace", "very nice necklace", new GregorianCalendar(), new Location("stam"),R.drawable.necklace1));
-
         items.add(new Item("Car keys", "my beautiful car keys", new GregorianCalendar(), new Location("stam"),R.drawable.car_keys1));
-
         items.add(new Item("Earrings", "very nice earrings", new GregorianCalendar(), new Location("stam"),R.drawable.earings1));
-
         items.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), new Location("stam"),R.drawable.headphones2));
 
         LostFoundListAdapter adapter = new LostFoundListAdapter(items,rootView);
 
         lv_itemList.setClickable(true);
-
         lv_itemList.setAdapter(adapter);
-
         lv_itemList.setOnItemClickListener(this);
     }
 
@@ -103,15 +101,15 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(rootView.getContext(), MapsActivity.class);
-//                intent.putExtra("Location_LAT", 0); // TODO get current location LAT
-//                intent.putExtra("Location_LONG", 0); // TODO get current location LONG
-//                startActivity(intent);
+                Intent intent = new Intent(rootView.getContext(), MapsActivity.class);
+                intent.putExtra("Location_LAT", 0); // TODO get current location LAT
+                intent.putExtra("Location_LONG", 0); // TODO get current location LONG
+                startActivity(intent);
 
-                Dialog placePicker = new Dialog(getActivity());
-                placePicker.setContentView(R.layout.location_picker_dialog);
-                placePicker.setTitle("Hi");
-                placePicker.show();
+//                Dialog placePicker = new Dialog(getActivity());
+//                placePicker.setContentView(R.layout.location_picker_dialog);
+//                placePicker.setTitle("Hi");
+//                placePicker.show();
 
             }
         });

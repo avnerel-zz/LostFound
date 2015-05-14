@@ -1,7 +1,9 @@
-package com.avner.lostfound;
+package com.avner.lostfound.structs;
 
 import android.location.Location;
 import android.media.Image;
+
+import com.avner.lostfound.R;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.activities;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
 
 public class MainActivity extends FragmentActivity implements

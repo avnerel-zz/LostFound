@@ -1,19 +1,12 @@
 package com.avner.lostfound;
 
 import android.app.Application;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.util.Base64;
 import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by avner on 25/04/2015.
@@ -26,7 +19,11 @@ public class LostFoundApplication extends Application {
 
     private String userName;
 
+    /**
+     * used to get push notifications
+     */
     private ParseInstallation installation;
+    private boolean isMessagingActive;
 
     @Override
     public void onCreate() {
@@ -75,9 +72,9 @@ public class LostFoundApplication extends Application {
 
     }
 
-    public String getUserName() {
+    public String getUserDisplayName() {
 
-        return (String)ParseUser.getCurrentUser().get("name");
+        return (String)ParseUser.getCurrentUser().get(Constants.USER_DISPLAY_NAME);
     }
 
     public String getUserEmail() {
@@ -85,4 +82,13 @@ public class LostFoundApplication extends Application {
         return (String)ParseUser.getCurrentUser().getEmail();
     }
 
+    public void updateMessagingStatus(boolean isActive) {
+
+        isMessagingActive = isActive;
+
+    }
+
+    public boolean isMessagingActivityActive() {
+        return isMessagingActive;
+    }
 }

@@ -9,7 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.avner.lostfound.Item;
+import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.R;
 
 import java.util.List;

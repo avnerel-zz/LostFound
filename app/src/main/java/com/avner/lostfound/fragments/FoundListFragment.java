@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -17,6 +17,9 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.R;
+import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.software.shell.fab.FloatingActionButton;
 

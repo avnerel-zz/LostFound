@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.structs;
 
 /**
  * Created by avner on 28/04/2015.

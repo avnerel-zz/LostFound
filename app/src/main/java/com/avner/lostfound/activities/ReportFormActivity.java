@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.activities;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.avner.lostfound.R;
 
 import java.util.Calendar;
 

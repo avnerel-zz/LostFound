@@ -1,15 +1,20 @@
-package com.avner.lostfound;
+package com.avner.lostfound.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.avner.lostfound.Constants;
+import com.avner.lostfound.LostFoundApplication;
+import com.avner.lostfound.R;
 import com.avner.lostfound.messaging.MessageService;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
@@ -24,7 +29,7 @@ import java.util.List;
 
 
 
-public class LoginActivity extends Activity implements Button.OnClickListener{
+public class LoginActivity extends Activity implements Button.OnClickListener, TextWatcher {
 
     private Button signUpButton;
 
@@ -67,7 +72,9 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
         facebookLoginButton.setOnClickListener(this);
 
         userName = (EditText) findViewById(R.id.et_user_name);
+        userName.addTextChangedListener(this);
         password = (EditText) findViewById(R.id.et_user_password);
+        password.addTextChangedListener(this);
 
 
     }
@@ -159,7 +166,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
 
         ParseUser user = ParseUser.getCurrentUser();
 
-        user.put("name", name);
+        user.put(Constants.USER_DISPLAY_NAME, name);
 
         //TODO get email.
 
@@ -183,7 +190,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
 
                     finishLogin();
                     user.setEmail(userName);
-                    user.put("name", userName.split("@")[0]);
+                    user.put(Constants.USER_DISPLAY_NAME, userName.split("@")[0]);
                     user.saveInBackground();
                     ((LostFoundApplication)getApplication()).setUserName(userName);
                 } else {
@@ -193,5 +200,26 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
                 }
             }
         });
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        if(password.getText().toString().isEmpty() || userName.getText().toString().isEmpty() ){
+            emailLoginButton.setEnabled(false);
+        }else{
+            emailLoginButton.setEnabled(true);
+        }
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

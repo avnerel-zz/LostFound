@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.fragments;
 
 import android.content.Intent;
 import android.location.Location;
@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.activities.LoginActivity;
+import com.avner.lostfound.R;
+import com.avner.lostfound.activities.SettingsActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.avner.lostfound.messaging.UsersListActivity;
 import com.parse.ParseUser;

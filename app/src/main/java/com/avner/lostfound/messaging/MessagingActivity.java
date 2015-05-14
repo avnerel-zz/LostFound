@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -32,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MessagingActivity extends Activity {
+public class MessagingActivity extends Activity implements TextWatcher {
     private String recipientId;
     private EditText messageBodyField;
     private String messageBody;
@@ -42,32 +46,34 @@ public class MessagingActivity extends Activity {
     private MyMessageClientListener messageClientListener;
     private ListView messagesList;
     private MessageAdapter messageAdapter;
+    private ImageButton sendButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(true);
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_messaging);
+
         bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
+
         //get recipientId from the intent
         Intent intent = getIntent();
         recipientId = intent.getStringExtra("RECIPIENT_ID");
+
         currentUserId = ParseUser.getCurrentUser().getObjectId();
+
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
-        //listen for a click on the send button
-        findViewById(R.id.sendButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        messageBodyField.addTextChangedListener(this);
 
-                messageBody = messageBodyField.getText().toString();
-                if (messageBody.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                messageService.sendMessage(recipientId, messageBody);
-                messageBodyField.setText("");
-            }
-        });
+        initSendButton();
 
+        initMessageList();
+    }
+
+    private void initMessageList() {
         messagesList = (ListView) findViewById(R.id.lv_messages_list);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
@@ -93,13 +99,51 @@ public class MessagingActivity extends Activity {
             }
         });
     }
+
+    private void initSendButton() {
+
+        sendButton = (ImageButton) findViewById(R.id.sendButton);
+        //listen for a click on the send button
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                messageBody = messageBodyField.getText().toString();
+                messageService.sendMessage(recipientId, messageBody);
+
+                //reset message
+                messageBodyField.setText("");
+            }
+        });
+    }
+
     //unbind the service when the activity is destroyed
     @Override
-    public void onDestroy() {
+    public void onPause() {
         serviceConnection.onServiceDisconnected(null);
         unbindService(serviceConnection);
-        super.onDestroy();
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(false);
+        super.onPause();
     }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        if(s.toString().isEmpty()){
+
+            sendButton.setVisibility(ImageButton.INVISIBLE);
+        }else{
+            sendButton.setVisibility(ImageButton.VISIBLE);
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {}
+
+
     private class MyServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -157,15 +201,22 @@ public class MessagingActivity extends Activity {
                 }
             });
 
+            sendPushNotification(recipientId);
+        }
+
+        private void sendPushNotification(String recipientId) {
+
             ParseQuery pushQuery = ParseInstallation.getQuery();
             pushQuery.whereEqualTo("user", recipientId);
             ParsePush push = new ParsePush();
             push.setQuery(pushQuery); // Set our Installation query
-            push.setMessage("received a new message from user:" + ((LostFoundApplication)getApplication()).getUserName());
+//            push.setD
+            push.setMessage("received a new message from user:" + ((LostFoundApplication) getApplication()).getUserDisplayName());
             push.sendInBackground();
 
             Log.d("messaging", "sent to user id: " + recipientId);
         }
+
         //Do you want to notify your user when the message is delivered?
         @Override
         public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {}

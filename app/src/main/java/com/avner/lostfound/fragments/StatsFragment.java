@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.fragments;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,14 +16,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.avner.lostfound.LostFoundApplication;
+import com.avner.lostfound.R;
+import com.avner.lostfound.structs.User;
 import com.facebook.Profile;
-import com.parse.ParseUser;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +81,7 @@ public class StatsFragment extends Fragment {
 
         LostFoundApplication app = (LostFoundApplication) getActivity().getApplication();
 
-        userName.setText(app.getUserName());
+        userName.setText(app.getUserDisplayName());
 
         userPicture = (ImageView) rootView.findViewById(R.id.iv_profileImage);
 

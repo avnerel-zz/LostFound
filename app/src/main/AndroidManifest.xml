@@ -57,7 +57,7 @@
 
         <!-- ACTIVITIES -->
         <activity
-        android:name=".LoginActivity"
+        android:name=".activities.LoginActivity"
         android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,11 +66,11 @@
             </intent-filter>
         </activity>
         <activity
-        android:name=".MapsActivity"
+        android:name=".activities.MapsActivity"
         android:label="@string/title_activity_maps" >
         </activity>
         <activity
-        android:name=".ReportFormActivity"
+        android:name=".activities.ReportFormActivity"
         android:label="@string/title_activity_report_form" >
         </activity>
         <activity
@@ -79,15 +79,15 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
-        android:name=".SignUpActivity"
+        android:name=".activities.SignUpActivity"
         android:label="@string/app_name" >
         </activity>
         <activity
-        android:name=".MainActivity"
+        android:name=".activities.MainActivity"
         android:label="@string/app_name" >
         </activity>
         <activity
-        android:name=".SettingsActivity"
+        android:name=".activities.SettingsActivity"
         android:label="@string/app_name" >
         </activity>
         <activity
@@ -116,7 +116,7 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.ParsePushBroadcastReceiver"
+        <receiver android:name="com.avner.lostfound.PushNotificationReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />

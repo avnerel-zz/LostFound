@@ -44,13 +44,14 @@
             android:layout_alignBottom="@+id/sendButton"
             android:layout_toLeftOf="@+id/sendButton"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/sendButton"
-            android:layout_width="72dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_margin="4dp"
-            android:background="@drawable/button_send" />
+            android:visibility="invisible"
+            android:background="@android:drawable/ic_menu_send" />
     </RelativeLayout>
 
 
