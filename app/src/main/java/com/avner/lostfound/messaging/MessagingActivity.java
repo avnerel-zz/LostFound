@@ -51,8 +51,6 @@ public class MessagingActivity extends Activity implements TextWatcher {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        ((LostFoundApplication)getApplication()).updateMessagingStatus(true);
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_messaging);
@@ -117,13 +115,24 @@ public class MessagingActivity extends Activity implements TextWatcher {
         });
     }
 
-    //unbind the service when the activity is destroyed
     @Override
-    public void onPause() {
-        serviceConnection.onServiceDisconnected(null);
-        unbindService(serviceConnection);
+    protected void onResume() {
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(true);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
         ((LostFoundApplication)getApplication()).updateMessagingStatus(false);
         super.onPause();
+    }
+
+    //unbind the service when the activity is destroyed
+    @Override
+    public void onDestroy() {
+        serviceConnection.onServiceDisconnected(null);
+        unbindService(serviceConnection);
+        super.onDestroy();
     }
 
     @Override

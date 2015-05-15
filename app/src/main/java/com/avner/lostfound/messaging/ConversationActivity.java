@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class UsersListActivity extends Activity implements FindCallback<ParseUser> {
+public class ConversationActivity extends Activity implements FindCallback<ParseUser> {
 
     private String currentUserId;
     private List<String> userDisplayNames;
@@ -97,7 +97,7 @@ public class UsersListActivity extends Activity implements FindCallback<ParseUse
 //                }
 //            }
 //        };
-//        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.avner.lostfound.messaging.UsersListActivity"));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.avner.lostfound.messaging.ConversationActivity"));
     }
 
     private void initUserList() {
@@ -164,12 +164,12 @@ public class UsersListActivity extends Activity implements FindCallback<ParseUse
         user.put("userDisplayNames", userDisplayNames);
         user.put("userIds", userIds);
         user.saveInBackground();
-        user.unpinInBackground(new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                user.pinInBackground();
-            }
-        });
+//        user.unpinInBackground(new DeleteCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                user.pinInBackground();
+//            }
+//        });
     }
 
     public void openConversation(int pos) {

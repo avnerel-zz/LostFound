@@ -3,20 +3,17 @@
     package="com.avner.lostfound" >
 
     <!-- to access location of user: -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- To access Google+ APIs: -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!--
-   For Google Maps API
-   -->
+<!--    For Google Maps API -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
 
     <!--
  To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
@@ -26,14 +23,15 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:protectionLevel="signature"
-        android:name="com.avner.lostfound.permission.C2D_MESSAGE" />
+    <permission
+        android:name="com.avner.lostfound.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.avner.lostfound.permission.C2D_MESSAGE" />
 
     <application
@@ -42,7 +40,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
 
         <!-- META-DATA -->
         <meta-data
@@ -57,8 +54,8 @@
 
         <!-- ACTIVITIES -->
         <activity
-        android:name=".activities.LoginActivity"
-        android:label="@string/app_name" >
+            android:name=".activities.LoginActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -66,66 +63,65 @@
             </intent-filter>
         </activity>
         <activity
-        android:name=".activities.MapsActivity"
-        android:label="@string/title_activity_maps" >
+            android:name=".activities.ViewLocationActivity"
+            android:label="@string/title_activity_maps" >
         </activity>
         <activity
-        android:name=".activities.ReportFormActivity"
-        android:label="@string/title_activity_report_form" >
+            android:name=".activities.ReportFormActivity"
+            android:label="@string/title_activity_report_form" >
         </activity>
         <activity
-        android:name="com.facebook.FacebookActivity"
-        android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-        android:label="@string/app_name"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
-        android:name=".activities.SignUpActivity"
-        android:label="@string/app_name" >
+            android:name=".activities.SignUpActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
-        android:name=".activities.MainActivity"
-        android:label="@string/app_name" >
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
-        android:name=".activities.SettingsActivity"
-        android:label="@string/app_name" >
+            android:name=".activities.SettingsActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
-        android:name=".messaging.MessagingActivity"
-        android:label="@string/app_name" >
+            android:name=".messaging.MessagingActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
-        android:name=".messaging.UsersListActivity"
-        android:label="@string/app_name" >
+            android:name=".messaging.ConversationActivity"
+            android:label="@string/app_name" >
         </activity>
-
 
         <!-- SERVICES -->
         <service
-        android:name=".messaging.MessageService"
-        android:enabled="true"
-        android:exported="true" >
+            android:name=".messaging.MessageService"
+            android:enabled="true"
+            android:exported="true" >
         </service>
         <service android:name="com.parse.PushService" />
 
-
-
-        <receiver android:name="com.parse.ParseBroadcastReceiver">
+        <receiver android:name="com.parse.ParseBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.avner.lostfound.PushNotificationReceiver"
-            android:exported="false">
+        <receiver
+            android:name=".PushNotificationReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
                 <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -133,6 +129,11 @@
                 <category android:name="com.avner.lostfound" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".activities.PickLocationActivity"
+            android:label="@string/title_activity_pick_location" >
+        </activity>
     </application>
 
 </manifest>

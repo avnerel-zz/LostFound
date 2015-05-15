@@ -12,4 +12,8 @@ public class Constants {
     public static final String PASSWORD = "password";
     public static final int FACEBOOK_LOGIN_REQUEST_ID = 3;
     public static final String USER_DISPLAY_NAME = "name";
+    public static final java.lang.String LONGITUDE = "longitude";
+    public static final java.lang.String LATITUDE = "latitude";
+    public static final int PICK_LOCATION_REQUEST_CODE = 4;
+    public static final int PICK_LOCATION_SUCCESSFUL = 2;
 }

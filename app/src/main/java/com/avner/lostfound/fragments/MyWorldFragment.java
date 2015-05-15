@@ -15,7 +15,7 @@ import com.avner.lostfound.activities.LoginActivity;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.SettingsActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
-import com.avner.lostfound.messaging.UsersListActivity;
+import com.avner.lostfound.messaging.ConversationActivity;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         }else if(v.getId() == R.id.b_messages){
 
-            Intent intent = new Intent(rootView.getContext(),UsersListActivity.class);
+            Intent intent = new Intent(rootView.getContext(),ConversationActivity.class);
 
             startActivity(intent);
         }

@@ -50,7 +50,7 @@ public class OpenItemsAdapter extends BaseAdapter {
         View view;
         ViewHolder viewHolder;
 
-        Log.d("MY_TAG", "Position: " + position);
+//        Log.d("MY_TAG", "Position: " + position);
 
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

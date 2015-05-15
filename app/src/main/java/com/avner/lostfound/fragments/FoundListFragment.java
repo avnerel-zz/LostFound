@@ -17,6 +17,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.avner.lostfound.Constants;
+import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ReportFormActivity;
@@ -72,17 +74,18 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void initItemsList() {
+
         List<Item> items = new ArrayList<>();
 
-        items.add(new Item("Ring", "very nice ring", new GregorianCalendar(), new Location("stam"), R.drawable.ring1));
+        Location location = new Location("");
+        location.setLatitude(32.7734607);
+        location.setLongitude(35.0320228);
 
-        items.add(new Item("Necklace", "very nice necklace", new GregorianCalendar(), new Location("stam"),R.drawable.necklace1));
-
-        items.add(new Item("Car keys", "my beautiful car keys", new GregorianCalendar(), new Location("stam"),R.drawable.car_keys1));
-
-        items.add(new Item("Earrings", "very nice earrings", new GregorianCalendar(), new Location("stam"),R.drawable.earings1));
-
-        items.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), new Location("stam"),R.drawable.headphones2));
+        items.add(new Item("Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1));
+        items.add(new Item("Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1));
+        items.add(new Item("Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1));
+        items.add(new Item("Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1));
+        items.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2));
 
 
         //ListAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values);
@@ -96,7 +99,7 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_item_details_layout);
 
@@ -110,15 +113,17 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(rootView.getContext(), MapsActivity.class);
-//                intent.putExtra("Location_LAT", 0); // TODO get current location LAT
-//                intent.putExtra("Location_LONG", 0); // TODO get current location LONG
-//                startActivity(intent);
-
-                Dialog placePicker = new Dialog(getActivity());
-                placePicker.setContentView(R.layout.location_picker_dialog);
-                placePicker.setTitle("Hi");
-                placePicker.show();
+                Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
+                Item item = (Item) parent.getItemAtPosition(position);
+                if (null == item) {
+                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
+                    return;
+                }
+                double latitude = item.getLocation().getLatitude();
+                double longitude = item.getLocation().getLongitude();
+                intent.putExtra(Constants.LATITUDE, latitude);
+                intent.putExtra(Constants.LONGITUDE, longitude);
+                startActivity(intent);
 
             }
         });

@@ -57,5 +57,8 @@
     <string name="search_title">Search</string>
     <string name="userEmail">Email:</string>
     <string name="password_hint">Password</string>
+    <string name="title_activity_pick_location">PickLocationActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -18,16 +18,18 @@ import com.sinch.android.rtc.messaging.MessageClientListener;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
 public class MessageService extends Service implements SinchClientListener {
+
     private static final String APP_KEY = "e65991aa-36e3-4f14-b26d-8bcdceefebca";
     private static final String APP_SECRET = "zbRQl1p4306UTFbNpW4CKQ==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
+
     private final MessageServiceInterface serviceInterface = new MessageServiceInterface();
     private SinchClient sinchClient = null;
     private MessageClient messageClient = null;
     private String currentUserId;
 
-    private Intent broadcastIntent = new Intent("com.avner.lostfound.messaging.UsersListActivity");
-    private LocalBroadcastManager broadcaster;
+//    private Intent broadcastIntent = new Intent("com.avner.lostfound.messaging.ConversationActivity");
+//    private LocalBroadcastManager broadcaster;
 
 
     @Override
@@ -40,9 +42,10 @@ public class MessageService extends Service implements SinchClientListener {
         if (currentUserId != null && !isSinchClientStarted()) {
             startSinchClient(currentUserId);
         }
-        broadcaster = LocalBroadcastManager.getInstance(this);
+//        broadcaster = LocalBroadcastManager.getInstance(this);
         return super.onStartCommand(intent, flags, startId);
     }
+
     public void startSinchClient(String username) {
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(this)
@@ -61,28 +64,30 @@ public class MessageService extends Service implements SinchClientListener {
         sinchClient.checkManifest();
         sinchClient.start();
     }
+
     private boolean isSinchClientStarted() {
         return sinchClient != null && sinchClient.isStarted();
     }
+
     //The next 5 methods are for the sinch client listener
     @Override
     public void onClientFailed(SinchClient client, SinchError error) {
         sinchClient = null;
 
-        broadcastIntent.putExtra("success", false);
-        broadcaster.sendBroadcast(broadcastIntent);
-
-        Log.d("LostFound", "sent failure on connecting to user");
+//        broadcastIntent.putExtra("success", false);
+//        broadcaster.sendBroadcast(broadcastIntent);
+//
+//        Log.d("LostFound", "sent failure on connecting to user");
 
     }
     @Override
     public void onClientStarted(SinchClient client) {
         client.startListeningOnActiveConnection();
 
-        broadcastIntent.putExtra("success", true);
-
-        broadcaster.sendBroadcast(broadcastIntent);
-        Log.d("LostFound", "sent success on connecting to user");
+//        broadcastIntent.putExtra("success", true);
+//
+//        broadcaster.sendBroadcast(broadcastIntent);
+//        Log.d("LostFound", "sent success on connecting to user");
 
         messageClient = client.getMessageClient();
     }
@@ -94,10 +99,12 @@ public class MessageService extends Service implements SinchClientListener {
     public void onRegistrationCredentialsRequired(SinchClient client, ClientRegistration clientRegistration) {}
     @Override
     public void onLogMessage(int level, String area, String message) {}
+
     @Override
     public IBinder onBind(Intent intent) {
         return serviceInterface;
     }
+
     public void sendMessage(String recipientUserId, String textBody) {
         if (messageClient != null) {
             WritableMessage message = new WritableMessage(recipientUserId, textBody);

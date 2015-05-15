@@ -2,25 +2,35 @@ package com.avner.lostfound.activities;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
-public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CompoundButton.OnCheckedChangeListener {
 
     private Spinner spinner;
     private TextView et_itemName;
@@ -28,38 +38,71 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     private TextView tv_date_picker;
     private ImageButton b_pick_time;
     private TextView tv_time_picker;
-    private TextView tv_location_picker;
     private ImageButton b_pick_location;
+    private GoogleApiClient googleApiClient;
+    private LatLng location_chosen;
+    private CheckBox cb_with_location;
+    private TextView tv_location_picker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_form);
 
+        initViews();
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    private void updateCurrentLocation() {
+        if(location_chosen == null){
+
+            Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            location_chosen = new LatLng(location.getLatitude(), location.getLongitude());
+            tv_location_picker.setText(location_chosen.toString());
+        }
+    }
+
+    /**
+     * initializing views and onClickListeners and setting default values.
+     */
+    private void initViews() {
+
+        Calendar currentDate = new GregorianCalendar();
 
         b_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
         b_pick_date.setOnClickListener(this);
         tv_date_picker = (TextView) findViewById(R.id.tv_date_picker);
+        tv_date_picker.setText((currentDate.get(Calendar.DAY_OF_MONTH) + "-" + (currentDate.get(Calendar.MONTH) + 1) + "-" + currentDate.get(Calendar.YEAR)));
 
         b_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
         b_pick_time.setOnClickListener(this);
         tv_time_picker = (TextView) findViewById(R.id.tv_time_picker);
+        tv_time_picker.setText(String.format("%02d", currentDate.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", currentDate.get(Calendar.MINUTE)));
 
         b_pick_location = (ImageButton) findViewById(R.id.b_pick_location);
         b_pick_location.setOnClickListener(this);
-        tv_location_picker = (TextView) findViewById(R.id.tv_location_picker);
 
         spinner = (Spinner) findViewById(R.id.s_choose_item);
-// Create an ArrayAdapter using the string array and a default spinner layout
+        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.default_items, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
+        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
+        // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
         et_itemName = (TextView) findViewById(R.id.et_itemName);
+
+        cb_with_location = (CheckBox) findViewById(R.id.cb_with_location);
+        cb_with_location.setOnCheckedChangeListener(this);
+
+        tv_location_picker = (TextView) findViewById(R.id.tv_location_picker);
     }
 
 
@@ -71,53 +114,104 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.b_pick_date) {
 
-            final Calendar c = Calendar.getInstance();
-            int mYear = c.get(Calendar.YEAR);
-            int mMonth = c.get(Calendar.MONTH);
-            int mDay = c.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog dpd = new DatePickerDialog(this,
-                    new DatePickerDialog.OnDateSetListener() {
-
-                        @Override
-                        public void onDateSet(DatePicker view, int year,
-                                              int monthOfYear, int dayOfMonth) {
-                            tv_date_picker.setText(dayOfMonth + "-"
-                                    + (monthOfYear + 1) + "-" + year);
-
-                        }
-                    }, mYear, mMonth, mDay);
-
-            // setting max date to be today's date so user can't insert a date in the future.
-            dpd.getDatePicker().setMaxDate(System.currentTimeMillis());
-            dpd.show();
-
+            getDate();
 
         } else if (v.getId() == R.id.b_pick_time) {
 
-            final Calendar c = Calendar.getInstance();
-            int mHour = c.get(Calendar.HOUR_OF_DAY);
-            int mMinute = c.get(Calendar.MINUTE);
-
-            TimePickerDialog tpd = new TimePickerDialog(this,
-                    new TimePickerDialog.OnTimeSetListener() {
-
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay,
-                                              int minute) {
-                            tv_time_picker.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
-                        }
-                    }, mHour, mMinute, false);
-            tpd.show();
+            getTime();
 
         } else if (v.getId() == R.id.b_pick_location) {
-            Dialog placePicker = new Dialog(this);
-            placePicker.setContentView(R.layout.location_picker_dialog);
-            placePicker.setTitle("Hi");
-            placePicker.show();
+            getLocation();
+        }
+    }
+
+    private void getDate() {
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dpd = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        tv_date_picker.setText(dayOfMonth + "-"
+                                + (monthOfYear + 1) + "-" + year);
+
+                    }
+                }, mYear, mMonth, mDay);
+
+        // setting max date to be today's date so user can't insert a date in the future.
+        dpd.getDatePicker().setMaxDate(System.currentTimeMillis());
+        dpd.show();
+    }
+
+    private void getTime() {
+        final Calendar c = Calendar.getInstance();
+        int mHour = c.get(Calendar.HOUR_OF_DAY);
+        int mMinute = c.get(Calendar.MINUTE);
+
+        TimePickerDialog tpd = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay,
+                                          int minute) {
+                        tv_time_picker.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                    }
+                }, mHour, mMinute, false);
+        tpd.show();
+    }
+
+    private void getLocation() {
+        Intent intent = new Intent(this, PickLocationActivity.class);
+
+        double latitude;
+        double longitude;
+
+        if(location_chosen != null){
+            latitude = location_chosen.latitude;
+            longitude = location_chosen.longitude;
+
+        }else{
+            Log.d("my_tag", "last known location is null");
+            latitude=32.7734607;
+            longitude=35.0320228;
+        }
+        intent.putExtra(Constants.LATITUDE, latitude);
+        intent.putExtra(Constants.LONGITUDE, longitude);
+        startActivityForResult(intent, Constants.PICK_LOCATION_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == Constants.PICK_LOCATION_REQUEST_CODE){
+
+            location_chosen = new LatLng(data.getDoubleExtra(Constants.LATITUDE,0),data.getDoubleExtra(Constants.LONGITUDE,0));
+
+            tv_location_picker.setText(location_chosen.toString());
+
+            Log.d("my_tag" , "location chosen: " + location_chosen);
         }
     }
 
@@ -133,5 +227,41 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+        updateCurrentLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+
+        if(isChecked){
+
+            b_pick_location.setEnabled(true);
+            tv_location_picker.setEnabled(true);
+            updateCurrentLocation();
+            tv_location_picker.setText(location_chosen.toString());
+
+        }else{
+
+            b_pick_location.setEnabled(false);
+            tv_location_picker.setEnabled(false);
+            tv_location_picker.setText("No location specified");
+            location_chosen = null;
+        }
     }
 }
