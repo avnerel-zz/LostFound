@@ -53,17 +53,17 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         List<Item> lostItems = new ArrayList<>();
 
-        lostItems.add(new Item("Ring", "very nice ring", new GregorianCalendar(), new Location("stam"),R.drawable.ring1));
-
-        lostItems.add(new Item("Necklace", "very nice necklace", new GregorianCalendar(), new Location("stam"),R.drawable.necklace1));
-
-        lostItems.add(new Item("Car keys", "my beautiful car keys", new GregorianCalendar(), new Location("stam"),R.drawable.car_keys1));
-
+//        lostItems.add(new Item("Ring", "very nice ring", new GregorianCalendar(), new Location("stam"),R.drawable.ring1));
+//
+//        lostItems.add(new Item("Necklace", "very nice necklace", new GregorianCalendar(), new Location("stam"),R.drawable.necklace1));
+//
+//        lostItems.add(new Item("Car keys", "my beautiful car keys", new GregorianCalendar(), new Location("stam"),R.drawable.car_keys1));
+//
         List<Item> foundItems = new ArrayList<>();
-
-        foundItems.add(new Item("Earrings", "very nice earrings", new GregorianCalendar(), new Location("stam"), R.drawable.earings1));
-
-        foundItems.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), new Location("stam"),R.drawable.headphones2));
+//
+//        foundItems.add(new Item("Earrings", "very nice earrings", new GregorianCalendar(), new Location("stam"), R.drawable.earings1));
+//
+//        foundItems.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), new Location("stam"),R.drawable.headphones2));
 
         OpenItemsAdapter myLosesAdapter = new OpenItemsAdapter(lostItems, rootView);
 

@@ -4,9 +4,11 @@
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants" >
 
-    <ImageView
+
+<ImageView
         android:id="@+id/iv_itemListingImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -39,7 +41,7 @@
         android:paddingRight="10dp"
         android:textSize="14sp" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/iv_shareImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -48,7 +50,7 @@
         android:layout_toStartOf="@+id/iv_potentialMatchImage"
         android:src="@android:drawable/ic_menu_share" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/iv_potentialMatchImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -57,6 +59,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/exclamation_mark_red" />
 
 

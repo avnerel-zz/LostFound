@@ -16,4 +16,5 @@ public class Constants {
     public static final java.lang.String LATITUDE = "latitude";
     public static final int PICK_LOCATION_REQUEST_CODE = 4;
     public static final int PICK_LOCATION_SUCCESSFUL = 2;
+    public static final String RECIPIENT_ID = "RECIPIENT_ID";
 }

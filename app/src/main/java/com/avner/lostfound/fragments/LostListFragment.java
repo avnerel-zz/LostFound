@@ -19,10 +19,16 @@ import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.activities.ViewLocationActivity;
+import com.avner.lostfound.messaging.MessageAdapter;
+import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
+import com.parse.FindCallback;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.software.shell.fab.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -78,11 +84,14 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
         location.setLatitude(32.7734607);
         location.setLongitude(35.0320228);
 
-        items.add(new Item("Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1));
-        items.add(new Item("Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1));
-        items.add(new Item("Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1));
-        items.add(new Item("Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1));
-        items.add(new Item("Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2));
+        String userId = "LKkpD5iTPx";
+        String userName = "Avner Elizarov";
+        String itemId = "stam";
+        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
+        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
+        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
+        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
+        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
 
         LostFoundListAdapter adapter = new LostFoundListAdapter(items,rootView);
 
@@ -102,6 +111,66 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
             return;
         }
 
+        initMapButton(parent, position, dialog);
+        initConversationButton(parent, position, dialog);
+
+
+        setDialogContents(dialog, item);
+
+        dialog.show();
+    }
+
+    private void initConversationButton (final AdapterView<?> parent, final int position, Dialog dialog) {
+
+        ImageButton ib_startConversation = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
+
+        final Item item = (Item) parent.getItemAtPosition(position);
+
+        // can't message myself.
+        if(item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())){
+            ib_startConversation.setEnabled(false);
+            return;
+        }
+        ib_startConversation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
+                final Item item = (Item) parent.getItemAtPosition(position);
+                if (null == item) {
+                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
+                    return;
+                }
+                String userId = item.getUserId();
+                intent.putExtra(Constants.RECIPIENT_ID, userId);
+
+                //only add conversation to parse database if it doesn't already exist there
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversations");
+
+                query.whereEqualTo("conversationItemId", item.getId());
+                query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
+
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> messageList, com.parse.ParseException e) {
+                        if (e == null) {
+                            if (messageList.size() == 0) {
+                                ParseObject parseConversations = new ParseObject("ParseConversations");
+                                parseConversations.put("userId", ParseUser.getCurrentUser().getObjectId());
+                                parseConversations.put("conversationUserId", item.getUserId());
+                                parseConversations.put("conversationUserName", item.getUserDisplayName());
+                                parseConversations.put("conversationItemId", item.getId());
+                                parseConversations.saveInBackground();
+                            }
+                        }
+                    }
+                });
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    private void initMapButton(final AdapterView<?> parent, final int position, Dialog dialog) {
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,11 +188,6 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
                 startActivity(intent);
             }
         });
-
-
-        setDialogContents(dialog, item);
-
-        dialog.show();
     }
 
     private void setDialogContents(Dialog dialog, Item item) {
@@ -140,7 +204,7 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());
 
-        dialog.setTitle("Found Item: " + item.getName());
+        dialog.setTitle("Lost Item: " + item.getName());
     }
 
 

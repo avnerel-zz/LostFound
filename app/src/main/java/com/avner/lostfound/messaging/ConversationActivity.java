@@ -2,13 +2,9 @@ package com.avner.lostfound.messaging;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
+import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,26 +13,31 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
-import com.parse.DeleteCallback;
+import com.avner.lostfound.adapters.ConversationListAdapter;
+import com.avner.lostfound.structs.Item;
 import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import com.parse.ParseException;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 
-public class ConversationActivity extends Activity implements FindCallback<ParseUser> {
+public class ConversationActivity extends Activity implements FindCallback<ParseObject> {
 
     private String currentUserId;
     private List<String> userDisplayNames;
     private ListView usersListView;
-    private ArrayAdapter<String> namesArrayAdapter;
+    private ConversationListAdapter conversationAdapter;
     private ProgressDialog progressDialog;
 //    private List<ParseUser> userList;
     private List<String> userIds;
+    private List<Item> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,28 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
         userDisplayNames = new ArrayList<String>();
         userIds = new ArrayList<String>();
 
+        initItems();
         initUserList();
-        waitForSinchService();
+    }
+
+    /**
+     * this is only for debug. items should be from server.
+     */
+    private void initItems() {
+        items = new ArrayList<>();
+
+        Location location = new Location("");
+        location.setLatitude(32.7734607);
+        location.setLongitude(35.0320228);
+
+        String userId = "LKkpD5iTPx";
+        String userName = "Avner Elizarov";
+        String itemId = "stam";
+        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
+        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
+        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
+        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
+        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
     }
 
     @Override
@@ -73,52 +94,14 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
         return super.onOptionsItemSelected(item);
     }
 
-    private void waitForSinchService() {
-
-
-//        progressDialog = new ProgressDialog(this);
-//        progressDialog.setTitle("Loading");
-//        progressDialog.setMessage("Please wait...");
-//        progressDialog.show();
-
-        //broadcast receiver to listen for the broadcast
-        //from MessageService
-//        BroadcastReceiver receiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                Log.d("LostFound", "received success/failure on connecting to user");
-//                Boolean success = intent.getBooleanExtra("success", false);
-////                progressDialog.dismiss();
-//
-//                //show a toast message if the Sinch
-//                //service failed to start
-//                if (!success) {
-//                    Toast.makeText(getApplicationContext(), "Messaging service failed to start", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        };
-//        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("com.avner.lostfound.messaging.ConversationActivity"));
-    }
-
     private void initUserList() {
 
         usersListView = (ListView)findViewById(R.id.lv_user_list);
 
-
-        // try to retrieve from local data.
-        ParseUser user = ParseUser.getCurrentUser();
-        List<String> localUserIds = (List<String>) user.get("userIds");
-        List<String> localUserDisplayNames = (List<String>) user.get("userDisplayNames");
-
-        if(localUserIds!= null && localUserDisplayNames != null){
-            userIds = localUserIds;
-            userDisplayNames = localUserDisplayNames;
-        }
-
         //TODO change to another list view adapter cause we need to add buttons
-        namesArrayAdapter = new ArrayAdapter<String>(getApplicationContext(),  R.layout.list_row_user, userDisplayNames);
+        conversationAdapter = new ConversationListAdapter(items, userDisplayNames, this);
 
-        usersListView.setAdapter(namesArrayAdapter);
+        usersListView.setAdapter(conversationAdapter);
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -128,54 +111,35 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
             }
         });
         //TODO should be removed because we won't need the list from the server, it will be added inside the app.
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversations");
         //don't include yourself
-        query.whereNotEqualTo("objectId", currentUserId);
+        query.whereEqualTo("userId", currentUserId);
         query.findInBackground(this);
-
-
     }
 
-    private void updateUsers(List<ParseUser> userList) {
+    private void updateUsers(List<ParseObject> userList) {
 
         userDisplayNames.clear();
         userIds.clear();
+        //TODO remove comment when there are items in the parse object.
+//        items.clear();
 
         for (int i=0; i<userList.size(); i++) {
 
-            ParseUser user = userList.get(i);
-            userDisplayNames.add((String) user.get("name"));
-            userIds.add(user.getObjectId());
+            ParseObject conversation = userList.get(i);
+            userDisplayNames.add((String) conversation.get("conversationUserName"));
+            userIds.add((String) conversation.get("conversationUserId"));
+            //TODO parse item and add it.
+//            items.add(conversation.get("conversationItemId"))
         }
-        namesArrayAdapter.notifyDataSetChanged();
-    }
-
-
-    @Override
-    public void done(final List<ParseUser> userList, com.parse.ParseException e) {
-
-        if(e!=null){
-            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        updateUsers(userList);
-
-        final ParseUser user = ParseUser.getCurrentUser();
-        user.put("userDisplayNames", userDisplayNames);
-        user.put("userIds", userIds);
-        user.saveInBackground();
-//        user.unpinInBackground(new DeleteCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                user.pinInBackground();
-//            }
-//        });
+        conversationAdapter.notifyDataSetChanged();
     }
 
     public void openConversation(int pos) {
 
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
-        intent.putExtra("RECIPIENT_ID", userIds.get(pos));
+        intent.putExtra(Constants.RECIPIENT_ID, userIds.get(pos));
         startActivity(intent);
 
 //        ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -196,4 +160,16 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
 //        });
     }
 
+    @Override
+    public void done(List<ParseObject> userList, ParseException e) {
+
+        if(e!=null){
+            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        updateUsers(userList);
+
+
+    }
 }

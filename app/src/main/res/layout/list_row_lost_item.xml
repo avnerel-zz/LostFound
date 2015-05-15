@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants" >
 
     <ImageView
         android:id="@+id/iv_itemListingImage"
@@ -40,7 +41,7 @@
         android:paddingRight="10dp"
         android:textSize="14sp" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/iv_potentialMatchImage"
         android:layout_width="40dp"
         android:layout_height="40dp"

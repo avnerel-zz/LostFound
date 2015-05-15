@@ -13,6 +13,10 @@ import java.util.GregorianCalendar;
  */
 public class Item {
 
+    private String userId;
+
+    private String userDisplayName;
+
     private String name;
 
     private String description;
@@ -22,18 +26,22 @@ public class Item {
     private Location location;
 
     private int imageId;
+    private String itemId;
 
-    public Item(String name, String description, GregorianCalendar calender, Location location) {
+    public Item(String itemId, String name, String description, GregorianCalendar calender, Location location, String userId, String userDisplayName) {
 
-        this(name, description, calender, location, 0);
+        this(itemId, name, description, calender, location, R.drawable.image_unavailable, userId, userDisplayName);
     }
 
-    public Item(String name, String description, GregorianCalendar calender, Location location, int imageId) {
+    public Item(String itemId, String name, String description, GregorianCalendar calender, Location location, int imageId, String userId, String userDisplayName) {
+        this.itemId = itemId;
         this.name = name;
         this.description = description;
         this.calender = calender;
         this.location = location;
         this.imageId = imageId;
+        this.userId = userId;
+        this.userDisplayName = userDisplayName;
     }
 
 
@@ -56,10 +64,6 @@ public class Item {
 
     public int getImage() {
 
-        if(imageId == 0){
-
-            return R.drawable.image_unavailable;
-        }
         return imageId;
     }
 
@@ -77,5 +81,17 @@ public class Item {
         returnValue += days + " days ago";
 
         return returnValue;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUserDisplayName() {
+        return userDisplayName;
+    }
+
+    public String getId() {
+        return itemId;
     }
 }

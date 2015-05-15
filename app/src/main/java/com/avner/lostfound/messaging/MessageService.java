@@ -73,21 +73,10 @@ public class MessageService extends Service implements SinchClientListener {
     @Override
     public void onClientFailed(SinchClient client, SinchError error) {
         sinchClient = null;
-
-//        broadcastIntent.putExtra("success", false);
-//        broadcaster.sendBroadcast(broadcastIntent);
-//
-//        Log.d("LostFound", "sent failure on connecting to user");
-
     }
     @Override
     public void onClientStarted(SinchClient client) {
         client.startListeningOnActiveConnection();
-
-//        broadcastIntent.putExtra("success", true);
-//
-//        broadcaster.sendBroadcast(broadcastIntent);
-//        Log.d("LostFound", "sent success on connecting to user");
 
         messageClient = client.getMessageClient();
     }
