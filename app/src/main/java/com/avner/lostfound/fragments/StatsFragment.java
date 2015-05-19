@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,11 +17,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.structs.User;
 import com.facebook.Profile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +41,6 @@ public class StatsFragment extends Fragment {
     private ImageView userPicture;
 
     private View rootView;
-
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,45 +89,14 @@ public class StatsFragment extends Fragment {
 
         userPicture = (ImageView) rootView.findViewById(R.id.iv_profileImage);
 
-        Profile currentProfile = Profile.getCurrentProfile();
+        File file = new File(Constants.USER_IMAGE_FILE_PATH);
 
-        final Uri imageUri = currentProfile != null ? currentProfile.getProfilePictureUri(150, 150): null;
+        if(file.exists()){
 
-        if(imageUri!= null){
+            userPicture.setImageBitmap(BitmapFactory.decodeFile(Constants.USER_IMAGE_FILE_PATH));
 
-            AsyncTask task = new AsyncTask() {
-                @Override
-                protected Object doInBackground(Object[] params) {
-
-                    return getFacebookProfilePicture(imageUri.toString());
-                }
-
-                @Override
-                protected void onPostExecute(Object o) {
-                    super.onPostExecute(o);
-                    userPicture.setImageBitmap((Bitmap) o);
-                }
-            };
-            task.execute();
-        }
-    }
-
-    public static Bitmap getFacebookProfilePicture(String imageUri) {
-
-        URL imageURL = null;
-
-        Bitmap bitmap = null;
-        try {
-//            imageURL = new URL("https://graph.facebook.com/" + userID + "/picture?type=large");
-            imageURL = new URL(imageUri);
-            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        return bitmap;
     }
 
         public class TopUsersAdapter extends BaseAdapter {

@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ViewLocationActivity;
-import com.avner.lostfound.messaging.ConversationActivity;
 import com.avner.lostfound.structs.Item;
 
 import java.util.List;
@@ -80,47 +78,8 @@ public class ConversationListAdapter extends BaseAdapter {
                     ib_sendMessage.setEnabled(false);
                     setDialogContents(dialog, item);
                     dialog.show();
-
-
                 }
-                private void initMapButton(final Item item, final int position, Dialog dialog) {
-                    ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
-                    ib_showMap.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(rootView, ViewLocationActivity.class);
-                            if (null == item) {
-                                Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-                                return;
-                            }
-                            double latitude = item.getLocation().getLatitude();
-                            double longitude = item.getLocation().getLongitude();
-                            intent.putExtra(Constants.LATITUDE, latitude);
-                            intent.putExtra(Constants.LONGITUDE, longitude);
-                            rootView.startActivity(intent);
-                        }
-                    });
-                }
-
-                private void setDialogContents(Dialog dialog, Item item) {
-                    TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
-                    itemLocation.setText(item.getLocationString());
-                    itemLocation.setMaxLines(2);
-
-                    TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
-                    itemTime.setText(item.timeAgo());
-
-                    ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
-                    itemImage.setImageResource(item.getImage());
-
-                    TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
-                    itemDescription.setText(item.getDescription());
-
-                    dialog.setTitle("Item: " + item.getName());
-                }
-
             });
-
             view.setTag(viewHolder);
         }
         else {
@@ -128,7 +87,6 @@ public class ConversationListAdapter extends BaseAdapter {
 
             viewHolder = (ViewHolder) view.getTag();
         }
-
         Item item = (Item)getItem(position);
         String userName = userNames.get(position);
 
@@ -137,6 +95,42 @@ public class ConversationListAdapter extends BaseAdapter {
         viewHolder.itemImage.setImageResource(item.getImage());
 
         return view;
+    }
+
+    private void initMapButton(final Item item, final int position, Dialog dialog) {
+        ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
+        ib_showMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView, ViewLocationActivity.class);
+                if (null == item) {
+                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
+                    return;
+                }
+                double latitude = item.getLocation().getLatitude();
+                double longitude = item.getLocation().getLongitude();
+                intent.putExtra(Constants.LATITUDE, latitude);
+                intent.putExtra(Constants.LONGITUDE, longitude);
+                rootView.startActivity(intent);
+            }
+        });
+    }
+
+    private void setDialogContents(Dialog dialog, Item item) {
+        TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
+        itemLocation.setText(item.getLocationString());
+        itemLocation.setMaxLines(2);
+
+        TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
+        itemTime.setText(item.timeAgo());
+
+        ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
+        itemImage.setImageResource(item.getImage());
+
+        TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
+        itemDescription.setText(item.getDescription());
+
+        dialog.setTitle("Item: " + item.getName());
     }
 
 

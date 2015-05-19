@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,8 +28,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
 
 
 public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CompoundButton.OnCheckedChangeListener {
@@ -63,7 +68,9 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             location_chosen = new LatLng(location.getLatitude(), location.getLongitude());
-            tv_location_picker.setText(location_chosen.toString());
+
+            String locationAsString = getLocationFromCoordinates(location_chosen);
+            tv_location_picker.setText(locationAsString);
         }
     }
 
@@ -209,10 +216,34 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
             location_chosen = new LatLng(data.getDoubleExtra(Constants.LATITUDE,0),data.getDoubleExtra(Constants.LONGITUDE,0));
 
-            tv_location_picker.setText(location_chosen.toString());
+            String location = getLocationFromCoordinates(location_chosen);
 
-            Log.d("my_tag" , "location chosen: " + location_chosen);
+            tv_location_picker.setText(location);
+
         }
+    }
+
+    private String getLocationFromCoordinates(LatLng location_chosen) {
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses  = null;
+        String addressLine = "";
+
+        try {
+            addresses = geocoder.getFromLocation(location_chosen.latitude,location_chosen.longitude, 1);
+            Address address = addresses.get(0);
+            for(int i=0; i<address.getMaxAddressLineIndex(); i++){
+
+                addressLine += address.getAddressLine(i) + ", ";
+            }
+            addressLine += address.getAddressLine(address.getMaxAddressLineIndex());
+
+        } catch (IOException e) {
+            addressLine = "Description not Available";
+        }
+
+        return addressLine;
     }
 
     @Override
@@ -254,7 +285,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             b_pick_location.setEnabled(true);
             tv_location_picker.setEnabled(true);
             updateCurrentLocation();
-            tv_location_picker.setText(location_chosen.toString());
 
         }else{
 

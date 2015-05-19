@@ -60,5 +60,11 @@
     <string name="title_activity_pick_location">PickLocationActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
+    <string name="my_open_listings"><![CDATA[Open lost & found listings:]]></string>
+    <string name="default_open_listings_num">0</string>
+    <string name="share">Share</string>
+    <string name="possible_matches">Possible Matches Found</string>
 
 </resources>

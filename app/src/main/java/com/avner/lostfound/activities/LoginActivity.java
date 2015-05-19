@@ -3,7 +3,12 @@ package com.avner.lostfound.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -24,6 +29,12 @@ import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -94,6 +105,66 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
     }
 
+    private void fetchUserPhotoFromFacebookProfile() {
+        Profile currentProfile = Profile.getCurrentProfile();
+
+        final Uri imageUri = currentProfile != null ? currentProfile.getProfilePictureUri(150, 150): null;
+
+        if(imageUri!= null){
+
+            AsyncTask task = new AsyncTask() {
+                @Override
+                protected Object doInBackground(Object[] params) {
+
+                    return saveFacebookProfilePictureToFile(imageUri.toString());
+                }
+
+                @Override
+                protected void onPostExecute(Object o) {
+                    super.onPostExecute(o);
+                }
+            };
+            task.execute();
+        }
+    }
+
+    public static Bitmap saveFacebookProfilePictureToFile(String imageUri) {
+
+        URL imageURL;
+
+        Bitmap bitmap = null;
+
+        // make dir for the app if it isn't already created.
+        boolean success = (new File( Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY)).mkdir();
+        if (!success)
+        {
+            Log.d("my_tag", "directory already created");
+        }
+
+        // fetch photo and save it to dir.
+        try {
+            imageURL = new URL(imageUri);
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+
+            FileOutputStream stream = new FileOutputStream(Constants.USER_IMAGE_FILE_PATH);
+
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
+            byte[] byteArray = outStream.toByteArray();
+
+            stream.write(byteArray);
+            stream.close();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+
 
 
     @Override
@@ -111,6 +182,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         }else if(requestCode == Constants.FACEBOOK_LOGIN_REQUEST_ID){
 
             ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+
         }
     }
 
@@ -157,6 +229,9 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
     private void logInToParseWithFacebook() {
         getUserDetails();
+
+        // try to fetch user photo from facebook.
+        fetchUserPhotoFromFacebookProfile();
         finishLogin();
     }
 

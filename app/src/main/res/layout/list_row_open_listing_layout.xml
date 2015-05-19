@@ -48,7 +48,9 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/iv_potentialMatchImage"
         android:layout_toStartOf="@+id/iv_potentialMatchImage"
-        android:src="@android:drawable/ic_menu_share" />
+        android:src="@android:drawable/ic_menu_share"
+        android:contentDescription="@string/share"
+        />
 
     <ImageButton
         android:id="@+id/iv_potentialMatchImage"
@@ -60,7 +62,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/exclamation_mark_red" />
+        android:src="@drawable/exclamation_mark_red"
+        android:contentDescription="@string/possible_matches" />
 
 
 </RelativeLayout>
