@@ -219,6 +219,8 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
 
             Intent intent = new Intent(rootView.getContext(),ReportFormActivity.class);
 
+            intent.putExtra(Constants.IS_LOST_FORM, false);
+
             startActivity(intent);
         }
     }

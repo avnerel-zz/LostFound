@@ -34,7 +34,7 @@ public class LostFoundApplication extends Application {
 
         Parse.initialize(this, PARSE_APPLICATION_ID, PARSE_CLIENT_KEY);
 
-        ParseFacebookUtils.initialize(this, Constants.FACEBOOK_LOGIN_REQUEST_ID);
+        ParseFacebookUtils.initialize(this, Constants.REQUEST_CODE_FACEBOOK_LOGIN);
 
        // installation used for sending push notifications.
         installation = ParseInstallation.getCurrentInstallation();

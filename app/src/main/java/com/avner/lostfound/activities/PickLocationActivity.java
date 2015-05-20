@@ -87,7 +87,7 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
         Intent resultIntent = new Intent();
         resultIntent.putExtra(Constants.LONGITUDE, longitude);
         resultIntent.putExtra(Constants.LATITUDE, latitude);
-        setResult(Constants.PICK_LOCATION_SUCCESSFUL, resultIntent);
+        setResult(RESULT_OK, resultIntent);
 
         location_chosen_marker = marker;
     }
@@ -110,7 +110,7 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
             Intent intent = new Intent();
             intent.putExtra(Constants.LONGITUDE, location_chosen_marker.getPosition().longitude);
             intent.putExtra(Constants.LATITUDE, location_chosen_marker.getPosition().latitude);
-            setResult(Constants.PICK_LOCATION_SUCCESSFUL, intent);
+            setResult(RESULT_OK, intent);
             finish();
         }
     }

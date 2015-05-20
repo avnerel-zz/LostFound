@@ -135,7 +135,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         Bitmap bitmap = null;
 
         // make dir for the app if it isn't already created.
-        boolean success = (new File( Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY)).mkdir();
+        boolean success = (new File( Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME)).mkdir();
         if (!success)
         {
             Log.d("my_tag", "directory already created");
@@ -171,7 +171,11 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
 
-        if(resultCode == Constants.SIGN_UP_SUCCESSFUL){
+        if(resultCode != RESULT_OK){
+
+            Log.e(Constants.LOST_FOUND_TAG, "result not o.k in login activity. request code: " + requestCode);
+        }
+        if(requestCode == Constants.REQUEST_CODE_SIGN_UP){
 
             String userName = data.getStringExtra(Constants.USER_NAME);
 
@@ -179,7 +183,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
             logInToParseWithAppLogin(userName, password);
 
-        }else if(requestCode == Constants.FACEBOOK_LOGIN_REQUEST_ID){
+        }else if(requestCode == Constants.REQUEST_CODE_FACEBOOK_LOGIN){
 
             ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
 
@@ -194,7 +198,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
             Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
 
-            startActivityForResult(intent, Constants.SIGN_UP_REQUEST_ID);
+            startActivityForResult(intent, Constants.REQUEST_CODE_SIGN_UP);
 
         } else if(v.getId() == R.id.b_email_login){
 

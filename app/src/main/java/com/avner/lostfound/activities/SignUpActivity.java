@@ -147,7 +147,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener, Te
                     intent.putExtra(Constants.USER_NAME, username);
                     intent.putExtra(Constants.PASSWORD, pass);
 
-                    setResult(Constants.SIGN_UP_SUCCESSFUL, intent);
+                    setResult(RESULT_OK, intent);
 
                     finish();
                 } else {

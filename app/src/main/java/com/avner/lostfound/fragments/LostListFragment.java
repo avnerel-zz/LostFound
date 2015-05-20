@@ -214,6 +214,7 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
 
             Intent intent = new Intent(rootView.getContext(),ReportFormActivity.class);
 
+            intent.putExtra(Constants.IS_LOST_FORM, true);
             startActivity(intent);
         }
     }
