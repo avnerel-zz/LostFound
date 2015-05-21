@@ -2,7 +2,6 @@ package com.avner.lostfound.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -31,7 +30,6 @@ import com.parse.ParseUser;
 import com.software.shell.fab.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 public class FoundListFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
@@ -80,31 +78,55 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
 
     private void initItemsList() {
 
-        List<Item> items = new ArrayList<>();
+        final List<Item> items = new ArrayList<>();
 
-        Location location = new Location("");
-        location.setLatitude(32.7734607);
-        location.setLongitude(35.0320228);
+        final LostFoundListAdapter adapter = new LostFoundListAdapter(items,rootView);
 
-        String userId = "LKkpD5iTPx";
-        String userName = "Avner Elizarov";
-        String itemId = "stam";
-        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
-        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
-        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
-        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
-        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_FOUND);
+        query.orderByAscending("createdAt");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < itemsList.size(); i++) {
+                        convertParseListToItemList(itemsList, items);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
+//        Location location = new Location("");
+//        location.setLatitude(32.7734607);
+//        location.setLongitude(35.0320228);
+//
+//        String userId = "LKkpD5iTPx";
+//        String userName = "Avner Elizarov";
+//        String itemId = "stam";
+//        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
+//        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
+//        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
+//        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
+//        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
 
-
-        //ListAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values);
-        LostFoundListAdapter adapter = new LostFoundListAdapter(items,rootView);
 
         lv_itemList.setClickable(true);
-
         lv_itemList.setAdapter(adapter);
-
-        lv_itemList.setOnItemClickListener(this);
+        lv_itemList.setOnItemClickListener(adapter);
     }
+
+    private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
+
+        //TODO if not loading all items and just adding so remove this.
+        items.clear();
+
+        for(ParseObject parseItem: itemsList){
+
+           Item item = new Item(parseItem);
+            items.add(item);
+        }
+
+    }
+
 
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
@@ -147,7 +169,7 @@ public class FoundListFragment extends Fragment implements AdapterView.OnItemCli
                     return;
                 }
                 String userId = item.getUserId();
-                intent.putExtra(Constants.RECIPIENT_ID, userId);
+                intent.putExtra(Constants.Conversation.RECIPIENT_ID, userId);
 
                 //only add conversation to parse database if it doesn't already exist there
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversations");

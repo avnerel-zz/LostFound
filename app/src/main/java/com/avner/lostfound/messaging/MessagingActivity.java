@@ -80,6 +80,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
         query.whereContainedIn("senderId", Arrays.asList(userIds));
         query.whereContainedIn("recipientId", Arrays.asList(userIds));
+        query.whereEqualTo("recipientId", Arrays.asList(userIds));
         query.orderByAscending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override

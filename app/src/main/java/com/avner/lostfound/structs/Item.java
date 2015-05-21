@@ -1,9 +1,13 @@
 package com.avner.lostfound.structs;
 
+import android.graphics.Bitmap;
 import android.location.Location;
-import android.media.Image;
 
+import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
+import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -13,6 +17,10 @@ import java.util.GregorianCalendar;
  */
 public class Item {
 
+    private String locationAsString;
+
+    private String imageUrl;
+
     private String userId;
 
     private String userDisplayName;
@@ -21,19 +29,21 @@ public class Item {
 
     private String description;
 
-    private GregorianCalendar calender;
+    private Calendar calender;
 
     private Location location;
 
     private int imageId;
     private String itemId;
 
-    public Item(String itemId, String name, String description, GregorianCalendar calender, Location location, String userId, String userDisplayName) {
+    private ParseObject parseItem;
+
+    public Item(String itemId, String name, String description, Calendar calender, Location location, String userId, String userDisplayName) {
 
         this(itemId, name, description, calender, location, R.drawable.image_unavailable, userId, userDisplayName);
     }
 
-    public Item(String itemId, String name, String description, GregorianCalendar calender, Location location, int imageId, String userId, String userDisplayName) {
+    public Item(String itemId, String name, String description, Calendar calender, Location location, int imageId, String userId, String userDisplayName) {
         this.itemId = itemId;
         this.name = name;
         this.description = description;
@@ -44,9 +54,44 @@ public class Item {
         this.userDisplayName = userDisplayName;
     }
 
-
     public String getName() {
         return name;
+    }
+
+    public Item(ParseObject parseItem){
+
+        this.parseItem = parseItem;
+
+        name = (String) parseItem.get(Constants.ParseReport.ITEM_NAME);
+        description = (String) parseItem.get(Constants.ParseReport.ITEM_DESCRIPTION);
+
+        ParseGeoPoint parseLocation = (ParseGeoPoint) parseItem.get(Constants.ParseReport.LOCATION);
+        location = new Location("location");
+        location.setLatitude(parseLocation.getLatitude());
+        location.setLongitude(parseLocation.getLongitude());
+
+        long timeLost = (long) parseItem.get(Constants.ParseReport.TIME);
+        calender = Calendar.getInstance();
+        calender.setTimeInMillis(timeLost);
+
+        userId = (String) parseItem.get(Constants.ParseReport.USER_ID);
+        itemId = (String) parseItem.getObjectId();
+        userDisplayName = (String) parseItem.get(Constants.ParseReport.USER_DISPLAY_NAME);
+        locationAsString = (String) parseItem.get(Constants.ParseReport.LOCATION_STRING);
+        imageUrl = ((ParseFile) parseItem.get(Constants.ParseReport.ITEM_IMAGE)).getUrl();
+
+    }
+
+    public Item(String itemId, String name, String description, Calendar calender, Location location, String imageUrl, String userId, String userDisplayName, String locationAsString) {
+        this.itemId = itemId;
+        this.name = name;
+        this.description = description;
+        this.calender = calender;
+        this.location = location;
+        this.imageUrl = imageUrl;
+        this.userId = userId;
+        this.userDisplayName = userDisplayName;
+        this.locationAsString = locationAsString;
     }
 
     public String getDescription() {
@@ -68,8 +113,7 @@ public class Item {
     }
 
     public String getLocationString() {
-//        return Location.convert(location.getLatitude(), Location.FORMAT_DEGREES) + " " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES);
-        return "Rehovot";
+        return locationAsString;
     }
 
     public String timeAgo() {
@@ -93,5 +137,13 @@ public class Item {
 
     public String getId() {
         return itemId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public ParseObject getParseItem() {
+        return parseItem;
     }
 }

@@ -2,7 +2,9 @@ package com.avner.lostfound.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -18,24 +20,26 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
+import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.activities.ViewLocationActivity;
-import com.avner.lostfound.messaging.MessageAdapter;
 import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.parse.FindCallback;
+import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.software.shell.fab.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.util.List;
 
-public class LostListFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class LostListFragment extends Fragment implements View.OnClickListener {
 
     private ListView lv_itemList;
 
@@ -78,133 +82,53 @@ public class LostListFragment extends Fragment implements AdapterView.OnItemClic
 	}
 
     private void initItemsList() {
-        List<Item> items = new ArrayList<>();
+        final List<Item> items = new ArrayList<>();
 
-        Location location = new Location("");
-        location.setLatitude(32.7734607);
-        location.setLongitude(35.0320228);
+        final LostFoundListAdapter adapter;
+        adapter = new LostFoundListAdapter(items,rootView);
 
-        String userId = "LKkpD5iTPx";
-        String userName = "Avner Elizarov";
-        String itemId = "stam";
-        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
-        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
-        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
-        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
-        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        query.orderByAscending("createdAt");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < itemsList.size(); i++) {
+                        convertParseListToItemList(itemsList,items);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+//        Location location = new Location("");
+//        location.setLatitude(32.7734607);
+//        location.setLongitude(35.0320228);
+//
+//        String userId = "LKkpD5iTPx";
+//        String userName = "Avner Elizarov";
+//        String itemId = "stam";
+//        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
+//        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
+//        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
+//        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
+//        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
 
-        LostFoundListAdapter adapter = new LostFoundListAdapter(items,rootView);
 
         lv_itemList.setClickable(true);
         lv_itemList.setAdapter(adapter);
-        lv_itemList.setOnItemClickListener(this);
+        lv_itemList.setOnItemClickListener(adapter);
     }
 
-    @Override
-    public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-        final Dialog dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.dialog_item_details_layout);
+    private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
 
-        Item item = (Item) parent.getItemAtPosition(position);
-        if (null == item) {
-            Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-            return;
+        //TODO if not loading all items and just adding so remove this.
+        items.clear();
+        for(ParseObject parseItem: itemsList){
+
+            Item item = new Item(parseItem);
+            items.add(item);
         }
 
-        initMapButton(parent, position, dialog);
-        initConversationButton(parent, position, dialog);
-
-
-        setDialogContents(dialog, item);
-
-        dialog.show();
-    }
-
-    private void initConversationButton (final AdapterView<?> parent, final int position, Dialog dialog) {
-
-        ImageButton ib_startConversation = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
-
-        final Item item = (Item) parent.getItemAtPosition(position);
-
-        // can't message myself.
-        if(item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())){
-            ib_startConversation.setEnabled(false);
-            return;
-        }
-        ib_startConversation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
-                final Item item = (Item) parent.getItemAtPosition(position);
-                if (null == item) {
-                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-                    return;
-                }
-                String userId = item.getUserId();
-                intent.putExtra(Constants.RECIPIENT_ID, userId);
-
-                //only add conversation to parse database if it doesn't already exist there
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversations");
-
-                query.whereEqualTo("conversationItemId", item.getId());
-                query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
-
-                query.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> messageList, com.parse.ParseException e) {
-                        if (e == null) {
-                            if (messageList.size() == 0) {
-                                ParseObject parseConversations = new ParseObject("ParseConversations");
-                                parseConversations.put("userId", ParseUser.getCurrentUser().getObjectId());
-                                parseConversations.put("conversationUserId", item.getUserId());
-                                parseConversations.put("conversationUserName", item.getUserDisplayName());
-                                parseConversations.put("conversationItemId", item.getId());
-                                parseConversations.saveInBackground();
-                            }
-                        }
-                    }
-                });
-                startActivity(intent);
-            }
-        });
-
-    }
-
-    private void initMapButton(final AdapterView<?> parent, final int position, Dialog dialog) {
-        ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
-        ib_showMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
-                Item item = (Item) parent.getItemAtPosition(position);
-                if (null == item) {
-                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-                    return;
-                }
-                double latitude = item.getLocation().getLatitude();
-                double longitude = item.getLocation().getLongitude();
-                intent.putExtra(Constants.LATITUDE, latitude);
-                intent.putExtra(Constants.LONGITUDE, longitude);
-                startActivity(intent);
-            }
-        });
-    }
-
-    private void setDialogContents(Dialog dialog, Item item) {
-        TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
-        itemLocation.setText(item.getLocationString());
-        itemLocation.setMaxLines(2);
-
-        TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
-        itemTime.setText(item.timeAgo());
-
-        ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
-        itemImage.setImageResource(item.getImage());
-
-        TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
-        itemDescription.setText(item.getDescription());
-
-        dialog.setTitle("Lost Item: " + item.getName());
     }
 
 

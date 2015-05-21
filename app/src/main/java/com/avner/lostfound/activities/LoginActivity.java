@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
+import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.messaging.MessageService;
@@ -29,12 +29,7 @@ import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -115,24 +110,15 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
             AsyncTask task = new AsyncTask() {
                 @Override
                 protected Object doInBackground(Object[] params) {
-
-                    return saveFacebookProfilePictureToFile(imageUri.toString());
-                }
-
-                @Override
-                protected void onPostExecute(Object o) {
-                    super.onPostExecute(o);
+                    saveFacebookProfilePictureToFile(imageUri.toString());
+                    return null;
                 }
             };
             task.execute();
         }
     }
 
-    public static Bitmap saveFacebookProfilePictureToFile(String imageUri) {
-
-        URL imageURL;
-
-        Bitmap bitmap = null;
+    public static void saveFacebookProfilePictureToFile(String imageUri) {
 
         // make dir for the app if it isn't already created.
         boolean success = (new File( Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME)).mkdir();
@@ -141,27 +127,10 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
             Log.d("my_tag", "directory already created");
         }
 
-        // fetch photo and save it to dir.
-        try {
-            imageURL = new URL(imageUri);
-            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        Bitmap image = ImageUtils.decodeRemoteUrl(imageUri);
 
-            FileOutputStream stream = new FileOutputStream(Constants.USER_IMAGE_FILE_PATH);
+        ImageUtils.saveImageToFile(image,Constants.USER_IMAGE_FILE_NAME);
 
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
-            byte[] byteArray = outStream.toByteArray();
-
-            stream.write(byteArray);
-            stream.close();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bitmap;
     }
 
 

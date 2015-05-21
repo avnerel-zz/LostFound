@@ -383,7 +383,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        // chose other.
+        // user chose other.
         if (spinner.getSelectedItemPosition() == spinner.getAdapter().getCount() - 1) {
             et_itemName.setVisibility(View.VISIBLE);
         } else {
@@ -448,10 +448,10 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         ParseObject parseReport;
         if(lostReport){
 
-            parseReport = new ParseObject("ParseLost");
+            parseReport = new ParseObject(Constants.ParseObject.PARSE_LOST);
         }else{
 
-            parseReport = new ParseObject("ParseFound");
+            parseReport = new ParseObject(Constants.ParseObject.PARSE_FOUND);
         }
 
         String itemName = et_itemName.getText().toString();
@@ -461,17 +461,19 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             itemName = spinner.getSelectedItem().toString();
         }
 
-        parseReport.put("itemName", itemName);
-        parseReport.put("itemDescription", et_description.getText().toString());
-        parseReport.put("time", timeChosen.getTimeInMillis());
+        parseReport.put(Constants.ParseReport.ITEM_NAME, itemName);
+        parseReport.put(Constants.ParseReport.ITEM_DESCRIPTION, et_description.getText().toString());
+        parseReport.put(Constants.ParseReport.TIME, timeChosen.getTimeInMillis());
 
-        if(cb_with_location.isChecked()){
+        if(cb_with_location.isChecked() && location_chosen!= null){
 
             ParseGeoPoint location = new ParseGeoPoint(location_chosen.latitude, location_chosen.longitude);
-            parseReport.put("location", location);
+            parseReport.put(Constants.ParseReport.LOCATION, location);
+            parseReport.put(Constants.ParseReport.LOCATION_STRING, tv_location_picker.getText().toString());
         }
-        parseReport.put("userId", ParseUser.getCurrentUser().getObjectId());
-        parseReport.put("itemImage", parseItemImage);
+        parseReport.put(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
+        parseReport.put(Constants.ParseReport.ITEM_IMAGE, parseItemImage);
+        parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
         parseReport.saveInBackground();
 
         Toast.makeText(this,"report has been shipped" ,Toast.LENGTH_SHORT).show();

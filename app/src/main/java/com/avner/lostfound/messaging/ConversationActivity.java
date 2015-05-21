@@ -9,13 +9,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.ConversationListAdapter;
+import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -36,8 +36,8 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
     private ConversationListAdapter conversationAdapter;
     private ProgressDialog progressDialog;
 //    private List<ParseUser> userList;
-    private List<String> userIds;
-    private List<Item> items;
+
+    private List<Conversation> conversations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
 
         currentUserId = ParseUser.getCurrentUser().getObjectId();
         userDisplayNames = new ArrayList<String>();
-        userIds = new ArrayList<String>();
+        conversations = new ArrayList<>();
 
         initItems();
         initUserList();
@@ -56,20 +56,20 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
      * this is only for debug. items should be from server.
      */
     private void initItems() {
-        items = new ArrayList<>();
-
-        Location location = new Location("");
-        location.setLatitude(32.7734607);
-        location.setLongitude(35.0320228);
-
-        String userId = "LKkpD5iTPx";
-        String userName = "Avner Elizarov";
-        String itemId = "stam";
-        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
-        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
-        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
-        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
-        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
+//        items = new ArrayList<>();
+//
+//        Location location = new Location("");
+//        location.setLatitude(32.7734607);
+//        location.setLongitude(35.0320228);
+//
+//        String userId = "LKkpD5iTPx";
+//        String userName = "Avner Elizarov";
+//        String itemId = "stam";
+//        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
+//        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
+//        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
+//        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
+//        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
     }
 
     @Override
@@ -99,10 +99,9 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
         usersListView = (ListView)findViewById(R.id.lv_user_list);
 
         //TODO change to another list view adapter cause we need to add buttons
-        conversationAdapter = new ConversationListAdapter(items, userDisplayNames, this);
+        conversationAdapter = new ConversationListAdapter(conversations, this);
 
         usersListView.setAdapter(conversationAdapter);
-
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -113,25 +112,22 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
         //TODO should be removed because we won't need the list from the server, it will be added inside the app.
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversations");
-        //don't include yourself
         query.whereEqualTo("userId", currentUserId);
+        query.include("conversationItem");
         query.findInBackground(this);
     }
 
-    private void updateUsers(List<ParseObject> userList) {
+    private void updateUsers(List<ParseObject> conversationList) {
 
-        userDisplayNames.clear();
-        userIds.clear();
+        conversations.clear();
         //TODO remove comment when there are items in the parse object.
 //        items.clear();
 
-        for (int i=0; i<userList.size(); i++) {
+        for (int i=0; i<conversationList.size(); i++) {
 
-            ParseObject conversation = userList.get(i);
-            userDisplayNames.add((String) conversation.get("conversationUserName"));
-            userIds.add((String) conversation.get("conversationUserId"));
-            //TODO parse item and add it.
-//            items.add(conversation.get("conversationItemId"))
+            ParseObject parseConversation = conversationList.get(i);
+            Conversation conversation = new Conversation(parseConversation);
+            conversations.add(conversation);
         }
         conversationAdapter.notifyDataSetChanged();
     }
@@ -139,7 +135,8 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
     public void openConversation(int pos) {
 
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
-        intent.putExtra(Constants.RECIPIENT_ID, userIds.get(pos));
+        intent.putExtra(Constants.Conversation.RECIPIENT_ID, conversations.get(pos).getUserId());
+        intent.putExtra(Constants.Conversation.ITEM_ID, conversations.get(pos).getItem().getId());
         startActivity(intent);
 
 //        ParseQuery<ParseUser> query = ParseUser.getQuery();
@@ -163,11 +160,13 @@ public class ConversationActivity extends Activity implements FindCallback<Parse
     @Override
     public void done(List<ParseObject> userList, ParseException e) {
 
+        // Exception thrown from parse.
         if(e!=null){
             Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // success in retrieving user list.
         updateUsers(userList);
 
 

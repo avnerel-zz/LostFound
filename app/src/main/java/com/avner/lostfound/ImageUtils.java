@@ -4,8 +4,10 @@ import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.parse.ParseFile;
 
@@ -14,6 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by avner on 20/05/2015.
@@ -96,6 +100,35 @@ public class ImageUtils {
 
     }
 
+    public static Bitmap decodeRemoteUrl(final String imageUrl) {
 
 
+        URL imageURL;
+
+        Bitmap bitmap = null;
+
+        // fetch photo and save it to dir.
+        try {
+            imageURL = new URL(imageUrl);
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+
+//            FileOutputStream stream = new FileOutputStream(Constants.USER_IMAGE_FILE_PATH);
+//
+//            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
+//            byte[] byteArray = outStream.toByteArray();
+//
+//            stream.write(byteArray);
+//            stream.close();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+
+
+    }
 }

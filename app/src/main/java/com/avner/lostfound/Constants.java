@@ -20,7 +20,6 @@ public class Constants {
     public static final String USER_DISPLAY_NAME = "name";
     public static final java.lang.String LONGITUDE = "longitude";
     public static final java.lang.String LATITUDE = "latitude";
-    public static final String RECIPIENT_ID = "RECIPIENT_ID";
 
     public static final String APP_IMAGE_DIRECTORY_NAME = "/lostfound";
     public static final String USER_IMAGE_FILE_NAME = "userImage.png";
@@ -33,4 +32,33 @@ public class Constants {
      * tag for logger.
      */
     public static final String LOST_FOUND_TAG = "lostfound";
+
+    public class ParseReport{
+
+        public static final String ITEM_NAME = "itemName";
+        public static final String ITEM_DESCRIPTION = "itemDescription";
+        public static final String TIME = "time";
+        public static final String LOCATION = "location";
+        public static final String LOCATION_STRING = "locationString";
+        public static final String USER_ID = "userId";
+        public static final String ITEM_IMAGE = "itemImage";
+        public static final String USER_DISPLAY_NAME = "name";
+    }
+
+    public class ParseObject{
+
+        public static final String PARSE_LOST = "ParseLost";
+        public static final String PARSE_FOUND = "ParseFound";
+    }
+
+    public class ParseUser{
+
+        public static final String USER_DISPLAY_NAME = "name";
+    }
+
+    public class Conversation{
+
+        public static final String ITEM_ID = "itemId";
+        public static final String RECIPIENT_ID = "RECIPIENT_ID";
+    }
 }

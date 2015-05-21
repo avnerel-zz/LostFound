@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
+import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ViewLocationActivity;
+import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
 
 import java.util.List;
@@ -25,26 +29,24 @@ import java.util.List;
  */
 public class ConversationListAdapter extends BaseAdapter {
 
-    private List<Item> items;
-    private List<String> userNames;
+    private List<Conversation> conversations;
 
     private Activity rootView;
 
-    public ConversationListAdapter(List<Item> items, List<String> userNames,Activity rootView) {
-        this.items = items;
-        this.userNames = userNames;
+    public ConversationListAdapter(List<Conversation> conversations, Activity rootView) {
+        this.conversations = conversations;
         this.rootView=rootView;
     }
 
 
     @Override
     public int getCount() {
-        return userNames.size();
+        return conversations.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return items.get(position);
+        return conversations.get(position);
     }
 
     @Override
@@ -56,9 +58,7 @@ public class ConversationListAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, final ViewGroup parent) {
 
         final View view;
-        ViewHolder viewHolder;
-
-//        Log.d("MY_TAG", "Position: " + position);
+        final ViewHolder viewHolder;
 
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootView.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -70,12 +70,12 @@ public class ConversationListAdapter extends BaseAdapter {
             viewHolder.itemImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Item item = items.get(position);
+                    Item item = conversations.get(position).getItem();
                     final Dialog dialog = new Dialog(rootView);
                     dialog.setContentView(R.layout.dialog_item_details_layout);
                     initMapButton(item, position, dialog);
                     ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
-                    ib_sendMessage.setEnabled(false);
+                    ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
                     setDialogContents(dialog, item);
                     dialog.show();
                 }
@@ -87,12 +87,24 @@ public class ConversationListAdapter extends BaseAdapter {
 
             viewHolder = (ViewHolder) view.getTag();
         }
-        Item item = (Item)getItem(position);
-        String userName = userNames.get(position);
+        final Item item = conversations.get(position).getItem();
+        String userName = conversations.get(position).getUserName();
 
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
-        viewHolder.itemImage.setImageResource(item.getImage());
+
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                viewHolder.itemImage.setImageBitmap((Bitmap)o);
+            }
+        };
+        task.execute();
 
         return view;
     }
@@ -116,7 +128,7 @@ public class ConversationListAdapter extends BaseAdapter {
         });
     }
 
-    private void setDialogContents(Dialog dialog, Item item) {
+    private void setDialogContents(Dialog dialog, final Item item) {
         TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
         itemLocation.setText(item.getLocationString());
         itemLocation.setMaxLines(2);
@@ -124,8 +136,19 @@ public class ConversationListAdapter extends BaseAdapter {
         TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
         itemTime.setText(item.timeAgo());
 
-        ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
-        itemImage.setImageResource(item.getImage());
+        final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                itemImage.setImageBitmap((Bitmap)o);
+            }
+        };
+        task.execute();
 
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());
