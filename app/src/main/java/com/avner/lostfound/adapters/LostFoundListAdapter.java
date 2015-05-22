@@ -3,8 +3,6 @@ package com.avner.lostfound.adapters;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.ImageUtils;
+import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
@@ -25,13 +23,14 @@ import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 /**
  * Created by avner on 28/04/2015.
  */
-public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
+public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener{
 
     private List<Item> items;
 
@@ -63,6 +62,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
         View view;
         final ViewHolder viewHolder;
+        final Item item = (Item)getItem(position);
 
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -74,7 +74,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             viewHolder.timeAdded = (TextView) view.findViewById(R.id.tv_number_of_days_ago);
             viewHolder.locationAdded = (TextView) view.findViewById(R.id.tv_near_address);
             viewHolder.itemImage = (ImageView) view.findViewById(R.id.iv_itemListingImage);
-            viewHolder.editReport = (ImageButton) view.findViewById(R.id.ib_editReport);
+            initEditReport(view, viewHolder,item);
 
             view.setTag(viewHolder);
         }
@@ -82,13 +82,29 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             view = convertView;
             viewHolder = (ViewHolder) view.getTag();
         }
-        setViewHolderFields(position, viewHolder);
+        setViewHolderFields(position, viewHolder,item);
 
         return view;
     }
 
-    private void setViewHolderFields(int position, final ViewHolder viewHolder) {
-        final Item item = (Item)getItem(position);
+    private void initEditReport(View view, ViewHolder viewHolder, final Item item) {
+        viewHolder.editReport = (ImageButton) view.findViewById(R.id.ib_editReport);
+        viewHolder.editReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(rootView.getContext(),ReportFormActivity.class);
+                intent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost());
+                intent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
+                intent.putExtra(Constants.ReportForm.ITEM, item);
+                rootView.getContext().startActivity(intent);
+
+            }
+        });
+    }
+
+
+    private void setViewHolderFields(int position, final ViewHolder viewHolder,Item item) {
         // Put the content in the view
         viewHolder.itemName.setText(item.getName());
         viewHolder.description.setText(item.getDescription());
@@ -102,18 +118,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             viewHolder.editReport.setVisibility(ImageButton.INVISIBLE);
         }
 
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                viewHolder.itemImage.setImageBitmap((Bitmap)o);
-            }
-        };
-        task.execute();
+        Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(viewHolder.itemImage);
     }
 
     @Override
@@ -123,7 +128,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
         Item item = (Item) parent.getItemAtPosition(position);
         if (null == item) {
-            Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
+            Log.d(Constants.LOST_FOUND_TAG, "Failed to retrieve item from adapter list, at position " + position);
             return;
         }
         initMapButton(parent, position, dialog);
@@ -135,7 +140,6 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     private void initConversationButton (final AdapterView<?> parent, final int position, Dialog dialog) {
 
         ImageButton ib_startConversation = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
-
         final Item item = (Item) parent.getItemAtPosition(position);
 
         // can't message myself.
@@ -146,42 +150,47 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         ib_startConversation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
                 final Item item = (Item) parent.getItemAtPosition(position);
                 if (null == item) {
                     Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
                     return;
                 }
-                String userId = item.getUserId();
-                intent.putExtra(Constants.Conversation.RECIPIENT_ID, userId);
+                saveConversationToParse(item);
+
+                Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
+                intent.putExtra(Constants.Conversation.RECIPIENT_ID, item.getUserId());
                 intent.putExtra(Constants.Conversation.ITEM_ID, item.getId());
-
-                //only add conversation to parse database if it doesn't already exist there
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversations");
-
-                query.whereEqualTo("conversationItemId", item.getId());
-                query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
-
-                query.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> messageList, com.parse.ParseException e) {
-                        if (e == null) {
-                            // check this conversation hasn't been added already.
-                            if (messageList.size() == 0) {
-                                ParseObject parseConversations = new ParseObject("ParseConversations");
-                                parseConversations.put("userId", ParseUser.getCurrentUser().getObjectId());
-                                parseConversations.put("conversationUserId", item.getUserId());
-                                parseConversations.put("conversationUserName", item.getUserDisplayName());
-                                parseConversations.put("conversationItem", item.getParseItem());
-                                parseConversations.saveInBackground();
-                            }
-                        }
-                    }
-                });
                 rootView.getContext().startActivity(intent);
             }
         });
 
+    }
+
+    private void saveConversationToParse(final Item item) {
+
+        //only add conversation to parse database if it doesn't already exist there
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+
+        query.whereEqualTo(Constants.ParseConversation.ITEM, item.getParseItem());
+        query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> messageList, com.parse.ParseException e) {
+                if (e == null) {
+                    // this conversation hasn't been added already, so add it.
+                    if (messageList.size() == 0) {
+                        ParseObject parseConversations = new ParseObject(Constants.ParseObject.PARSE_CONVERSATION);
+                        parseConversations.put(Constants.ParseConversation.MY_USER_ID,
+                                                ParseUser.getCurrentUser().getObjectId());
+                        parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_ID, item.getUserId());
+                        parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_NAME, item.getUserDisplayName());
+                        parseConversations.put(Constants.ParseConversation.ITEM, item.getParseItem());
+                        parseConversations.saveInBackground();
+                    }
+                }
+            }
+        });
     }
 
     private void initMapButton(final AdapterView<?> parent, final int position, Dialog dialog) {
@@ -195,10 +204,8 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
                     Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
                     return;
                 }
-                double latitude = item.getLocation().getLatitude();
-                double longitude = item.getLocation().getLongitude();
-                intent.putExtra(Constants.LATITUDE, latitude);
-                intent.putExtra(Constants.LONGITUDE, longitude);
+                intent.putExtra(Constants.LATITUDE, item.getLocation().getLatitude());
+                intent.putExtra(Constants.LONGITUDE, item.getLocation().getLongitude());
                 rootView.getContext().startActivity(intent);
             }
         });
@@ -214,29 +221,13 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
 
-        if(item.getImage() != 0){
-
-            itemImage.setImageResource(item.getImage());
-        }else{
-
-            AsyncTask task = new AsyncTask() {
-                @Override
-                protected Object doInBackground(Object[] params) {
-                    return ImageUtils.decodeRemoteUrl(item.getImageUrl());
-                }
-
-                @Override
-                protected void onPostExecute(Object o) {
-                    itemImage.setImageBitmap((Bitmap)o);
-                }
-            };
-            task.execute();
-        }
+        // get item image from url.
+        Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(itemImage);
 
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());
 
-        dialog.setTitle("Lost Item: " + item.getName());
+        dialog.setTitle("Item: " + item.getName());
     }
 
     private class ViewHolder {

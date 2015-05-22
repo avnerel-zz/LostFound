@@ -1,15 +1,10 @@
 package com.avner.lostfound.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -42,7 +37,7 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
 
         String[] items = new String[]{"30", "50", "100", INFINITY};
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.message_history_spinner_item, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.message_history_spinner_item, items);
 
         messageHistory.setAdapter(adapter);
 
@@ -67,118 +62,61 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
         userPhotoImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
+                ImageUtils.selectItemImage(getParent());
             }
         });
 
 
     }
 
-    //TODO maybe move this to a common class
-    private void selectImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library",
-                "Cancel" };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), Constants.REQUEST_CODE_SELECT_FILE);
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
+//    private void selectImage() {
+//        final CharSequence[] items = { "Take Photo", "Choose from Library",
+//                "Cancel" };
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Add Photo!");
+//        builder.setItems(items, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int item) {
+//                if (items[item].equals("Take Photo")) {
+//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
+//                } else if (items[item].equals("Choose from Library")) {
+//                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                    intent.setType("image/*");
+//                    startActivityForResult(Intent.createChooser(intent, "Select File"), Constants.REQUEST_CODE_SELECT_FILE);
+//                } else if (items[item].equals("Cancel")) {
+//                    dialog.dismiss();
+//                }
+//            }
+//        });
+//        builder.show();
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == Constants.REQUEST_CODE_CAMERA) {
-                Bitmap image_from_camera = (Bitmap) data.getExtras().get("data");
-                ImageUtils.saveImageToFile(image_from_camera, Constants.USER_IMAGE_FILE_NAME);
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        if (requestCode == Constants.REQUEST_CODE_CAMERA) {
+            Bitmap image_from_camera = (Bitmap) data.getExtras().get("data");
+            ImageUtils.saveImageToFile(image_from_camera, Constants.USER_IMAGE_FILE_NAME);
+            userPhotoImageButton.setImageBitmap(image_from_camera);
 
-                userPhotoImageButton.setImageBitmap(image_from_camera);
+        } else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE) {
 
-            } else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE) {
+            try{
+                Bitmap imageFromGallery = ImageUtils.decodeUri(getContentResolver(),data.getData());
+                ImageUtils.saveImageToFile(imageFromGallery, Constants.USER_IMAGE_FILE_NAME);
+                userPhotoImageButton.setImageBitmap(imageFromGallery);
 
-                try{
-                    Bitmap imageFromGallery = ImageUtils.decodeUri(getContentResolver(),data.getData());
-                    ImageUtils.saveImageToFile(imageFromGallery, Constants.USER_IMAGE_FILE_NAME);
-                    userPhotoImageButton.setImageBitmap(imageFromGallery);
-
-                } catch (FileNotFoundException e) {
-                    Log.e(Constants.LOST_FOUND_TAG, "user image file from gallery not found. WTF???");
-                    e.printStackTrace();
-                }
+            } catch (FileNotFoundException e) {
+                Log.e(Constants.LOST_FOUND_TAG, "user image file from gallery not found. WTF???");
+                e.printStackTrace();
             }
         }
     }
-
-//    public Bitmap decodeUri(ContentResolver resolver, Uri selectedImage) throws FileNotFoundException {
-//
-//        // Decode image size
-//        BitmapFactory.Options o = new BitmapFactory.Options();
-//        o.inJustDecodeBounds = true;
-//        BitmapFactory.decodeStream(resolver.openInputStream(selectedImage), null, o);
-//
-//        // The new size we want to scale to
-//        final int REQUIRED_SIZE = 140;
-//
-//        // Find the correct scale value. It should be the power of 2.
-//        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-//        int scale = 1;
-//        while (true) {
-//            if (width_tmp / 2 < REQUIRED_SIZE
-//                    || height_tmp / 2 < REQUIRED_SIZE) {
-//                break;
-//            }
-//            width_tmp /= 2;
-//            height_tmp /= 2;
-//            scale *= 2;
-//        }
-//
-//        // Decode with inSampleSize
-//        BitmapFactory.Options o2 = new BitmapFactory.Options();
-//        o2.inSampleSize = scale;
-//        return BitmapFactory.decodeStream(resolver.openInputStream(selectedImage), null, o2);
-//
-//    }
-
-//    private void saveImageToFile(Bitmap thumbnail) {
-//
-//        // make dir for the app if it isn't already created.
-//        boolean success = (new File( Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME)).mkdir();
-//        if (!success)
-//        {
-//            Log.d("my_tag", "directory already created");
-//        }
-//
-//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-//        File destination = new File(Constants.USER_IMAGE_FILE_PATH);
-//
-//        FileOutputStream fo;
-//        try {
-//            destination.createNewFile();
-//            fo = new FileOutputStream(destination);
-//            fo.write(bytes.toByteArray());
-//            fo.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

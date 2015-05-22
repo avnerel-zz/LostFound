@@ -1,13 +1,16 @@
 package com.avner.lostfound;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.ImageView;
 
 import com.parse.ParseFile;
 
@@ -42,7 +45,7 @@ public class ImageUtils {
         boolean success = (new File(directoryPath)).mkdir();
         if (!success)
         {
-            Log.d("my_tag", "directory " + directoryPath + " already created");
+            Log.d(Constants.LOST_FOUND_TAG, "directory " + directoryPath + " already created");
         }
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -102,33 +105,43 @@ public class ImageUtils {
 
     public static Bitmap decodeRemoteUrl(final String imageUrl) {
 
-
         URL imageURL;
-
         Bitmap bitmap = null;
-
         // fetch photo and save it to dir.
         try {
             imageURL = new URL(imageUrl);
             bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-
-//            FileOutputStream stream = new FileOutputStream(Constants.USER_IMAGE_FILE_PATH);
-//
-//            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
-//            byte[] byteArray = outStream.toByteArray();
-//
-//            stream.write(byteArray);
-//            stream.close();
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return bitmap;
-
-
     }
+
+    public static void selectItemImage(final Activity activity) {
+        final CharSequence[] items = { "Take Photo", "Choose from Library",
+                "Cancel" };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    activity.startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
+                } else if (items[item].equals("Choose from Library")) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    activity.startActivityForResult(Intent.createChooser(intent, "Select File"), Constants.REQUEST_CODE_SELECT_FILE);
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
 }

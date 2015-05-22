@@ -18,15 +18,14 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
 
     private GoogleMap map; // Might be null if Google Play services APK is not available.
 
-    private Button locationChosenButton;
-
     private MarkerOptions location_chosen_marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pick_location);
-        locationChosenButton = (Button) findViewById(R.id.b_chose_location);
+
+        Button locationChosenButton = (Button) findViewById(R.id.b_chose_location);
         locationChosenButton.setOnClickListener(this);
         setUpMapIfNeeded();
     }

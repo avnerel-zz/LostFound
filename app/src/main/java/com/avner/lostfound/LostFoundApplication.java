@@ -64,9 +64,7 @@ public class LostFoundApplication extends Application {
         if(user!=null){
 
             installation.put("user",user.getObjectId());
-
             installation.saveInBackground();
-
             Log.d("messaging","put installation user id: " + user.getObjectId());
         }
 

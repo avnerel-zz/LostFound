@@ -71,7 +71,7 @@ public class ViewLocationActivity extends FragmentActivity {
         double longitude = intent.getExtras().getDouble(Constants.LONGITUDE);
         LatLng position = new LatLng(latitude, longitude);
         map.addMarker(new MarkerOptions().position(position).title("Marker"));
-        Log.d("my_tag", "" + map.getMaxZoomLevel());
+        Log.d(Constants.LOST_FOUND_TAG, "" + map.getMaxZoomLevel());
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17));
     }
 }

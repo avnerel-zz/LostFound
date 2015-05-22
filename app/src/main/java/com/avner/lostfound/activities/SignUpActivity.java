@@ -1,5 +1,6 @@
 package com.avner.lostfound.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,6 +32,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener, Te
 
     private Pattern pattern;
 
+    /**
+     * used to check email entered is in correct form.
+     */
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     private ProgressDialog progressDialog;
@@ -40,7 +44,12 @@ public class SignUpActivity extends Activity implements View.OnClickListener, Te
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        getActionBar().hide();
+
+        // hide action bar because it isn't needed.
+        ActionBar actionBar = getActionBar();
+        if(actionBar != null){
+            actionBar.hide();
+        }
 
         signUp = (Button) findViewById(R.id.b_sign_up);
         signUp.setOnClickListener(this);
@@ -65,16 +74,12 @@ public class SignUpActivity extends Activity implements View.OnClickListener, Te
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -83,14 +88,13 @@ public class SignUpActivity extends Activity implements View.OnClickListener, Te
 
         if(v.getId()==R.id.b_sign_up){
 
-            final String username = userName.getText().toString().toLowerCase();
+            final String username = userName.getText().toString().toLowerCase().trim();
             final String password = this.pass.getText().toString();
             final String reTypedPassword = this.passwordRetyped.getText().toString();
 
             if (! checkValidityOfUserDetails(username, password, reTypedPassword)) {
                 return;
             }
-
             signInToParse(username, password);
         }
     }

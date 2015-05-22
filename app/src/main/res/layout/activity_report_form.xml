@@ -33,14 +33,14 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_toEndOf="@+id/iv_item_image"
-                    android:layout_toRightOf="@+id/iv_item_image" />
+                    android:layout_toEndOf="@+id/ib_item_image"
+                    android:layout_toRightOf="@+id/ib_item_image" />
 
                 <EditText
                     android:id="@+id/et_itemName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/iv_item_image"
+                    android:layout_alignBottom="@+id/ib_item_image"
                     android:layout_alignLeft="@+id/s_choose_item"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
@@ -50,11 +50,12 @@
                     android:hint="Item name"
                     android:visibility="invisible" />
 
-                <ImageView
-                    android:id="@+id/iv_item_image"
+                <ImageButton
+                    android:id="@+id/ib_item_image"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
                     android:background="@drawable/image_border"
                     android:src="@drawable/image_unavailable" />
 
@@ -212,7 +213,7 @@
                     android:textSize="@dimen/abc_text_size_medium_material" />
 
                 <EditText
-                    android:id="@+id/editText2"
+                    android:id="@+id/et_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#dcdcdcdc"

@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.avner.lostfound.Constants;
 import com.parse.ParseUser;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.Sinch;
@@ -94,9 +95,10 @@ public class MessageService extends Service implements SinchClientListener {
         return serviceInterface;
     }
 
-    public void sendMessage(String recipientUserId, String textBody) {
+    public void sendMessage(String recipientUserId, String textBody, String itemId) {
         if (messageClient != null) {
             WritableMessage message = new WritableMessage(recipientUserId, textBody);
+            message.addHeader(Constants.SinchMessage.ITEM_ID,itemId);
             messageClient.send(message);
         }
     }
@@ -117,8 +119,8 @@ public class MessageService extends Service implements SinchClientListener {
     }
     //public interface for ListUsersActivity & MessagingActivity
     public class MessageServiceInterface extends Binder {
-        public void sendMessage(String recipientUserId, String textBody) {
-            MessageService.this.sendMessage(recipientUserId, textBody);
+        public void sendMessage(String recipientUserId, String textBody, String itemId) {
+            MessageService.this.sendMessage(recipientUserId, textBody,itemId);
         }
         public void addMessageClientListener(MessageClientListener listener) {
             MessageService.this.addMessageClientListener(listener);

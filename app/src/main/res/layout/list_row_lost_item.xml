@@ -42,7 +42,7 @@
         android:textSize="14sp" />
 
     <ImageButton
-        android:id="@+id/iv_potentialMatchImage"
+        android:id="@+id/ib_editReport"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"
@@ -97,6 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/tv_number_of_days_ago"
         android:layout_alignLeft="@+id/tv_number_of_days_ago"
+        android:layout_toLeftOf="@+id/ib_editReport"
         android:layout_alignStart="@+id/tv_number_of_days_ago"
         android:singleLine="true"
         android:text="@string/default_description" />

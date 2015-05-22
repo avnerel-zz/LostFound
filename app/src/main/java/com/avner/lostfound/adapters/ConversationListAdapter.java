@@ -21,21 +21,23 @@ import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 /**
  * Created by avner on 28/04/2015.
+ * this class handles the conversation list.
  */
 public class ConversationListAdapter extends BaseAdapter {
 
     private List<Conversation> conversations;
 
-    private Activity rootView;
+    private Activity rootActivity;
 
-    public ConversationListAdapter(List<Conversation> conversations, Activity rootView) {
+    public ConversationListAdapter(List<Conversation> conversations, Activity rootActivity) {
         this.conversations = conversations;
-        this.rootView=rootView;
+        this.rootActivity =rootActivity;
     }
 
 
@@ -61,7 +63,7 @@ public class ConversationListAdapter extends BaseAdapter {
         final ViewHolder viewHolder;
 
         if (convertView == null) {
-            LayoutInflater li = (LayoutInflater) rootView.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater li = (LayoutInflater) rootActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = li.inflate(R.layout.list_row_conversation, null);
 
             viewHolder = new ViewHolder();
@@ -71,7 +73,7 @@ public class ConversationListAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
                     Item item = conversations.get(position).getItem();
-                    final Dialog dialog = new Dialog(rootView);
+                    final Dialog dialog = new Dialog(rootActivity);
                     dialog.setContentView(R.layout.dialog_item_details_layout);
                     initMapButton(item, position, dialog);
                     ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
@@ -92,19 +94,20 @@ public class ConversationListAdapter extends BaseAdapter {
 
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
+        Picasso.with(rootActivity).load(item.getImageUrl()).into(viewHolder.itemImage);
 
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                viewHolder.itemImage.setImageBitmap((Bitmap)o);
-            }
-        };
-        task.execute();
+//        AsyncTask task = new AsyncTask() {
+//            @Override
+//            protected Object doInBackground(Object[] params) {
+//                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Object o) {
+//                viewHolder.itemImage.setImageBitmap((Bitmap)o);
+//            }
+//        };
+//        task.execute();
 
         return view;
     }
@@ -114,7 +117,7 @@ public class ConversationListAdapter extends BaseAdapter {
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(rootView, ViewLocationActivity.class);
+                Intent intent = new Intent(rootActivity, ViewLocationActivity.class);
                 if (null == item) {
                     Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
                     return;
@@ -123,7 +126,7 @@ public class ConversationListAdapter extends BaseAdapter {
                 double longitude = item.getLocation().getLongitude();
                 intent.putExtra(Constants.LATITUDE, latitude);
                 intent.putExtra(Constants.LONGITUDE, longitude);
-                rootView.startActivity(intent);
+                rootActivity.startActivity(intent);
             }
         });
     }
@@ -137,18 +140,21 @@ public class ConversationListAdapter extends BaseAdapter {
         itemTime.setText(item.timeAgo());
 
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
-            }
+        Picasso.with(rootActivity).load(item.getImageUrl()).into(itemImage);
 
-            @Override
-            protected void onPostExecute(Object o) {
-                itemImage.setImageBitmap((Bitmap)o);
-            }
-        };
-        task.execute();
+
+//        AsyncTask task = new AsyncTask() {
+//            @Override
+//            protected Object doInBackground(Object[] params) {
+//                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Object o) {
+//                itemImage.setImageBitmap((Bitmap)o);
+//            }
+//        };
+//        task.execute();
 
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());

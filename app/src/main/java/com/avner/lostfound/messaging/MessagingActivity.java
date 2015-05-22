@@ -10,12 +10,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.parse.FindCallback;
@@ -47,6 +47,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
     private ListView messagesList;
     private MessageAdapter messageAdapter;
     private ImageButton sendButton;
+    private String itemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,8 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
         //get recipientId from the intent
         Intent intent = getIntent();
-        recipientId = intent.getStringExtra("RECIPIENT_ID");
+        recipientId = intent.getStringExtra(Constants.Conversation.RECIPIENT_ID);
+        itemId = intent.getStringExtra(Constants.Conversation.ITEM_ID);
 
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
@@ -77,18 +79,19 @@ public class MessagingActivity extends Activity implements TextWatcher {
         messagesList.setAdapter(messageAdapter);
 
         String[] userIds = {currentUserId, recipientId};
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
-        query.whereContainedIn("senderId", Arrays.asList(userIds));
-        query.whereContainedIn("recipientId", Arrays.asList(userIds));
-        query.whereEqualTo("recipientId", Arrays.asList(userIds));
-        query.orderByAscending("createdAt");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
+        query.whereContainedIn(Constants.ParseMessage.SENDER_ID, Arrays.asList(userIds));
+        query.whereContainedIn(Constants.ParseMessage.RECIPIENT_ID, Arrays.asList(userIds));
+        query.whereEqualTo(Constants.ParseMessage.ITEM_ID, itemId);
+        query.orderByAscending(Constants.ParseMessage.CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messageList, com.parse.ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < messageList.size(); i++) {
-                        WritableMessage message = new WritableMessage(messageList.get(i).get("recipientId").toString(), messageList.get(i).get("messageText").toString());
-                        if (messageList.get(i).get("senderId").toString().equals(currentUserId)) {
+                        WritableMessage message = new WritableMessage(messageList.get(i).get(Constants.ParseMessage.RECIPIENT_ID).toString(),
+                                                                    messageList.get(i).get(Constants.ParseMessage.MESSAGE_TEXT).toString());
+                        if (messageList.get(i).get(Constants.ParseMessage.SENDER_ID).toString().equals(currentUserId)) {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
                         } else {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_INCOMING);
@@ -108,7 +111,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
             public void onClick(View view) {
 
                 messageBody = messageBodyField.getText().toString();
-                messageService.sendMessage(recipientId, messageBody);
+                messageService.sendMessage(recipientId, messageBody,itemId);
 
                 //reset message
                 messageBodyField.setText("");
@@ -174,11 +177,12 @@ public class MessagingActivity extends Activity implements TextWatcher {
         @Override
         public void onMessageFailed(MessageClient client, Message message,
                                     MessageFailureInfo failureInfo) {
-            Toast.makeText(MessagingActivity.this, "Message failed to send.", Toast.LENGTH_SHORT).show();
+            //TODO check this failure message is o.k.
+            Toast.makeText(MessagingActivity.this, failureInfo.getSinchError().getMessage(), Toast.LENGTH_SHORT).show();
         }
         @Override
         public void onIncomingMessage(MessageClient client, Message message) {
-            if (message.getSenderId().equals(recipientId)) {
+            if (message.getSenderId().equals(recipientId) && message.getHeaders().get(Constants.SinchMessage.ITEM_ID).equals(itemId)) {
                 WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
                 messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
             }
@@ -189,20 +193,21 @@ public class MessagingActivity extends Activity implements TextWatcher {
             final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
 
             //only add message to parse database if it doesn't already exist there
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseMessage");
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
 
-            query.whereEqualTo("sinchId", message.getMessageId());
+            query.whereEqualTo(Constants.ParseMessage.SINCH_ID, message.getMessageId());
 
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> messageList, com.parse.ParseException e) {
                     if (e == null) {
                         if (messageList.size() == 0) {
-                            ParseObject parseMessage = new ParseObject("ParseMessage");
-                            parseMessage.put("senderId", currentUserId);
-                            parseMessage.put("recipientId", writableMessage.getRecipientIds().get(0));
-                            parseMessage.put("messageText", writableMessage.getTextBody());
-                            parseMessage.put("sinchId", writableMessage.getMessageId());
+                            ParseObject parseMessage = new ParseObject(Constants.ParseObject.PARSE_MESSAGE);
+                            parseMessage.put(Constants.ParseMessage.SENDER_ID, currentUserId);
+                            parseMessage.put(Constants.ParseMessage.RECIPIENT_ID, writableMessage.getRecipientIds().get(0));
+                            parseMessage.put(Constants.ParseMessage.MESSAGE_TEXT, writableMessage.getTextBody());
+                            parseMessage.put(Constants.ParseMessage.SINCH_ID, writableMessage.getMessageId());
+                            parseMessage.put(Constants.ParseMessage.ITEM_ID, itemId);
                             parseMessage.saveInBackground();
 
                             messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
@@ -211,20 +216,20 @@ public class MessagingActivity extends Activity implements TextWatcher {
                 }
             });
 
-            sendPushNotification(recipientId);
+            sendPushNotification(recipientId, message);
         }
 
-        private void sendPushNotification(String recipientId) {
+        private void sendPushNotification(String recipientId,Message message) {
 
             ParseQuery pushQuery = ParseInstallation.getQuery();
             pushQuery.whereEqualTo("user", recipientId);
             ParsePush push = new ParsePush();
             push.setQuery(pushQuery); // Set our Installation query
 //            push.setD
-            push.setMessage("received a new message from user:" + ((LostFoundApplication) getApplication()).getUserDisplayName());
+            push.setMessage("user: " + ((LostFoundApplication) getApplication()).getUserDisplayName() + "sent: " + message.getTextBody());
             push.sendInBackground();
 
-            Log.d("messaging", "sent to user id: " + recipientId);
+            Log.d("messaging", "sent " + message.getTextBody() + " to user id: " + recipientId);
         }
 
         //Do you want to notify your user when the message is delivered?

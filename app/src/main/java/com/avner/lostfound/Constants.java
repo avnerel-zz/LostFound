@@ -26,8 +26,6 @@ public class Constants {
     public static final String USER_IMAGE_FILE_PATH = Environment.getExternalStorageDirectory()
             + Constants.APP_IMAGE_DIRECTORY_NAME + "/" + Constants.USER_IMAGE_FILE_NAME;
 
-    public static final String IS_LOST_FORM = "lost";
-
     /**
      * tag for logger.
      */
@@ -43,12 +41,21 @@ public class Constants {
         public static final String USER_ID = "userId";
         public static final String ITEM_IMAGE = "itemImage";
         public static final String USER_DISPLAY_NAME = "name";
+        public static final String IS_LOST = "isLost";
+    }
+
+    public class ParseQuery{
+
+        public static final String CREATED_AT = "createdAt";
+        public static final String OBJECT_ID = "objectId";
     }
 
     public class ParseObject{
 
         public static final String PARSE_LOST = "ParseLost";
         public static final String PARSE_FOUND = "ParseFound";
+        public static final String PARSE_CONVERSATION= "ParseConversation";
+        public static final String PARSE_MESSAGE= "ParseMessage";
     }
 
     public class ParseUser{
@@ -60,5 +67,40 @@ public class Constants {
 
         public static final String ITEM_ID = "itemId";
         public static final String RECIPIENT_ID = "RECIPIENT_ID";
+    }
+
+    public class ParseConversation{
+
+        public static final String MY_USER_ID = "myUserId";
+        public static final String RECIPIENT_USER_ID = "recipientUserId";
+        public static final String RECIPIENT_USER_NAME = "recipientUserName";
+        public static final String ITEM = "item";
+
+    }
+
+    public class ParseMessage{
+        public static final String SENDER_ID = "senderId";
+        public static final String RECIPIENT_ID = "recipientId";
+        public static final String MESSAGE_TEXT = "messageText";
+        public static final String SINCH_ID = "sinchId";
+        public static final String ITEM_ID = "itemId";
+        public static final String CREATED_AT = "createdAt";
+
+    }
+
+    public class ReportForm{
+
+        public static final String IS_LOST_FORM = "lost";
+        public static final String IS_EDIT_FORM = "edit";
+        public static final String ITEM = "item";
+    }
+
+    public class SinchMessage {
+        public static final String ITEM_ID = "itemId";
+    }
+
+    public class Geocoder {
+
+        public static final String DESCRIPTION_NOT_AVAILABLE = "Description not Available";
     }
 }

@@ -1,10 +1,9 @@
 package com.avner.lostfound.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,7 +11,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,19 +31,24 @@ import android.widget.Toast;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.R;
+import com.avner.lostfound.structs.Item;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -76,6 +79,11 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
      * This field indicates if the report is for a lost item or a found item.
      */
     private boolean lostReport;
+    /**
+     * This field indicates if the report is new or an edit of a previous report.
+     */
+    private boolean editReport;
+    private Item itemEdited;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,13 +92,62 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         initViews();
 
+
+        lostReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_LOST_FORM);
+        editReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_EDIT_FORM);
+
+        if(editReport){
+            itemEdited = (Item) getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
+            loadFromItem(itemEdited);
+        }else{
+
+            setDefaultValues();
+        }
+
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        lostReport = getIntent().getExtras().getBoolean(Constants.IS_LOST_FORM);
+    }
+
+    private void setDefaultValues() {
+
+        setTime(Calendar.getInstance());
+    }
+
+    private void loadFromItem(Item itemEdited) {
+
+        setTime(itemEdited.getTime());
+
+        //setting picture
+        Picasso.with(this).load(itemEdited.getImageUrl()).into(ib_item_photo);
+
+        et_description.setText(itemEdited.getDescription());
+        Location location = itemEdited.getLocation();
+        if(location!= null) {
+            location_chosen = new LatLng(location.getLatitude(), location.getLongitude());
+            tv_location_picker.setText(itemEdited.getLocationString());
+            cb_with_location.setChecked(true);
+        }
+
+        boolean found = false;
+        // go over all spinner items except for other... and if a match is found than choose it.
+        int lastSpinnerItemPosition =  spinner.getCount() - 1;
+        for(int i=0; i< lastSpinnerItemPosition; i++) {
+
+            if (itemEdited.getName().equals(spinner.getItemAtPosition(i))) {
+
+                found = true;
+                spinner.setSelection(i);
+            }
+        }
+        //set spinner to other...
+        if(!found){
+            spinner.setSelection(lastSpinnerItemPosition);
+            et_itemName.setText(itemEdited.getName());
+        }
     }
 
     private void updateCurrentLocation() {
@@ -110,25 +167,17 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     private void initViews() {
 
         initTimeViews();
-
         initLocationViews();
-
         initItemSelector();
-
         submitButton = (Button) findViewById(R.id.b_submit);
         submitButton.setOnClickListener(this);
-
         et_description = (EditText) findViewById(R.id.et_description);
-
         initItemImage();
     }
 
     private void initItemImage() {
         ib_item_photo = (ImageButton) findViewById(R.id.ib_item_image);
         ib_item_photo.setOnClickListener(this);
-
-        Bitmap defaultImage = ((BitmapDrawable)ib_item_photo.getDrawable()).getBitmap();
-        parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME,defaultImage);
     }
 
     private void initItemSelector() {
@@ -156,19 +205,29 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private void initTimeViews() {
-        Calendar currentDate = new GregorianCalendar();
 
         ib_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
         ib_pick_date.setOnClickListener(this);
         tv_date_picker = (TextView) findViewById(R.id.tv_date_picker);
-        tv_date_picker.setText((currentDate.get(Calendar.DAY_OF_MONTH) + "-" + (currentDate.get(Calendar.MONTH) + 1) + "-" + currentDate.get(Calendar.YEAR)));
 
         ib_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
         ib_pick_time.setOnClickListener(this);
         tv_time_picker = (TextView) findViewById(R.id.tv_time_picker);
-        tv_time_picker.setText(String.format("%02d", currentDate.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", currentDate.get(Calendar.MINUTE)));
+    }
+
+    private void setTime(Calendar calendar) {
+        setDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+        setTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
 
         timeChosen = Calendar.getInstance();
+    }
+
+    private void setDate(int day, int month, int year) {
+        tv_date_picker.setText(day+ "-" + month+ "-" + year);
+    }
+
+    private void setTime(int hour, int minute) {
+        tv_time_picker.setText(String.format("%02d", hour) + ":" + String.format("%02d", minute));
     }
 
 
@@ -212,36 +271,36 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                 submitReport();
                 break;
             case R.id.ib_item_image:
-                selectItemImage();
+                ImageUtils.selectItemImage(this);
                 break;
             default:
-                Log.e("my_tag", "clicked on something weird!!");
+                Log.e(Constants.LOST_FOUND_TAG, "clicked on something weird!!");
         }
     }
 
-    private void selectItemImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library",
-                "Cancel" };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Select File"), Constants.REQUEST_CODE_SELECT_FILE);
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
+//    private void selectItemImage() {
+//        final CharSequence[] items = { "Take Photo", "Choose from Library",
+//                "Cancel" };
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Add Photo!");
+//        builder.setItems(items, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int item) {
+//                if (items[item].equals("Take Photo")) {
+//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
+//                } else if (items[item].equals("Choose from Library")) {
+//                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                    intent.setType("image/*");
+//                    startActivityForResult(Intent.createChooser(intent, "Select File"), Constants.REQUEST_CODE_SELECT_FILE);
+//                } else if (items[item].equals("Cancel")) {
+//                    dialog.dismiss();
+//                }
+//            }
+//        });
+//        builder.show();
+//    }
 
 
     private void getDate() {
@@ -341,14 +400,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     private void setImageFromCamera(Intent data) {
         Bitmap imageFromCamera = (Bitmap) data.getExtras().get("data");
-        parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME,imageFromCamera);
         ib_item_photo.setImageBitmap(imageFromCamera);
     }
 
     private void setImageFromGallery(Intent data) {
         try{
             Bitmap imageFromGallery = ImageUtils.decodeUri(getContentResolver(), data.getData());
-            parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME,imageFromGallery);
             ib_item_photo.setImageBitmap(imageFromGallery);
 
         } catch (FileNotFoundException e) {
@@ -361,11 +418,11 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
-        List<Address> addresses  = null;
         String addressLine = "";
 
         try {
-            addresses = geocoder.getFromLocation(location_chosen.latitude,location_chosen.longitude, 1);
+
+            List<Address> addresses = geocoder.getFromLocation(location_chosen.latitude,location_chosen.longitude, 1);
             Address address = addresses.get(0);
             for(int i=0; i<address.getMaxAddressLineIndex(); i++){
 
@@ -374,7 +431,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             addressLine += address.getAddressLine(address.getMaxAddressLineIndex());
 
         } catch (IOException e) {
-            addressLine = "Description not Available";
+            addressLine = Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE;
         }
 
         return addressLine;
@@ -416,14 +473,11 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-
         if(isChecked){
 
             ib_pick_location.setEnabled(true);
             tv_location_picker.setEnabled(true);
             updateCurrentLocation();
-
         }else{
 
             ib_pick_location.setEnabled(false);
@@ -446,14 +500,35 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     private void submitReport() {
 
         ParseObject parseReport;
-        if(lostReport){
 
-            parseReport = new ParseObject(Constants.ParseObject.PARSE_LOST);
+        String parseClass = lostReport ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
+
+        if(editReport){
+
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Loading");
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+
+            ParseQuery query = ParseQuery.getQuery(parseClass);
+            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID,itemEdited.getId());
+            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    progressDialog.dismiss();
+                    fillReport(parseObject);
+                }
+            });
+
         }else{
-
-            parseReport = new ParseObject(Constants.ParseObject.PARSE_FOUND);
+                parseReport = new ParseObject(parseClass);
+                fillReport(parseReport);
         }
 
+    }
+
+    private void fillReport(ParseObject parseReport) {
+        parseReport.put(Constants.ParseReport.IS_LOST,lostReport);
         String itemName = et_itemName.getText().toString();
 
         // item name was chosen from spinner.
@@ -472,11 +547,14 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             parseReport.put(Constants.ParseReport.LOCATION_STRING, tv_location_picker.getText().toString());
         }
         parseReport.put(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
+
+        Bitmap itemImage = ((BitmapDrawable)ib_item_photo.getDrawable()).getBitmap();
+        parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME,itemImage);
         parseReport.put(Constants.ParseReport.ITEM_IMAGE, parseItemImage);
         parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
         parseReport.saveInBackground();
 
-        Toast.makeText(this,"report has been shipped" ,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "report has been shipped", Toast.LENGTH_SHORT).show();
 
         finish();
     }

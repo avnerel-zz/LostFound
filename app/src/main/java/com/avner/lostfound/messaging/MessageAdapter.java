@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by avner on 26/04/2015.
+ * This adapter handles the messages between users.
  */
 public class MessageAdapter extends BaseAdapter {
     public static final int DIRECTION_INCOMING = 0;

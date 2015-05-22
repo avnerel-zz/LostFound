@@ -13,12 +13,17 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.avner.lostfound.Constants;
+import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.activities.LoginActivity;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.SettingsActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.avner.lostfound.messaging.ConversationActivity;
+import com.parse.FindCallback;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.IOException;
@@ -29,12 +34,7 @@ import java.util.Locale;
 
 public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
-    private ImageButton settingsButton;
-    private ImageButton messagesButton;
-    private ImageButton logOutButton;
     private View rootView;
-
-    private ListView lv_openListings;
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,13 +42,13 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
 		rootView = inflater.inflate(R.layout.fragment_my_world, container, false);
 
-        messagesButton = (ImageButton)rootView.findViewById(R.id.b_messages);
+        ImageButton messagesButton = (ImageButton) rootView.findViewById(R.id.b_messages);
         messagesButton.setOnClickListener(this);
 
-        settingsButton = (ImageButton)rootView.findViewById(R.id.b_settings);
+        ImageButton settingsButton = (ImageButton) rootView.findViewById(R.id.b_settings);
         settingsButton.setOnClickListener(this);
 
-        logOutButton = (ImageButton)rootView.findViewById(R.id.b_log_out);
+        ImageButton logOutButton = (ImageButton) rootView.findViewById(R.id.b_log_out);
         logOutButton.setOnClickListener(this);
 
         initOpenListings();
@@ -58,48 +58,72 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
     private void initOpenListings() {
 
-        lv_openListings = (ListView) rootView.findViewById(R.id.lv_openListings);
+        ListView lv_openListings = (ListView) rootView.findViewById(R.id.lv_openListings);
 
-        List<Item> items = new ArrayList<>();
+        final List<Item> items = new ArrayList<>();
+        final OpenItemsAdapter myOpenListingsAdapter = new OpenItemsAdapter(items, rootView);
 
-        Location location = new Location("");
-        location.setLatitude(32.7734607);
-        location.setLongitude(35.0320228);
+        // get all my lost items
+        ParseQuery<ParseObject> lostQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        lostQuery.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 
-        String userId = "LKkpD5iTPx";
-        String userName = "Avner Elizarov";
-        String itemId = "stam";
+        // get all my found items
+        ParseQuery<ParseObject> foundQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        foundQuery.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 
-        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
-        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
-        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(lostQuery);
+        queries.add(foundQuery);
 
-        OpenItemsAdapter myOpenListingsAdapter = new OpenItemsAdapter(items, rootView);
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.orderByAscending(Constants.ParseQuery.CREATED_AT);
+
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < itemsList.size(); i++) {
+                        convertParseListToItemList(itemsList, items);
+                    }
+                    myOpenListingsAdapter.notifyDataSetChanged();
+                }
+            }
+        });
         lv_openListings.setAdapter(myOpenListingsAdapter);
+        lv_openListings.setOnItemClickListener(myOpenListingsAdapter);
     }
 
+    private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
+
+        //TODO if not loading all items and just adding so remove this.
+        items.clear();
+        for(ParseObject parseItem: itemsList){
+            Item item = new Item(parseItem);
+            items.add(item);
+        }
+    }
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.b_settings){
 
-            Intent intent = new Intent(rootView.getContext(),SettingsActivity.class);
-            startActivity(intent);
+        Intent intent;
+        switch(v.getId()){
 
-        }else if(v.getId() == R.id.b_messages){
-
-            Intent intent = new Intent(rootView.getContext(),ConversationActivity.class);
-            startActivity(intent);
-        }
-
-        if(v.getId() == R.id.b_log_out){
-
-            ParseUser.logOut();
-
-            Intent intent = new Intent(rootView.getContext(),LoginActivity.class);
-            startActivity(intent);
-            getActivity().finish();
-
+            case R.id.b_settings:
+                intent = new Intent(rootView.getContext(),SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.b_messages:
+                intent = new Intent(rootView.getContext(),ConversationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.b_log_out:
+                ParseUser.logOut();
+                intent = new Intent(rootView.getContext(),LoginActivity.class);
+                startActivity(intent);
+                // return to login screen.
+                getActivity().finish();
+                break;
         }
     }
 

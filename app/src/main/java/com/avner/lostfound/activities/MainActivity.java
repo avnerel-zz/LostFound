@@ -18,7 +18,6 @@ public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener {
 
     private ViewPager viewPager;
-    private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     // Tab titles
     private String[] tabsStrings = { "My World", "Lost", "Found", "Stats" };
@@ -40,16 +39,11 @@ public class MainActivity extends FragmentActivity implements
         // Initialization
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
-        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+        TabsPagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 
         viewPager.setAdapter(mAdapter);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setHomeButtonEnabled(false);
-//        actionBar.setDisplayShowTitleEnabled(false);
-//        actionBar.setDisplayUseLogoEnabled(false);
-//        actionBar.setDisplayOptions(0);
-
-
 
         // Adding Tabs with icons
         for (int i = 0; i < tabsStrings.length; ++i) {
@@ -74,18 +68,15 @@ public class MainActivity extends FragmentActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                // on changing the page
-                // make respected tab selected
+                // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
             }
 
             @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
 
             @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
+            public void onPageScrollStateChanged(int arg0) {}
         });
     }
 
