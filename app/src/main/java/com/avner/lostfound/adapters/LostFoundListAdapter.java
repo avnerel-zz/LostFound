@@ -3,6 +3,7 @@ package com.avner.lostfound.adapters;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -194,18 +195,26 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     }
 
     private void initMapButton(final AdapterView<?> parent, final int position, Dialog dialog) {
+
+        final Item item = (Item) parent.getItemAtPosition(position);
+        final Location location = item.getLocation();
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
+        // no location specified.
+        if(location == null){
+            ib_showMap.setVisibility(ImageButton.INVISIBLE);
+            return;
+        }
+
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
-                Item item = (Item) parent.getItemAtPosition(position);
                 if (null == item) {
                     Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
                     return;
                 }
-                intent.putExtra(Constants.LATITUDE, item.getLocation().getLatitude());
-                intent.putExtra(Constants.LONGITUDE, item.getLocation().getLongitude());
+                intent.putExtra(Constants.LATITUDE, location.getLatitude());
+                intent.putExtra(Constants.LONGITUDE, location.getLongitude());
                 rootView.getContext().startActivity(intent);
             }
         });

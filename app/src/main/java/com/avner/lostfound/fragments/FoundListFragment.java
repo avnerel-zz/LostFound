@@ -28,6 +28,8 @@ public class FoundListFragment extends Fragment implements View.OnClickListener 
     private ListView lv_itemList;
 
     private View rootView;
+    private List<Item> items;
+    private LostFoundListAdapter adapter;
 
 
     @Override
@@ -64,41 +66,35 @@ public class FoundListFragment extends Fragment implements View.OnClickListener 
 
     private void initItemsList() {
 
-        final List<Item> items = new ArrayList<>();
+        items = new ArrayList<>();
+        adapter = new LostFoundListAdapter(items,rootView);
+        lv_itemList.setClickable(true);
+        lv_itemList.setAdapter(adapter);
+        lv_itemList.setOnItemClickListener(adapter);
+    }
 
-        final LostFoundListAdapter adapter = new LostFoundListAdapter(items,rootView);
+    @Override
+    public void onResume() {
+        super.onResume();
+        getItemsFromParse();
+    }
 
+    private void getItemsFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_FOUND);
-        query.orderByAscending("createdAt");
+        query.orderByAscending(Constants.ParseQuery.CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < itemsList.size(); i++) {
-                        convertParseListToItemList(itemsList, items);
-                        adapter.notifyDataSetChanged();
+                        convertParseListToItemList(itemsList,items);
                     }
+                    adapter.notifyDataSetChanged();
                 }
             }
         });
-//        Location location = new Location("");
-//        location.setLatitude(32.7734607);
-//        location.setLongitude(35.0320228);
-//
-//        String userId = "LKkpD5iTPx";
-//        String userName = "Avner Elizarov";
-//        String itemId = "stam";
-//        items.add(new Item(itemId,"Ring", "very nice ring", new GregorianCalendar(), location, R.drawable.ring1,userId,userName));
-//        items.add(new Item(itemId,"Necklace", "very nice necklace", new GregorianCalendar(), location, R.drawable.necklace1,userId,userName));
-//        items.add(new Item(itemId,"Car keys", "my beautiful car keys", new GregorianCalendar(), location, R.drawable.car_keys1,userId,userName));
-//        items.add(new Item(itemId,"Earrings", "very nice earrings", new GregorianCalendar(), location, R.drawable.earings1,userId,userName));
-//        items.add(new Item(itemId,"Headphones", "lost my beats", new GregorianCalendar(), location, R.drawable.headphones2,userId,userName));
-
-
-        lv_itemList.setClickable(true);
-        lv_itemList.setAdapter(adapter);
-        lv_itemList.setOnItemClickListener(adapter);
     }
+
 
     private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
 

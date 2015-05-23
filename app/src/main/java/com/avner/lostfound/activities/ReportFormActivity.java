@@ -55,6 +55,7 @@ import java.util.Locale;
 public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CompoundButton.OnCheckedChangeListener, MenuItem.OnMenuItemClickListener {
 
     private static final String ITEM_IMAGE_NAME = "itemImage.png";
+    public static final String NO_LOCATION_AVAILABLE = "No location available";
 
     private Spinner spinner;
     private TextView et_itemName;
@@ -127,6 +128,9 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             location_chosen = new LatLng(location.getLatitude(), location.getLongitude());
             tv_location_picker.setText(itemEdited.getLocationString());
             cb_with_location.setChecked(true);
+        }else{
+            cb_with_location.setChecked(false);
+            tv_location_picker.setText(NO_LOCATION_AVAILABLE);
         }
 
         boolean found = false;
@@ -152,6 +156,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             if (null == location) { // failed to get a location
+                tv_location_picker.setText(NO_LOCATION_AVAILABLE);
                 return;
             }
 
@@ -279,31 +284,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                 Log.e(Constants.LOST_FOUND_TAG, "clicked on something weird!!");
         }
     }
-
-//    private void selectItemImage() {
-//        final CharSequence[] items = { "Take Photo", "Choose from Library",
-//                "Cancel" };
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Add Photo!");
-//        builder.setItems(items, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int item) {
-//                if (items[item].equals("Take Photo")) {
-//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(intent, Constants.REQUEST_CODE_CAMERA);
-//                } else if (items[item].equals("Choose from Library")) {
-//                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                    intent.setType("image/*");
-//                    startActivityForResult(Intent.createChooser(intent, "Select File"), Constants.REQUEST_CODE_SELECT_FILE);
-//                } else if (items[item].equals("Cancel")) {
-//                    dialog.dismiss();
-//                }
-//            }
-//        });
-//        builder.show();
-//    }
-
 
     private void getDate() {
         final Calendar c = Calendar.getInstance();
@@ -477,6 +457,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+        tv_location_picker.setText(NO_LOCATION_AVAILABLE);
     }
 
     @Override
@@ -489,7 +470,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         else {
             ib_pick_location.setEnabled(false);
             tv_location_picker.setEnabled(false);
-            tv_location_picker.setText("No location specified");
+            tv_location_picker.setText(NO_LOCATION_AVAILABLE);
             location_chosen = null;
         }
     }
@@ -550,6 +531,9 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             ParseGeoPoint location = new ParseGeoPoint(location_chosen.latitude, location_chosen.longitude);
             parseReport.put(Constants.ParseReport.LOCATION, location);
             parseReport.put(Constants.ParseReport.LOCATION_STRING, tv_location_picker.getText().toString());
+        }else{
+
+            parseReport.put(Constants.ParseReport.LOCATION_STRING, NO_LOCATION_AVAILABLE);
         }
         parseReport.put(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 

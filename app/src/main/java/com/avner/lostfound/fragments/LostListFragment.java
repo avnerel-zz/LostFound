@@ -29,6 +29,8 @@ public class LostListFragment extends Fragment implements View.OnClickListener {
     private ListView lv_itemList;
 
     private View rootView;
+    private List<Item> items;
+    private LostFoundListAdapter adapter;
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,11 +59,21 @@ public class LostListFragment extends Fragment implements View.OnClickListener {
 	}
 
     private void initItemsList() {
-        final List<Item> items = new ArrayList<>();
-
-        final LostFoundListAdapter adapter;
+        items = new ArrayList<>();
         adapter = new LostFoundListAdapter(items,rootView);
 
+        lv_itemList.setClickable(true);
+        lv_itemList.setAdapter(adapter);
+        lv_itemList.setOnItemClickListener(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getItemsFromParse();
+    }
+
+    private void getItemsFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
         query.orderByAscending(Constants.ParseQuery.CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -75,9 +87,6 @@ public class LostListFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-        lv_itemList.setClickable(true);
-        lv_itemList.setAdapter(adapter);
-        lv_itemList.setOnItemClickListener(adapter);
     }
 
     private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {

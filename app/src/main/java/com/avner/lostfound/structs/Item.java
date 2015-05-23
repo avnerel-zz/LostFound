@@ -35,9 +35,12 @@ public class Item implements Parcelable {
         description = (String) parseItem.get(Constants.ParseReport.ITEM_DESCRIPTION);
 
         ParseGeoPoint parseLocation = (ParseGeoPoint) parseItem.get(Constants.ParseReport.LOCATION);
-        location = new Location("");
-        location.setLatitude(parseLocation.getLatitude());
-        location.setLongitude(parseLocation.getLongitude());
+        if(parseLocation!= null){
+
+            location = new Location("");
+            location.setLatitude(parseLocation.getLatitude());
+            location.setLongitude(parseLocation.getLongitude());
+        }
 
         long timeLost = (long) parseItem.get(Constants.ParseReport.TIME);
         calender = Calendar.getInstance();
@@ -136,7 +139,10 @@ public class Item implements Parcelable {
         dest.writeStringArray(new String[]{locationAsString, imageUrl, userId, userDisplayName, name, description, itemId});
         dest.writeLong(calender.getTimeInMillis());
         dest.writeBooleanArray(new boolean[]{isLost});
-        location.writeToParcel(dest, flags);
+        if(location!= null){
+
+            location.writeToParcel(dest, flags);
+        }
     }
 
     public Item(Parcel source) {
@@ -157,7 +163,12 @@ public class Item implements Parcelable {
         boolean[] booleanField = new boolean[1];
         source.readBooleanArray(booleanField);
         isLost = booleanField[0];
-        location = Location.CREATOR.createFromParcel(source);
+
+        // location is valid.
+        if(source.dataAvail()!=0){
+
+            location = Location.CREATOR.createFromParcel(source);
+        }
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

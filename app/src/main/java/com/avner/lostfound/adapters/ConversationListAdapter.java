@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -113,7 +114,15 @@ public class ConversationListAdapter extends BaseAdapter {
     }
 
     private void initMapButton(final Item item, final int position, Dialog dialog) {
+
+        final Location location = item.getLocation();
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
+
+        // no location specified.
+        if(location == null){
+            ib_showMap.setVisibility(ImageButton.INVISIBLE);
+            return;
+        }
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,10 +131,8 @@ public class ConversationListAdapter extends BaseAdapter {
                     Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
                     return;
                 }
-                double latitude = item.getLocation().getLatitude();
-                double longitude = item.getLocation().getLongitude();
-                intent.putExtra(Constants.LATITUDE, latitude);
-                intent.putExtra(Constants.LONGITUDE, longitude);
+                intent.putExtra(Constants.LATITUDE, location.getLatitude());
+                intent.putExtra(Constants.LONGITUDE, location.getLongitude());
                 rootActivity.startActivity(intent);
             }
         });
