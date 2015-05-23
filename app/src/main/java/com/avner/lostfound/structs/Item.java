@@ -5,12 +5,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.avner.lostfound.Constants;
-import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
-import java.io.Serializable;
 import java.util.Calendar;
 
 /**
@@ -31,7 +29,6 @@ public class Item implements Parcelable {
     private boolean isLost;
 
     public Item(ParseObject parseItem) {
-
         this.parseItem = parseItem;
 
         name = (String) parseItem.get(Constants.ParseReport.ITEM_NAME);
@@ -47,12 +44,11 @@ public class Item implements Parcelable {
         calender.setTimeInMillis(timeLost);
 
         userId = (String) parseItem.get(Constants.ParseReport.USER_ID);
-        itemId = (String) parseItem.getObjectId();
+        itemId = parseItem.getObjectId();
         userDisplayName = (String) parseItem.get(Constants.ParseReport.USER_DISPLAY_NAME);
         locationAsString = (String) parseItem.get(Constants.ParseReport.LOCATION_STRING);
         imageUrl = ((ParseFile) parseItem.get(Constants.ParseReport.ITEM_IMAGE)).getUrl();
         isLost = (boolean) parseItem.get(Constants.ParseReport.IS_LOST);
-
     }
 
 
@@ -163,7 +159,6 @@ public class Item implements Parcelable {
         isLost = booleanField[0];
         location = Location.CREATOR.createFromParcel(source);
     }
-
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         @Override

@@ -97,9 +97,20 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         //TODO if not loading all items and just adding so remove this.
         items.clear();
-        for(ParseObject parseItem: itemsList){
-            Item item = new Item(parseItem);
-            items.add(item);
+        Item item = null;
+        for (ParseObject parseItem : itemsList){
+            try {
+                if (null != parseItem) {
+                    item = new Item(parseItem);
+                    if (null == item) {
+                        Log.d(Constants.LOST_FOUND_TAG, "item created as NULL");
+                    }
+                    items.add(item);
+                }
+            } catch (NullPointerException e) {
+                Log.d(Constants.LOST_FOUND_TAG, "caught NullPointerException when adding an item (item == null?" + (item == null) + ")");
+                Log.d(Constants.LOST_FOUND_TAG, "based on parseItem: " + parseItem.toString());
+            }
         }
     }
 

@@ -36,7 +36,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -92,15 +91,13 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         initViews();
 
-
         lostReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_LOST_FORM);
         editReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_EDIT_FORM);
 
-        if(editReport){
+        if (editReport){
             itemEdited = (Item) getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
             loadFromItem(itemEdited);
-        }else{
-
+        } else {
             setDefaultValues();
         }
 
@@ -126,7 +123,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         et_description.setText(itemEdited.getDescription());
         Location location = itemEdited.getLocation();
-        if(location!= null) {
+        if (location != null) {
             location_chosen = new LatLng(location.getLatitude(), location.getLongitude());
             tv_location_picker.setText(itemEdited.getLocationString());
             cb_with_location.setChecked(true);
@@ -152,8 +149,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     private void updateCurrentLocation() {
         if(location_chosen == null){
-
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+            if (null == location) { // failed to get a location
+                return;
+            }
+
             location_chosen = new LatLng(location.getLatitude(), location.getLongitude());
 
             String locationAsString = getLocationFromCoordinates(location_chosen);
@@ -169,6 +170,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         initTimeViews();
         initLocationViews();
         initItemSelector();
+
         submitButton = (Button) findViewById(R.id.b_submit);
         submitButton.setOnClickListener(this);
         et_description = (EditText) findViewById(R.id.et_description);
@@ -415,26 +417,32 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private String getLocationFromCoordinates(LatLng location_chosen) {
-
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-
-        String addressLine = "";
+        StringBuilder sb = new StringBuilder();
 
         try {
-
             List<Address> addresses = geocoder.getFromLocation(location_chosen.latitude,location_chosen.longitude, 1);
-            Address address = addresses.get(0);
-            for(int i=0; i<address.getMaxAddressLineIndex(); i++){
 
-                addressLine += address.getAddressLine(i) + ", ";
+            if (addresses.isEmpty()) {
+                Log.d(Constants.LOST_FOUND_TAG, "Got no address from map activity, using unknown");
+                sb.append(Constants.Geocoder.LOCATION_UNKNOWN);
             }
-            addressLine += address.getAddressLine(address.getMaxAddressLineIndex());
+            else {
+                Address address = addresses.get(0);
+                for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                    sb.append(address.getAddressLine(i))
+                      .append(", ");
+                }
+
+                sb.append(address.getAddressLine(address.getMaxAddressLineIndex()));
+            }
 
         } catch (IOException e) {
-            addressLine = Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE;
+            Log.d(Constants.LOST_FOUND_TAG, "Exception when trying to get address description");
+            sb.append(Constants.Geocoder.LOCATION_UNKNOWN);
         }
 
-        return addressLine;
+        return sb.toString();
     }
 
     @Override
@@ -473,13 +481,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked){
-
+        if (isChecked){
             ib_pick_location.setEnabled(true);
             tv_location_picker.setEnabled(true);
             updateCurrentLocation();
-        }else{
-
+        }
+        else {
             ib_pick_location.setEnabled(false);
             tv_location_picker.setEnabled(false);
             tv_location_picker.setText("No location specified");
@@ -489,9 +496,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-
         if(item.getItemId() == R.id.action_send){
-
             submitReport();
         }
         return true;
@@ -551,7 +556,13 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         Bitmap itemImage = ((BitmapDrawable)ib_item_photo.getDrawable()).getBitmap();
         parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME,itemImage);
         parseReport.put(Constants.ParseReport.ITEM_IMAGE, parseItemImage);
-        parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
+
+        String userLoginName = (String) ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME);
+        if (null == userLoginName) {
+            Log.d(Constants.LOST_FOUND_TAG, "got NULL login name, using unknown");
+            userLoginName = "<unknown user>";
+        }
+        parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, userLoginName);
         parseReport.saveInBackground();
 
         Toast.makeText(this, "report has been shipped", Toast.LENGTH_SHORT).show();

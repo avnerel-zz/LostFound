@@ -1,5 +1,6 @@
 package com.avner.lostfound.structs;
 
+import com.avner.lostfound.Constants;
 import com.parse.ParseObject;
 
 /**
@@ -7,15 +8,15 @@ import com.parse.ParseObject;
  */
 public class Conversation {
 
-    public String userName;
-    public String userId;
-    public Item item;
+    public final String userName;
+    public final String userId;
+    public final Item item;
 
     public Conversation(ParseObject parseConversation){
 
-        this.userName  = (String) parseConversation.get("conversationUserName");
-        this.userId = (String) parseConversation.get("conversationUserId");
-        this.item = new Item((ParseObject) parseConversation.get("conversationItem"));
+        this.userName  = (String) parseConversation.get(Constants.Conversation.CONVERSATION_FIELD_USER_NAME);
+        this.userId    = (String) parseConversation.get(Constants.Conversation.CONVERSATION_FIELD_USER_ID);
+        this.item      = new Item((ParseObject) parseConversation.get(Constants.Conversation.CONVERSATION_FIELD_ITEM));
     }
 
     public Item getItem() {

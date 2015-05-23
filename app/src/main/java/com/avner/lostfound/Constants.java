@@ -67,6 +67,9 @@ public class Constants {
 
         public static final String ITEM_ID = "itemId";
         public static final String RECIPIENT_ID = "RECIPIENT_ID";
+        public static final String CONVERSATION_FIELD_USER_NAME = "conversationUserName";
+        public static final String CONVERSATION_FIELD_USER_ID = "conversationUserId";
+        public static final String CONVERSATION_FIELD_ITEM = "conversationItem";
     }
 
     public class ParseConversation{
@@ -100,7 +103,7 @@ public class Constants {
     }
 
     public class Geocoder {
-
+        public static final String LOCATION_UNKNOWN = "Location Unknown";
         public static final String DESCRIPTION_NOT_AVAILABLE = "Description not Available";
     }
 }

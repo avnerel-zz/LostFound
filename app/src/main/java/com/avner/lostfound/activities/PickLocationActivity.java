@@ -3,6 +3,7 @@ package com.avner.lostfound.activities;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -77,18 +78,28 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
 
         double latitude = intent.getExtras().getDouble(Constants.LATITUDE);
         double longitude = intent.getExtras().getDouble(Constants.LONGITUDE);
+        MarkerOptions marker = getMarker(latitude, longitude);
+
+        location_chosen_marker = marker;
+    }
+
+    private MarkerOptions getMarker(double latitude, double longitude) {
         LatLng position = new LatLng(latitude, longitude);
+
         MarkerOptions marker = new MarkerOptions().position(position).title("My location");
-        map.addMarker(marker);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17));
+
+        if (null != map) {
+            Log.d(Constants.LOST_FOUND_TAG, "map is NULL! skipping marker update on map");
+            map.addMarker(marker);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17));
+        }
 
         // set result for if the user doesn't chose a location.
         Intent resultIntent = new Intent();
         resultIntent.putExtra(Constants.LONGITUDE, longitude);
         resultIntent.putExtra(Constants.LATITUDE, latitude);
         setResult(RESULT_OK, resultIntent);
-
-        location_chosen_marker = marker;
+        return marker;
     }
 
     @Override
@@ -104,7 +115,22 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
     @Override
     public void onClick(View v) {
 
-        if(v.getId() == R.id.b_chose_location){
+        if (null == v) {
+            Log.d(Constants.LOST_FOUND_TAG, "View v is NULL!");
+            Intent intent = new Intent();
+            intent.putExtra(Constants.LONGITUDE, 0.0);
+            intent.putExtra(Constants.LATITUDE, 0.0);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+
+
+        if (v.getId() == R.id.b_chose_location) {
+
+            if (null == location_chosen_marker) { // no marker selected - create a dummy one
+                Log.d(Constants.LOST_FOUND_TAG, "location_chosen_marker is NULL!");
+                location_chosen_marker = getMarker(0.0, 0.0);
+            }
 
             Intent intent = new Intent();
             intent.putExtra(Constants.LONGITUDE, location_chosen_marker.getPosition().longitude);
