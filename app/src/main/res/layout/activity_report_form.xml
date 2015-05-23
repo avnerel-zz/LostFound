@@ -218,6 +218,7 @@
                     android:layout_height="wrap_content"
                     android:background="#dcdcdcdc"
                     android:ems="10"
+                    android:hint="@string/ADD_ITEM_DESCRIPTION"
                     android:gravity="top"
                     android:inputType="textMultiLine"
                     android:lines="10"
