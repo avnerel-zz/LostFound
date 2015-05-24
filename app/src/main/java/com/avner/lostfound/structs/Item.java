@@ -147,7 +147,7 @@ public class Item implements Parcelable {
 
     public Item(Parcel source) {
 
-        String[] stringFields = new String[7]; //new String[]{locationAsString, imageUrl, userId, userDisplayName, name, description, itemId};
+        String[] stringFields = new String[7]; // new String[]{locationAsString, imageUrl, userId, userDisplayName, name, description, itemId};
         source.readStringArray(stringFields);
         locationAsString = stringFields[0];
         imageUrl = stringFields[1];
@@ -183,4 +183,5 @@ public class Item implements Parcelable {
             return new Object[0];
         }
     };
+
 }

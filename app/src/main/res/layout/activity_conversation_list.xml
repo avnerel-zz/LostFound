@@ -4,12 +4,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.avner.lostfound.messaging.ConversationActivity">
+    tools:context="com.avner.lostfound.messaging.ConversationListActivity">
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/lv_user_list">
+        android:id="@+id/lv_user_list"
+        >
 
         </ListView>
 

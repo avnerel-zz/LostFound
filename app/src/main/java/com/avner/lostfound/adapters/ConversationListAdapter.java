@@ -4,10 +4,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +16,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -35,10 +39,12 @@ public class ConversationListAdapter extends BaseAdapter {
     private List<Conversation> conversations;
 
     private Activity rootActivity;
+    private SparseBooleanArray selectedItemIds;
 
     public ConversationListAdapter(List<Conversation> conversations, Activity rootActivity) {
         this.conversations = conversations;
         this.rootActivity =rootActivity;
+        selectedItemIds = new SparseBooleanArray();
     }
 
 
@@ -63,6 +69,7 @@ public class ConversationListAdapter extends BaseAdapter {
         final View view;
         final ViewHolder viewHolder;
 
+        final Conversation conversation = conversations.get(position);
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = li.inflate(R.layout.list_row_conversation, null);
@@ -70,10 +77,12 @@ public class ConversationListAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.userDisplayName = (TextView) view.findViewById(R.id.tv_user_list_item);
             viewHolder.itemImage = (ImageButton) view.findViewById(R.id.ib_conversation_item_image);
+            viewHolder.unreadCount = (TextView) view.findViewById(R.id.tv_unread_count);
+            
             viewHolder.itemImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Item item = conversations.get(position).getItem();
+                    Item item = conversation.getItem();
                     final Dialog dialog = new Dialog(rootActivity);
                     dialog.setContentView(R.layout.dialog_item_details_layout);
                     initMapButton(item, position, dialog);
@@ -90,25 +99,20 @@ public class ConversationListAdapter extends BaseAdapter {
 
             viewHolder = (ViewHolder) view.getTag();
         }
-        final Item item = conversations.get(position).getItem();
-        String userName = conversations.get(position).getUserName();
+        final Item item = conversation.getItem();
+        String userName = conversation.getUserName();
 
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
         Picasso.with(rootActivity).load(item.getImageUrl()).into(viewHolder.itemImage);
 
-//        AsyncTask task = new AsyncTask() {
-//            @Override
-//            protected Object doInBackground(Object[] params) {
-//                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Object o) {
-//                viewHolder.itemImage.setImageBitmap((Bitmap)o);
-//            }
-//        };
-//        task.execute();
+        if (conversation.getUnreadCount() != 0){
+
+            viewHolder.unreadCount.setText(String.valueOf(conversation.getUnreadCount()));
+
+        }else{
+            viewHolder.unreadCount.setVisibility(TextView.INVISIBLE);
+        }
 
         return view;
     }
@@ -149,31 +153,53 @@ public class ConversationListAdapter extends BaseAdapter {
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
         Picasso.with(rootActivity).load(item.getImageUrl()).into(itemImage);
 
-
-//        AsyncTask task = new AsyncTask() {
-//            @Override
-//            protected Object doInBackground(Object[] params) {
-//                return ImageUtils.decodeRemoteUrl(item.getImageUrl());
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Object o) {
-//                itemImage.setImageBitmap((Bitmap)o);
-//            }
-//        };
-//        task.execute();
-
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());
 
         dialog.setTitle("Item: " + item.getName());
     }
 
+    public void remove(Conversation selectedConversation) {
 
+        conversations.remove(selectedConversation);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, selectedConversation.getId());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e== null){
+                    parseObject.deleteInBackground();
+                }
+            }
+        });
+    }
+
+    public void toggleSelection(int position) {
+        selectView(position, !selectedItemIds.get(position));
+    }
+
+    public void selectView(int position, boolean value) {
+        if (value)
+            selectedItemIds.put(position, value);
+
+        else
+            selectedItemIds.delete(position);
+        notifyDataSetChanged();
+    }
+
+    public SparseBooleanArray getSelectedIds(){
+        return selectedItemIds;
+    }
+
+    public void removeSelection() {
+        selectedItemIds = new SparseBooleanArray();
+        notifyDataSetChanged();
+    }
 
     private class ViewHolder {
         TextView userDisplayName;
         ImageButton itemImage;
+        TextView unreadCount;
     }
 
 }

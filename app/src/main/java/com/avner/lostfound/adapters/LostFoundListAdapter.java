@@ -160,6 +160,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
                 Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
                 intent.putExtra(Constants.Conversation.RECIPIENT_ID, item.getUserId());
+                intent.putExtra(Constants.Conversation.RECIPIENT_NAME, item.getUserDisplayName());
                 intent.putExtra(Constants.Conversation.ITEM_ID, item.getId());
                 rootView.getContext().startActivity(intent);
             }
@@ -187,6 +188,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
                         parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_ID, item.getUserId());
                         parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_NAME, item.getUserDisplayName());
                         parseConversations.put(Constants.ParseConversation.ITEM, item.getParseItem());
+                        parseConversations.put(Constants.ParseConversation.UNREAD_COUNT, 0);
                         parseConversations.saveInBackground();
                     }
                 }

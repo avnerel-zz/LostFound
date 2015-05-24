@@ -130,7 +130,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             cb_with_location.setChecked(true);
         }else{
             cb_with_location.setChecked(false);
-            tv_location_picker.setText(NO_LOCATION_AVAILABLE);
+
         }
 
         boolean found = false;

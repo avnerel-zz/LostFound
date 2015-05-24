@@ -67,5 +67,6 @@
     <string name="share">Share</string>
     <string name="possible_matches">Possible Matches Found</string>
     <string name="ADD_ITEM_DESCRIPTION">add a detailed description</string>
+    <string name="action_complete">Complete</string>
 
 </resources>

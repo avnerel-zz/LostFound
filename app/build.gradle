@@ -19,6 +19,7 @@ android {
     }
     repositories {
         mavenCentral()
+        maven { url 'http://clinker.47deg.com/nexus/content/groups/public' }
 
     }
 
@@ -34,4 +35,7 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile ('com.fortysevendeg.swipelistview:swipelistview:1.0-SNAPSHOT@aar') {
+        transitive = true
+    }
 }

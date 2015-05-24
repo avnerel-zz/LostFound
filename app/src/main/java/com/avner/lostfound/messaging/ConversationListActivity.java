@@ -2,10 +2,14 @@ package com.avner.lostfound.messaging;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -24,17 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ConversationActivity extends Activity {
+public class ConversationListActivity extends Activity {
 
     private String myUserId;
     private ConversationListAdapter conversationAdapter;
-
     private List<Conversation> conversations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_users_list);
+        setContentView(R.layout.activity_conversation_list);
 
         myUserId = ParseUser.getCurrentUser().getObjectId();
         conversations = new ArrayList<>();
@@ -46,7 +49,7 @@ public class ConversationActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_users_list, menu);
+        getMenuInflater().inflate(R.menu.menu_conversation_list, menu);
         return true;
     }
 
@@ -68,6 +71,8 @@ public class ConversationActivity extends Activity {
     private void initConversationList() {
 
         ListView usersListView = (ListView) findViewById(R.id.lv_user_list);
+
+        setContextualBar(usersListView);
         conversationAdapter = new ConversationListAdapter(conversations, this);
         usersListView.setAdapter(conversationAdapter);
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -94,6 +99,65 @@ public class ConversationActivity extends Activity {
             }
         });
     }
+
+    private void setContextualBar(final ListView usersListView) {
+        usersListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        // Capture ListView item click
+        usersListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode,
+                                                  int position, long id, boolean checked) {
+                // Capture total checked items
+                final int checkedCount = usersListView.getCheckedItemCount();
+                // Set the CAB title according to total checked items
+                mode.setTitle(checkedCount + " Selected");
+                // Calls toggleSelection method from ListViewAdapter Class
+                conversationAdapter.toggleSelection(position);
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.delete:
+                        // Calls getSelectedIds method from ListViewAdapter Class
+                        SparseBooleanArray selected = conversationAdapter.getSelectedIds();
+                        // Captures all selected ids with a loop
+                        for (int i = (selected.size() - 1); i >= 0; i--) {
+                            if (selected.valueAt(i)) {
+                                Conversation selectedConversation = (Conversation) conversationAdapter.getItem(selected.keyAt(i));
+                                // Remove selected items following the ids
+                                conversationAdapter.remove(selectedConversation);
+                            }
+                        }
+                        // Close CAB
+                        mode.finish();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                mode.getMenuInflater().inflate(R.menu.menu_conversation_contextual, menu);
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                // TODO Auto-generated method stub
+                conversationAdapter.removeSelection();
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+        });
+    }
+
     private void updateConversations(List<ParseObject> conversationList) {
 
         conversations.clear();
@@ -109,8 +173,11 @@ public class ConversationActivity extends Activity {
 
     public void openConversation(int pos) {
 
+        conversations.get(pos).setUnreadCount(0);
+        conversationAdapter.notifyDataSetChanged();
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
         intent.putExtra(Constants.Conversation.RECIPIENT_ID, conversations.get(pos).getUserId());
+        intent.putExtra(Constants.Conversation.RECIPIENT_NAME, conversations.get(pos).getUserName());
         intent.putExtra(Constants.Conversation.ITEM_ID, conversations.get(pos).getItem().getId());
         startActivity(intent);
     }

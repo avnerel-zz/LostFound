@@ -21,7 +21,7 @@ import com.avner.lostfound.R;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class SettingsActivity extends Activity implements AdapterView.OnItemSelectedListener{
+public class SettingsActivity extends Activity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     private static final String INFINITY = "\u221E";
     Spinner messageHistory;
@@ -59,12 +59,7 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
 
         }
 
-        userPhotoImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageUtils.selectItemImage(getParent());
-            }
-        });
+        userPhotoImageButton.setOnClickListener(this);
 
 
     }
@@ -126,5 +121,10 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        ImageUtils.selectItemImage(this);
     }
 }

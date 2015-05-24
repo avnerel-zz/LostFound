@@ -27,7 +27,7 @@ public class MessageService extends Service implements SinchClientListener {
     private MessageClient messageClient = null;
     private String currentUserId;
 
-//    private Intent broadcastIntent = new Intent("com.avner.lostfound.messaging.ConversationActivity");
+//    private Intent broadcastIntent = new Intent("com.avner.lostfound.messaging.ConversationListActivity");
 //    private LocalBroadcastManager broadcaster;
 
 

@@ -3,6 +3,7 @@ package com.avner.lostfound;
 import android.app.Application;
 import android.util.Log;
 
+import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseInstallation;
@@ -36,6 +37,7 @@ public class LostFoundApplication extends Application {
 
         ParseFacebookUtils.initialize(this, Constants.REQUEST_CODE_FACEBOOK_LOGIN);
 
+        FacebookSdk.sdkInitialize(this);
        // installation used for sending push notifications.
         installation = ParseInstallation.getCurrentInstallation();
 

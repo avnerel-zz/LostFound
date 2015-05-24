@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,6 +21,8 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -45,6 +50,8 @@ public class MessagingActivity extends Activity implements TextWatcher {
     private MessageAdapter messageAdapter;
     private ImageButton sendButton;
     private String itemId;
+    private MenuItem action_complete;
+    private String recipientName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
         Intent intent = getIntent();
         recipientId = intent.getStringExtra(Constants.Conversation.RECIPIENT_ID);
         itemId = intent.getStringExtra(Constants.Conversation.ITEM_ID);
+        recipientName = intent.getStringExtra(Constants.Conversation.RECIPIENT_NAME);
 
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
@@ -68,6 +76,24 @@ public class MessagingActivity extends Activity implements TextWatcher {
         initSendButton();
 
         initMessageList();
+
+        clearUnreadCount();
+    }
+
+    private void clearUnreadCount() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(Constants.ParseConversation.RECIPIENT_USER_ID, recipientId);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseConversation, ParseException e) {
+                if(e==null){
+
+                    parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 0);
+                    parseConversation.saveInBackground();
+                }
+            }
+        });
     }
 
     private void initMessageList() {
@@ -97,6 +123,25 @@ public class MessagingActivity extends Activity implements TextWatcher {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_messaging, menu);
+        action_complete = menu.findItem(R.id.action_complete);
+        getActionBar().setTitle(recipientName);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+        if(item.equals(action_complete)){
+
+            //TODO complete lost or found.
+        }
+        return super.onMenuItemSelected(featureId, item);
     }
 
     private void initSendButton() {

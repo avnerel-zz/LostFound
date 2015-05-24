@@ -1,10 +1,17 @@
 package com.avner.lostfound.adapters;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +26,17 @@ import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.R;
+import com.facebook.FacebookSdk;
+import com.facebook.share.ShareApi;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,13 +102,13 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     }
 
     private void initShareButton(View view, final Item item, final ImageView image) {
-        ImageButton shareButton = (ImageButton) view.findViewById(R.id.iv_shareImage);
+        final ImageButton shareButton = (ImageButton) view.findViewById(R.id.iv_shareImage);
 
 
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent shareIntent = new Intent();
+                final Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
 
                 ImageUtils.saveImageToFile(((BitmapDrawable)image.getDrawable()).getBitmap(), "tempImage.png");
@@ -102,6 +117,40 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
                 shareIntent.putExtra(Intent.EXTRA_TEXT, item.getDescription());
                 shareIntent.setType("*/*");
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+//                final List<ResolveInfo> activities = rootView.getContext().getPackageManager().queryIntentActivities(shareIntent, 0);
+//
+//                List<String> appNames = new ArrayList<String>();
+//                for (ResolveInfo info : activities) {
+//                    appNames.add(info.loadLabel(rootView.getContext().getPackageManager()).toString());
+//                }
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
+//                builder.setTitle("Complete Action using...");
+//                builder.setItems(appNames.toArray(new CharSequence[appNames.size()]), new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int activity) {
+//                        ResolveInfo info = activities.get(activity);
+//                        if (info.activityInfo.packageName.toLowerCase().contains("facebook")) {
+                            // Facebook was chosen
+//                            ShareLinkContent content = new ShareLinkContent.Builder().setContentTitle("LostFound")
+//                                                                    .setImageUrl(Uri.parse(item.getImageUrl()))
+//                                                                    .setContentDescription(item.getDescription()).build();
+//                            SharePhoto photo = new SharePhoto.Builder().setBitmap(((BitmapDrawable) image.getDrawable()).getBitmap()).build();
+//                            SharePhotoContent content = new SharePhotoContent.Builder().setRef("avner")
+//                                    .addPhoto(photo).build();
+//                            ShareDialog shareDialog = new ShareDialog((android.app.Activity) rootView.getContext());
+//                            shareDialog.show(content);
+//                        } else  {
+//                            // start the selected activity
+//                            shareIntent.setPackage(info.activityInfo.packageName);
+//                            rootView.getContext().startActivity(shareIntent);
+//                        }
+//
+//                    }
+//                });
+//                AlertDialog alert = builder.create();
+//                alert.show();
+
                 rootView.getContext().startActivity(Intent.createChooser(shareIntent, "Share to..."));
             }
         });
@@ -115,6 +164,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         editItemIntent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost());
         editItemIntent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
         editItemIntent.putExtra(Constants.ReportForm.ITEM, item);
+
         rootView.getContext().startActivity(editItemIntent);
 
     }

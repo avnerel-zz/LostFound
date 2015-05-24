@@ -66,10 +66,8 @@ public class Constants {
     public class Conversation{
 
         public static final String ITEM_ID = "itemId";
-        public static final String RECIPIENT_ID = "RECIPIENT_ID";
-        public static final String CONVERSATION_FIELD_USER_NAME = "conversationUserName";
-        public static final String CONVERSATION_FIELD_USER_ID = "conversationUserId";
-        public static final String CONVERSATION_FIELD_ITEM = "conversationItem";
+        public static final String RECIPIENT_ID = "recipientId";
+        public static final String RECIPIENT_NAME = "recipientName";
     }
 
     public class ParseConversation{
@@ -78,6 +76,7 @@ public class Constants {
         public static final String RECIPIENT_USER_ID = "recipientUserId";
         public static final String RECIPIENT_USER_NAME = "recipientUserName";
         public static final String ITEM = "item";
+        public static final String UNREAD_COUNT = "unreadCount";
 
     }
 

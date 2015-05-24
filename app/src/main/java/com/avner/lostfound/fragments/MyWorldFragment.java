@@ -1,9 +1,6 @@
 package com.avner.lostfound.fragments;
 
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,23 +11,19 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.adapters.LostFoundListAdapter;
+import com.avner.lostfound.messaging.ConversationListActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.activities.LoginActivity;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.SettingsActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
-import com.avner.lostfound.messaging.ConversationActivity;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
@@ -125,7 +118,7 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.b_messages:
-                intent = new Intent(rootView.getContext(),ConversationActivity.class);
+                intent = new Intent(rootView.getContext(),ConversationListActivity.class);
                 startActivity(intent);
                 break;
             case R.id.b_log_out:
