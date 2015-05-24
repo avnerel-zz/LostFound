@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -19,9 +18,7 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.parse.FindCallback;
-import com.parse.ParseInstallation;
 import com.parse.ParseObject;
-import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.sinch.android.rtc.PushPair;
@@ -221,15 +218,14 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
         private void sendPushNotification(String recipientId,Message message) {
 
-            ParseQuery pushQuery = ParseInstallation.getQuery();
-            pushQuery.whereEqualTo("user", recipientId);
-            ParsePush push = new ParsePush();
-            push.setQuery(pushQuery); // Set our Installation query
-//            push.setD
-            push.setMessage("user: " + ((LostFoundApplication) getApplication()).getUserDisplayName() + "sent: " + message.getTextBody());
-            push.sendInBackground();
-
-            Log.d("messaging", "sent " + message.getTextBody() + " to user id: " + recipientId);
+//            ParseQuery pushQuery = ParseInstallation.getQuery();
+//            pushQuery.whereEqualTo("user", recipientId);
+//            ParsePush push = new ParsePush();
+//            push.setQuery(pushQuery); // Set our Installation query
+//            push.setMessage("user: " + ((LostFoundApplication) getApplication()).getUserDisplayName() + "sent: " + message.getTextBody());
+//            push.sendInBackground();
+//
+//            Log.d("messaging", "sent " + message.getTextBody() + " to user id: " + recipientId);
         }
 
         //Do you want to notify your user when the message is delivered?
