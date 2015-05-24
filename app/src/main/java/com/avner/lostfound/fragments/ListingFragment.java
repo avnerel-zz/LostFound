@@ -40,24 +40,30 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private List<Item> allItems;
     private List<Item> itemsToDisplay;
     private LostFoundListAdapter adapter;
-
     private boolean isLostFragment;
     private int myLayoutId;
-
+    private String parseClassName; // used as parse queries identifier
     private ListFilter filters = new ListFilter();
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initMembers();
+    }
+
+    /**
+     * Initialize this fragment's instance variables, based on its configuration - Lost of Found listing.
+     */
+    private void initMembers() {
         this.isLostFragment = getArguments().getBoolean("isLostFragment");
         this.myLayoutId = isLostFragment ? R.layout.fragment_lost_list : R.layout.fragment_found_list;
+        this.parseClassName = this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
 
         initWidgets(inflater, container);
         initItemsList();
@@ -65,6 +71,12 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         return rootView;
     }
 
+    /**
+     * Initialize visible widgets in fragment (add report button, filter spinners, listview).
+     *
+     * @param inflater
+     * @param container
+     */
     private void initWidgets(LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(this.myLayoutId, container, false);
         lv_itemList = (ListView) rootView.findViewById(R.id.lv_myList);
@@ -76,22 +88,33 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         initLocationSpinner();
     }
 
+    /**
+     * Initialize the location spinner widget, used for filtering the listings by location.
+     */
     private void initLocationSpinner() {
         this.sp_locationSpinner = (Spinner) rootView.findViewById(R.id.s_location_filter);
         ArrayAdapter<CharSequence> locationSpinnerAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.default_locations, android.R.layout.simple_spinner_item);
+
         this.sp_locationSpinner.setAdapter(locationSpinnerAdapter);
         this.sp_locationSpinner.setOnItemSelectedListener(this);
     }
 
+    /**
+     * Initialize the time spinner widget, used for filtering the listings by time.
+     */
     private void initTimeSpinner() {
         this.sp_timeSpinner = (Spinner) rootView.findViewById(R.id.s_time_filter);
         ArrayAdapter<CharSequence> timeSpinnerAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.default_time, android.R.layout.simple_spinner_item);
+
         this.sp_timeSpinner.setAdapter(timeSpinnerAdapter);
         this.sp_timeSpinner.setOnItemSelectedListener(this);
     }
 
+    /**
+     * Initialize the list-view widget holding all listings for display.
+     */
     private void initItemsList() {
         this.allItems = new ArrayList<>();
         this.itemsToDisplay = new ArrayList<>();
@@ -104,29 +127,18 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.lv_itemList.setOnItemClickListener(this.adapter);
     }
 
-    private void applyListFilters() {
-        List<Item> filteredList = new ArrayList(this.allItems);
-
-        ListFilterUtils.applyDistanceFilter(filteredList, this.filters, ((MainActivity) getActivity()).getLastKnownLocation());
-        ListFilterUtils.applyTimeFilter(filteredList, this.filters);
-
-        this.itemsToDisplay = filteredList;
-        Log.d(Constants.LOST_FOUND_TAG, "filtering re-applied, notifying adapter. raw list size: " + this.allItems.size() + " filtered size: " + filteredList.size());
-        adapter.setList(this.itemsToDisplay);
-        adapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         getItemsFromParse();
-        applyListFilters();
-        adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Get all raw listings for display from Parse. List received is un-filtered, sorted by time of
+     * listing creation, and must be filtered using the {@link ListFilterUtils#applyListFilters(List, LostFoundListAdapter, ListFilter, android.location.Location)} method
+     */
     private void getItemsFromParse() {
-        String className = this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(className);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClassName);
         query.orderByAscending(Constants.ParseQuery.CREATED_AT); // TODO change to order by most recent
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -135,7 +147,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                     for (int i = 0; i < itemsList.size(); i++) {
                         convertParseListToItemList(itemsList, allItems);
                     }
-                    adapter.notifyDataSetChanged();
+                    ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
                     Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
                 }
             }
@@ -147,18 +159,16 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         //TODO if not loading all allItems and just adding so remove this.
         items.clear();
 
-        Item item = null;
         for (ParseObject parseItem : itemsList){
             try {
                 if (null != parseItem) {
-                    item = new Item(parseItem);
-                    items.add(item);
+                    items.add(new Item(parseItem));
                 }
                 else {
                     Log.d(Constants.LOST_FOUND_TAG, "parseItem was null");
                 }
             } catch (NullPointerException e) {
-                Log.d(Constants.LOST_FOUND_TAG, "caught NullPointerException when adding an item (item == null? " + (item == null) + ")");
+                Log.d(Constants.LOST_FOUND_TAG, "caught NullPointerException when adding an item");
             }
         }
     }
@@ -166,7 +176,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
             case R.id.b_add_item:
                 Intent intent = new Intent(rootView.getContext(), ReportFormActivity.class);
@@ -185,17 +194,19 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         switch (parent.getId()) {
             case R.id.s_location_filter:
                 if (this.filters.updateDistanceFilter((String) parent.getItemAtPosition(position))) {
-                    applyListFilters();
+                    ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
                     Log.d(Constants.LOST_FOUND_TAG, "distance filter updated to " + this.filters.getDistFilter() + " meter radius");
                 }
+
                 adapter.notifyDataSetInvalidated();
                 break;
 
             case R.id.s_time_filter:
                 if (this.filters.updateTimeFilter((String) parent.getItemAtPosition(position))) {
-                    applyListFilters();
+                    ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
                     Log.d(Constants.LOST_FOUND_TAG, "time filter updated to " + (this.filters.getTimeFilter() / Constants.MILLI_SECONDS_PER_DAY) + " last days");
                 }
+
                 adapter.notifyDataSetInvalidated();
                 break;
 

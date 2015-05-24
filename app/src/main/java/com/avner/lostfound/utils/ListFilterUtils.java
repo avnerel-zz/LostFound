@@ -5,9 +5,11 @@ import android.util.Log;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.activities.MainActivity;
+import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.structs.ListFilter;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,6 +54,26 @@ public class ListFilterUtils {
         }
     }
 
+
+    /**
+     * Apply both location and time filters that are currently defined on the listings being displayed.
+     *
+     * @param rawList List containing all potential items, to be filtered.
+     * @param adapter Adapter used for displaying the list's contents
+     * @param filters Filters to be applied on the list.
+     * @param lastKnownLocation Last known location, upon which to filter by location.
+     */
+    public static void applyListFilters(List<Item> rawList, LostFoundListAdapter adapter,
+                                        ListFilter filters, Location lastKnownLocation) {
+        List<Item> filteredList = new ArrayList<>(rawList);
+
+        ListFilterUtils.applyDistanceFilter(filteredList, filters, lastKnownLocation);
+        ListFilterUtils.applyTimeFilter(filteredList, filters);
+
+        Log.d(Constants.LOST_FOUND_TAG, "filtering re-applied, notifying adapter. raw list size: " + rawList.size() + " filtered size: " + filteredList.size());
+        adapter.setList(filteredList);
+        adapter.notifyDataSetChanged();
+    }
 }
 
 

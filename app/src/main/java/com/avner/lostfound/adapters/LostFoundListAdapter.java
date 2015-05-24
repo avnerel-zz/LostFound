@@ -15,11 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
+import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
-import com.avner.lostfound.R;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -74,7 +74,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             viewHolder.timeAdded = (TextView) view.findViewById(R.id.tv_number_of_days_ago);
             viewHolder.locationAdded = (TextView) view.findViewById(R.id.tv_near_address);
             viewHolder.itemImage = (ImageView) view.findViewById(R.id.iv_itemListingImage);
-            initEditReport(view, viewHolder,item);
+            Log.d(Constants.LOST_FOUND_TAG, "setting edit adapter for item " + item.getName() + " at position " + position);
 
             view.setTag(viewHolder);
         }
@@ -82,12 +82,14 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             view = convertView;
             viewHolder = (ViewHolder) view.getTag();
         }
-        setViewHolderFields(position, viewHolder,item);
+
+        setEditReportButton(view, viewHolder, item);
+        setViewHolderFields(position, viewHolder, item);
 
         return view;
     }
 
-    private void initEditReport(View view, ViewHolder viewHolder, final Item item) {
+    private void setEditReportButton(View view, ViewHolder viewHolder, final Item item) {
         viewHolder.editReport = (ImageButton) view.findViewById(R.id.ib_editReport);
         viewHolder.editReport.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,7 +206,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         final Location location = item.getLocation();
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
         // no location specified.
-        if(location == null){
+        if (location == null) {
             ib_showMap.setVisibility(ImageButton.INVISIBLE);
             return;
         }
@@ -213,10 +215,6 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
-                if (null == item) {
-                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-                    return;
-                }
                 intent.putExtra(Constants.LATITUDE, location.getLatitude());
                 intent.putExtra(Constants.LONGITUDE, location.getLongitude());
                 rootView.getContext().startActivity(intent);
