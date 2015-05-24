@@ -29,7 +29,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.ImageUtils;
+import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.R;
 import com.avner.lostfound.structs.Item;
 import com.google.android.gms.common.ConnectionResult;
@@ -111,7 +111,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private void setDefaultValues() {
-
         setTime(Calendar.getInstance());
     }
 
@@ -152,7 +151,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private void updateCurrentLocation() {
-        if(location_chosen == null){
+        if (location_chosen == null){
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             if (null == location) { // failed to get a location
@@ -484,13 +483,10 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private void submitReport() {
-
         ParseObject parseReport;
-
         String parseClass = lostReport ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
 
-        if(editReport){
-
+        if (editReport) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Loading");
             progressDialog.setMessage("Please wait...");
@@ -506,9 +502,10 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                 }
             });
 
-        }else{
-                parseReport = new ParseObject(parseClass);
-                fillReport(parseReport);
+        }
+        else {
+            parseReport = new ParseObject(parseClass);
+            fillReport(parseReport);
         }
 
     }
@@ -526,15 +523,15 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         parseReport.put(Constants.ParseReport.ITEM_DESCRIPTION, et_description.getText().toString());
         parseReport.put(Constants.ParseReport.TIME, timeChosen.getTimeInMillis());
 
-        if(cb_with_location.isChecked() && location_chosen!= null){
-
+        if (cb_with_location.isChecked() && location_chosen != null){
             ParseGeoPoint location = new ParseGeoPoint(location_chosen.latitude, location_chosen.longitude);
             parseReport.put(Constants.ParseReport.LOCATION, location);
             parseReport.put(Constants.ParseReport.LOCATION_STRING, tv_location_picker.getText().toString());
-        }else{
-
+        }
+        else {
             parseReport.put(Constants.ParseReport.LOCATION_STRING, NO_LOCATION_AVAILABLE);
         }
+
         parseReport.put(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 
         Bitmap itemImage = ((BitmapDrawable)ib_item_photo.getDrawable()).getBitmap();
@@ -546,6 +543,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             Log.d(Constants.LOST_FOUND_TAG, "got NULL login name, using unknown");
             userLoginName = "<unknown user>";
         }
+
         parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, userLoginName);
         parseReport.saveInBackground();
 

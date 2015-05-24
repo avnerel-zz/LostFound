@@ -1,4 +1,4 @@
-package com.avner.lostfound;
+package com.avner.lostfound.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.avner.lostfound.Constants;
 import com.parse.ParseFile;
 
 import java.io.ByteArrayOutputStream;

@@ -22,7 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.ImageUtils;
+import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.R;
