@@ -143,6 +143,21 @@ public class MainActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
         this.googleApiClient.connect();
+        setInitLocation();
+
+    }
+
+    private void setInitLocation() {
+        if (null == this.lastKnownLocation) {
+            Location mockLocation = new Location(LocationManager.NETWORK_PROVIDER);
+            mockLocation.setLatitude(90.0);
+            mockLocation.setLongitude(0.0);
+            mockLocation.setAltitude(0.0);
+            mockLocation.setAccuracy(50.0f);
+
+            this.lastKnownLocation = mockLocation;
+            Log.d(Constants.LOST_FOUND_TAG, "set init mock location: " + mockLocation.toString());
+        }
     }
 
     @Override
@@ -162,21 +177,9 @@ public class MainActivity extends FragmentActivity implements
         Log.d(Constants.LOST_FOUND_TAG, "Updating lastKnownLocation...");
         Location location = LocationServices.FusedLocationApi.getLastLocation(this.googleApiClient);
 
-        if (null != location) { // failed to get a location
+        if (null != location) { // got a location
             lastKnownLocation = location;
-            Log.d(Constants.LOST_FOUND_TAG, "found location! " + location.toString());
-        }
-        else {
-            if (null == lastKnownLocation) {
-                Location mockLocation = new Location(LocationManager.NETWORK_PROVIDER);
-                mockLocation.setLatitude(90.0);
-                mockLocation.setLongitude(0.0);
-                mockLocation.setAltitude(0.0);
-                mockLocation.setAccuracy(50.0f);
-
-                lastKnownLocation = mockLocation;
-                Log.d(Constants.LOST_FOUND_TAG, "location not found! set mock location" + mockLocation.toString());
-            }
+            Log.d(Constants.LOST_FOUND_TAG, "got last location! " + location.toString());
         }
     }
 
