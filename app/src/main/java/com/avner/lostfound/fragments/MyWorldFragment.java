@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.messaging.ConversationListActivity;
@@ -28,6 +29,7 @@ import java.util.List;
 public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
     private View rootView;
+    private TextView tv_openListingsNumber;
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,6 +45,8 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         ImageButton logOutButton = (ImageButton) rootView.findViewById(R.id.b_log_out);
         logOutButton.setOnClickListener(this);
+
+        tv_openListingsNumber = (TextView) rootView.findViewById(R.id.tv_openListingsNumber);
 
         initOpenListings();
 
@@ -79,6 +83,7 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
                         convertParseListToItemList(itemsList, items);
                     }
                     myOpenListingsAdapter.notifyDataSetChanged();
+                    tv_openListingsNumber.setText(String.valueOf(itemsList.size()));
                 }
             }
         });

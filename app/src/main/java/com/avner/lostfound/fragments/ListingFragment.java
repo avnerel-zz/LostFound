@@ -135,13 +135,12 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                     for (int i = 0; i < itemsList.size(); i++) {
                         convertParseListToItemList(itemsList, allItems);
                     }
+                    adapter.notifyDataSetChanged();
+                    Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
                 }
             }
         });
 
-        adapter.notifyDataSetChanged(); // TODO remove
-
-        Log.d(Constants.LOST_FOUND_TAG, "Fetched " + this.allItems.size() + " items from Parse");
     }
 
     private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {

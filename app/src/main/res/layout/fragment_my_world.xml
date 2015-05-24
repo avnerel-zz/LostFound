@@ -69,7 +69,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/default_open_listings_num"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textColor="@color/abc_search_url_text" />
+
             </LinearLayout>
 
             <ListView
