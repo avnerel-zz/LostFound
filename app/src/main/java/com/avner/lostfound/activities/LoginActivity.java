@@ -18,7 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.ImageUtils;
+import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.messaging.MessageService;

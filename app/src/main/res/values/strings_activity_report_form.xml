@@ -7,8 +7,6 @@
         <item>Student ID</item>
         <item>Keys</item>
         <item>Other..</item>
-        <!--<item>Uranus</item>-->
-        <!--<item>Neptune</item>-->
     </string-array>
 
     <string-array name="default_time">
@@ -20,11 +18,12 @@
 
     </string-array>
 
+    <!-- item values must start with an integer, followed by a single space, and then wither 'm' or 'km' -->
     <string-array name="default_locations">
         <item>All distances</item>
-        <item>500m radius</item>
-        <item>1km radius</item>
-        <item>5km radius</item>
+        <item>500 m radius</item>
+        <item>1 km radius</item>
+        <item>5 km radius</item>
 
     </string-array>
 

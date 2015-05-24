@@ -2,6 +2,9 @@ package com.avner.lostfound;
 
 import android.os.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by avner on 26/04/2015.
  * This class holds all common constants used by different components.
@@ -29,7 +32,27 @@ public class Constants {
     /**
      * tag for logger.
      */
-    public static final String LOST_FOUND_TAG = "lostfound";
+    public static final String LOST_FOUND_TAG = "LOST_FOUND_TAG";
+
+    /**
+     * for lists filtering
+     */
+    public static final long NO_DISTANCE_FILTER = -1;
+    public static final long NO_TIME_FILTER = -1;
+    public static final long MILLI_SECONDS_PER_DAY = 1000* 60 * 60 * 24;
+    public static final Map<String, Long> daysFactor = initDaysFactorMap();
+
+
+    private static Map<String, Long> initDaysFactorMap() {
+        Map<String, Long> map = new HashMap<>();
+
+        map.put("today", 1L);
+        map.put("week", 7L);
+        map.put("month", 30L);
+        map.put("year", 365L);
+
+        return map;
+    }
 
     public class ParseReport{
 

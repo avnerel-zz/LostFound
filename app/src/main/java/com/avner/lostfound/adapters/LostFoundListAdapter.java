@@ -34,7 +34,6 @@ import java.util.List;
 public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener{
 
     private List<Item> items;
-
     private View rootView;
 
     public LostFoundListAdapter(List<Item> items, View rootView) {
@@ -94,6 +93,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             @Override
             public void onClick(View v) {
 
+                Log.d(Constants.LOST_FOUND_TAG, "pressed to edit item " + item.getName());
                 Intent intent = new Intent(rootView.getContext(),ReportFormActivity.class);
                 intent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost());
                 intent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
@@ -105,17 +105,16 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     }
 
 
-    private void setViewHolderFields(int position, final ViewHolder viewHolder,Item item) {
+    private void setViewHolderFields(int position, final ViewHolder viewHolder, Item item) {
         // Put the content in the view
         viewHolder.itemName.setText(item.getName());
         viewHolder.description.setText(item.getDescription());
         viewHolder.locationAdded.setText(item.getLocationString());
-
         viewHolder.timeAdded.setText("" + item.getDiff() + " ");
-        if(item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())){
 
+        if (item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())) {
             viewHolder.editReport.setVisibility(ImageButton.VISIBLE);
-        }else{
+        } else {
             viewHolder.editReport.setVisibility(ImageButton.INVISIBLE);
         }
 
@@ -124,14 +123,17 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
+        final Item item = (Item) parent.getItemAtPosition(position);
+        Log.d(Constants.LOST_FOUND_TAG, "clicked item " + item.getName() + ", at position " + position);
+
         final Dialog dialog = new Dialog(rootView.getContext());
         dialog.setContentView(R.layout.dialog_item_details_layout);
 
-        Item item = (Item) parent.getItemAtPosition(position);
         if (null == item) {
             Log.d(Constants.LOST_FOUND_TAG, "Failed to retrieve item from adapter list, at position " + position);
             return;
         }
+
         initMapButton(parent, position, dialog);
         initConversationButton(parent, position, dialog);
         setDialogContents(dialog, item);
@@ -237,6 +239,10 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         itemDescription.setText(item.getDescription());
 
         dialog.setTitle("Item: " + item.getName());
+    }
+
+    public void setList(List<Item> list) {
+        this.items = list;
     }
 
     private class ViewHolder {

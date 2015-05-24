@@ -3,22 +3,34 @@ package com.avner.lostfound.activities;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends FragmentActivity implements
-        ActionBar.TabListener {
+        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private Location lastKnownLocation = null;
+    private GoogleApiClient googleApiClient;
 
     private ViewPager viewPager;
     private ActionBar actionBar;
+
+
     // Tab titles
     private String[] tabsStrings = { "My World", "Lost", "Found", "Stats" };
 
@@ -58,7 +70,6 @@ public class MainActivity extends FragmentActivity implements
             textView.setText(tabsStrings[i]);
 
             actionBar.addTab(tab);
-
         }
 
         /**
@@ -78,6 +89,16 @@ public class MainActivity extends FragmentActivity implements
             @Override
             public void onPageScrollStateChanged(int arg0) {}
         });
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    public Location getLastKnownLocation() {
+        return new Location(this.lastKnownLocation);
     }
 
     @Override
@@ -118,4 +139,54 @@ public class MainActivity extends FragmentActivity implements
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        this.googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        updateCurrentLocation();
+    }
+
+    private void updateCurrentLocation() {
+        Log.d(Constants.LOST_FOUND_TAG, "Updating lastKnownLocation...");
+        Location location = LocationServices.FusedLocationApi.getLastLocation(this.googleApiClient);
+
+        if (null != location) { // failed to get a location
+            lastKnownLocation = location;
+            Log.d(Constants.LOST_FOUND_TAG, "found location! " + location.toString());
+        }
+        else {
+            if (null == lastKnownLocation) {
+                Location mockLocation = new Location(LocationManager.NETWORK_PROVIDER);
+                mockLocation.setLatitude(90.0);
+                mockLocation.setLongitude(0.0);
+                mockLocation.setAltitude(0.0);
+                mockLocation.setAccuracy(50.0f);
+
+                lastKnownLocation = mockLocation;
+                Log.d(Constants.LOST_FOUND_TAG, "location not found! set mock location" + mockLocation.toString());
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 }

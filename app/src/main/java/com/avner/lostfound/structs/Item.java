@@ -81,7 +81,8 @@ public class Item implements Parcelable {
 
     public int getDiff() {
         long diff = System.currentTimeMillis() - calender.getTimeInMillis();
-        return (int) (diff / (1000 * 60 * 60 * 24));
+        diff /= 1000;
+        return (int) (diff / (60 * 60 * 24));
     }
 
     public Location getLocation() {
@@ -98,6 +99,7 @@ public class Item implements Parcelable {
         diff /= 1000; // seconds ago
 
         int days = (int) (diff / (60 * 60 * 24));
+//        int days = getDiff();
         returnValue += days + " days ago";
 
         return returnValue;

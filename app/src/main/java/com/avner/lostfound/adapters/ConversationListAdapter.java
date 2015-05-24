@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.ImageUtils;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.structs.Conversation;
