@@ -137,7 +137,17 @@ public class Constants {
     }
 
     public class Geocoder {
-        public static final String LOCATION_UNKNOWN = "Location Unknown";
         public static final String DESCRIPTION_NOT_AVAILABLE = "Description not Available";
+        public static final String NO_LOCATION_AVAILABLE = "No location available";
+    }
+
+    public class ParsePush{
+        public static final String EXTRA_NAME = "com.parse.Data";
+        public static final String PUSH_TYPE = "pushType";
+        public static final String SENDER_ID = "senderId";
+        public static final String SENDER_NAME = "senderName";
+        public static final String ITEM_ID = "itemId";
+        public static final String REPORTED_ITEM = "reportedItem";
+
     }
 }

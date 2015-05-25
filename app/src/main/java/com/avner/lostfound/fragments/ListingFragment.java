@@ -60,7 +60,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private void initMembers() {
         this.isLostFragment = getArguments().getBoolean("isLostFragment");
         this.myLayoutId = isLostFragment ? R.layout.fragment_lost_list : R.layout.fragment_found_list;
-        this.parseClassName = this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
+        this.parseClassName = Constants.ParseObject.PARSE_LOST ;//this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
     }
 
     @Override
@@ -178,6 +178,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
      */
     private void getItemsFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClassName);
+        query.whereEqualTo(Constants.ParseReport.IS_LOST,isLostFragment);
         query.orderByAscending(Constants.ParseQuery.CREATED_AT); // TODO change to order by most recent
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -218,7 +219,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         switch (v.getId()) {
             case R.id.b_add_item:
                 Intent intent = new Intent(rootView.getContext(), ReportFormActivity.class);
-                intent.putExtra(Constants.ReportForm.IS_LOST_FORM, true); // TODO maybe need to adjust for FOUND?
+                intent.putExtra(Constants.ReportForm.IS_LOST_FORM, isLostFragment);
                 intent.putExtra(Constants.ReportForm.IS_EDIT_FORM, false);
                 startActivity(intent);
                 break;

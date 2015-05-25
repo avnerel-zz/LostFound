@@ -55,7 +55,6 @@ import java.util.Locale;
 public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CompoundButton.OnCheckedChangeListener, MenuItem.OnMenuItemClickListener {
 
     private static final String ITEM_IMAGE_NAME = "itemImage.png";
-    public static final String NO_LOCATION_AVAILABLE = "No location available";
 
     private Spinner spinner;
     private TextView et_itemName;
@@ -155,7 +154,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             if (null == location) { // failed to get a location
-                tv_location_picker.setText(NO_LOCATION_AVAILABLE);
+                tv_location_picker.setText(Constants.Geocoder.NO_LOCATION_AVAILABLE);
                 return;
             }
 
@@ -404,7 +403,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
             if (addresses.isEmpty()) {
                 Log.d(Constants.LOST_FOUND_TAG, "Got no address from map activity, using unknown");
-                sb.append(Constants.Geocoder.LOCATION_UNKNOWN);
+                sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
             }
             else {
                 Address address = addresses.get(0);
@@ -418,7 +417,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         } catch (IOException e) {
             Log.d(Constants.LOST_FOUND_TAG, "Exception when trying to get address description");
-            sb.append(Constants.Geocoder.LOCATION_UNKNOWN);
+            sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
         }
 
         return sb.toString();
@@ -456,7 +455,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
-        tv_location_picker.setText(NO_LOCATION_AVAILABLE);
+        tv_location_picker.setText(Constants.Geocoder.NO_LOCATION_AVAILABLE);
     }
 
     @Override
@@ -469,7 +468,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         else {
             ib_pick_location.setEnabled(false);
             tv_location_picker.setEnabled(false);
-            tv_location_picker.setText(NO_LOCATION_AVAILABLE);
+            tv_location_picker.setText(Constants.Geocoder.NO_LOCATION_AVAILABLE);
             location_chosen = null;
         }
     }
@@ -484,7 +483,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     private void submitReport() {
         ParseObject parseReport;
-        String parseClass = lostReport ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
+//        String parseClass = lostReport ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
+        String parseClass = Constants.ParseObject.PARSE_LOST;
 
         if (editReport) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -529,7 +529,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             parseReport.put(Constants.ParseReport.LOCATION_STRING, tv_location_picker.getText().toString());
         }
         else {
-            parseReport.put(Constants.ParseReport.LOCATION_STRING, NO_LOCATION_AVAILABLE);
+            parseReport.put(Constants.ParseReport.LOCATION_STRING, Constants.Geocoder.NO_LOCATION_AVAILABLE);
         }
 
         parseReport.put(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());

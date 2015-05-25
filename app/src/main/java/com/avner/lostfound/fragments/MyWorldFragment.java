@@ -61,21 +61,10 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
         final OpenItemsAdapter myOpenListingsAdapter = new OpenItemsAdapter(items, rootView);
 
         // get all my lost items
-        ParseQuery<ParseObject> lostQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-        lostQuery.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        query.orderByAscending(Constants.ParseQuery.CREATED_AT);
 
-        // get all my found items
-        ParseQuery<ParseObject> foundQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-        foundQuery.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
-
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(lostQuery);
-        queries.add(foundQuery);
-
-        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
-        mainQuery.orderByAscending(Constants.ParseQuery.CREATED_AT);
-
-        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+        query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
                 if (e == null) {
