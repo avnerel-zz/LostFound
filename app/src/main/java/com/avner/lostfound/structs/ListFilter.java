@@ -10,17 +10,18 @@ import java.util.Arrays;
 public class ListFilter {
     private long filter_dist = Constants.NO_DISTANCE_FILTER;
     private long filter_time = Constants.NO_TIME_FILTER;
+    private String filter_content = Constants.NO_CONTENT_FILTER;
 
     public long getDistFilter() {
         return filter_dist;
     }
 
-    public void setDistFilter(long filter_dist) {
-        this.filter_dist = filter_dist;
-    }
-
     public long getTimeFilter() {
         return filter_time;
+    }
+
+    public String getContentFilter() {
+        return new String(this.filter_content); // defensive copy
     }
 
     public boolean updateTimeFilter(String strTimeFilter) {
@@ -40,6 +41,19 @@ public class ListFilter {
         }
 
         return (this.filter_time != prevFilter);
+    }
+
+    public boolean updateContentFilter(String phrase) {
+        if (null == phrase || "".equals(phrase) || phrase.length() < Constants.MIN_CONTENT_FILTER_SIZE) { // invalid filter
+            return false;
+        }
+
+        if (this.filter_content.equals(phrase)) { // same as previous filter
+            return false;
+        }
+
+        this.filter_content = new String(phrase);
+        return true;
     }
 
 

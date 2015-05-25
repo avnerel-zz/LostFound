@@ -39,8 +39,20 @@ public class Constants {
      */
     public static final long NO_DISTANCE_FILTER = -1;
     public static final long NO_TIME_FILTER = -1;
+    public static final String NO_CONTENT_FILTER = "";
     public static final long MILLI_SECONDS_PER_DAY = 1000* 60 * 60 * 24;
     public static final Map<String, Long> daysFactor = initDaysFactorMap();
+    public static final int MIN_CONTENT_FILTER_SIZE = 2;
+
+
+    public class TabTexts {
+        public static final String FOUND = "Found";
+        public static final String LOST = "Lost";
+        public static final String MY_WORLD = "My World";
+        public static final String STATS = "Stats";
+    }
+
+
 
 
     private static Map<String, Long> initDaysFactorMap() {

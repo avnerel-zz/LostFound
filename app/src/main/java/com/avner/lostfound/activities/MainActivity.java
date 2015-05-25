@@ -11,7 +11,9 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
@@ -29,10 +31,18 @@ public class MainActivity extends FragmentActivity implements
 
     private ViewPager viewPager;
     private ActionBar actionBar;
+    private SearchView sv_search;
+    private MenuItem mi_search_menu_item;
 
+    private int selectedTabIndex = 0;
 
     // Tab titles
-    private String[] tabsStrings = { "My World", "Lost", "Found", "Stats" };
+    private String[] tabsStrings = {
+            Constants.TabTexts.MY_WORLD,
+            Constants.TabTexts.LOST,
+            Constants.TabTexts.FOUND,
+            Constants.TabTexts.STATS
+    };
 
     // Tab icons
     private int[] tabsIcons = {
@@ -41,6 +51,7 @@ public class MainActivity extends FragmentActivity implements
             R.drawable.chequered_flags,
             R.drawable.graph,
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +92,17 @@ public class MainActivity extends FragmentActivity implements
             public void onPageSelected(int position) {
                 // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
+
+                if (isListingFragment(position)) {
+                    // switched to a listing tab - enable search view
+                    Log.d(Constants.LOST_FOUND_TAG, "changed to a listing tab - enabling search view");
+                    showSearchView();
+                }
+                else {
+                    // switched to a non-listing tab - disable search view
+                    Log.d(Constants.LOST_FOUND_TAG, "changed to a non-listing tab - disabling search view");
+                    hideSearchView();
+                }
             }
 
             @Override
@@ -97,6 +119,29 @@ public class MainActivity extends FragmentActivity implements
                 .build();
     }
 
+    private void showSearchView() {
+        sv_search.setVisibility(View.VISIBLE);
+        sv_search.setEnabled(true);
+        mi_search_menu_item.setVisible(true);
+        mi_search_menu_item.setEnabled(true);
+    }
+
+    private void hideSearchView() {
+        sv_search.setVisibility(View.INVISIBLE);
+        sv_search.setEnabled(false);
+        mi_search_menu_item.setVisible(false);
+        mi_search_menu_item.setEnabled(false);
+        mi_search_menu_item.collapseActionView();
+    }
+
+    private boolean isListingFragment(int position) {
+        final TextView tv = (TextView) actionBar.getTabAt(position)
+                .getCustomView()
+                .findViewById(R.id.tv_tabText);
+
+        return (tv.getText().equals(Constants.TabTexts.FOUND) || tv.getText().equals(Constants.TabTexts.LOST));
+    }
+
     public Location getLastKnownLocation() {
         return new Location(this.lastKnownLocation);
     }
@@ -105,7 +150,19 @@ public class MainActivity extends FragmentActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        this.mi_search_menu_item = menu.findItem(R.id.search);
+        this.sv_search = (SearchView) menu.findItem(R.id.search).getActionView();
+
+        if (!isListingFragment(actionBar.getSelectedNavigationIndex())) {
+            hideSearchView();
+        }
+
         return true;
+    }
+
+    public SearchView getSearchView() {
+        return this.sv_search;
     }
 
     @Override

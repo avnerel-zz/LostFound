@@ -54,6 +54,28 @@ public class ListFilterUtils {
         }
     }
 
+    public static void applyContentFilter(List<Item> items, ListFilter filter) {
+        final String phrase = filter.getContentFilter();
+
+        if (phrase.equals(Constants.NO_CONTENT_FILTER)) return; // no content filter defined - skip
+
+        Iterator<Item> it = items.iterator();
+        while (it.hasNext()) {
+            Item item = it.next(); // advance iterator
+
+            if (item.getDescription().contains(phrase)) { // found phrase in description - keep it
+                continue;
+            }
+
+            if (item.getName().contains(phrase)) { // found phrase in name - keep it
+                continue;
+            }
+
+            // by here, phrase wasn't found - filter item out
+            it.remove();
+        }
+    }
+
 
     /**
      * Apply both location and time filters that are currently defined on the listings being displayed.
@@ -65,10 +87,12 @@ public class ListFilterUtils {
      */
     public static void applyListFilters(List<Item> rawList, LostFoundListAdapter adapter,
                                         ListFilter filters, Location lastKnownLocation) {
+
         List<Item> filteredList = new ArrayList<>(rawList);
 
-        ListFilterUtils.applyDistanceFilter(filteredList, filters, lastKnownLocation);
-        ListFilterUtils.applyTimeFilter(filteredList, filters);
+        applyDistanceFilter(filteredList, filters, lastKnownLocation);
+        applyTimeFilter(filteredList, filters);
+        applyContentFilter(filteredList, filters);
 
         Log.d(Constants.LOST_FOUND_TAG, "filtering re-applied, notifying adapter. raw list size: " + rawList.size() + " filtered size: " + filteredList.size());
         adapter.setList(filteredList);

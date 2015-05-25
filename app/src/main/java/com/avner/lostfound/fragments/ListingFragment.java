@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Spinner;
 
 import com.avner.lostfound.Constants;
@@ -34,6 +35,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private ListView lv_itemList;
     private Spinner sp_locationSpinner;
     private Spinner sp_timeSpinner;
+    private SearchView sv_search;
 
     // INSTANCE VARIABLES
     private View rootView;
@@ -81,11 +83,48 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         rootView = inflater.inflate(this.myLayoutId, container, false);
         lv_itemList = (ListView) rootView.findViewById(R.id.lv_myList);
 
+        initSearchView(((MainActivity)getActivity()).getSearchView());
+
         FloatingActionButton button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
         button.setOnClickListener(this);
 
         initTimeSpinner();
         initLocationSpinner();
+    }
+
+    private void initSearchView(SearchView searchView) {
+        if (null == searchView) return;
+
+        this.sv_search = searchView;
+    }
+
+    /**
+     * Update the search view's contents to what it was the last time this fragment was active.
+     *
+     * @param phrase
+     */
+    public void refreshSearchPhrase(String phrase) {
+        if (null == phrase) return;
+
+        if (null == this.sv_search) { // don't count on inflation order of activity and fragments
+            initSearchView(((MainActivity)getActivity()).getSearchView());
+        }
+
+        if (null == this.sv_search) { // still null and couldn't initialize - skip refreshing
+            return;
+        }
+
+        sv_search.setQuery(filters.getContentFilter(), false);
+        sv_search.clearFocus();
+    }
+
+    public void searchPhrase(String phrase) {
+        if (this.filters.updateContentFilter(phrase)) {
+            ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
+            Log.d(Constants.LOST_FOUND_TAG, "content filter updated to \"" + this.filters.getContentFilter() + "\"");
+        }
+
+        adapter.notifyDataSetInvalidated();
     }
 
     /**
