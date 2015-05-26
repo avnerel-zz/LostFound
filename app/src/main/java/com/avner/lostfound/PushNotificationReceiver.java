@@ -35,20 +35,6 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        if (intent.hasExtra(Constants.ParsePush.EXTRA_NAME)) {
-            String stringData = intent.getStringExtra(Constants.ParsePush.EXTRA_NAME);
-
-            JSONObject jsonData = null;
-            try {
-                jsonData = new JSONObject(stringData);
-                Log.d("PUSH_RECEIVED", "jsonData: " + jsonData);
-
-                if (!handlePushes(context, jsonData)) return;
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
         super.onReceive(context, intent);
     }
 
@@ -189,8 +175,8 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushReceive(Context context, Intent intent) {
-        if (intent.hasExtra("com.parse.Data")) {
-            String stringData = intent.getStringExtra("com.parse.Data");
+        if (intent.hasExtra(Constants.ParsePush.EXTRA_NAME)) {
+            String stringData = intent.getStringExtra(Constants.ParsePush.EXTRA_NAME);
 
             JSONObject jsonData = null;
             try {
