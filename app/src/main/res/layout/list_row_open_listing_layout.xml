@@ -63,7 +63,8 @@
         android:layout_marginRight="10dp"
         android:scaleType="centerCrop"
         android:src="@drawable/exclamation_mark_red"
-        android:contentDescription="@string/possible_matches" />
+        android:contentDescription="@string/possible_matches"
+        android:visibility="invisible"/>
 
 
 </RelativeLayout>

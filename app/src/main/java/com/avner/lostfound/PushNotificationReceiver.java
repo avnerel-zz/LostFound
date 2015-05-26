@@ -182,6 +182,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                         messagingIntent.putExtra(Constants.Conversation.RECIPIENT_NAME, senderName);
                         messagingIntent.putExtra(Constants.Conversation.ITEM_ID, itemId);
                         messagingIntent.putExtra(Constants.Conversation.RECIPIENT_ID, senderId);
+                        messagingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(messagingIntent);
                         break;
                     default:

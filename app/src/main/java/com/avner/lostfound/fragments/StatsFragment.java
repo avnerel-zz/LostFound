@@ -62,7 +62,7 @@ public class StatsFragment extends Fragment {
 
     private void setUserDetails() {
 
-        TextView userName = (TextView) rootView.findViewById(R.id.tv_userName);
+        TextView userName = (TextView) rootView.findViewById(R.id.et_userName);
         LostFoundApplication app = (LostFoundApplication) getActivity().getApplication();
 
         userName.setText(app.getUserDisplayName());
@@ -106,7 +106,7 @@ public class StatsFragment extends Fragment {
                 LayoutInflater li = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = li.inflate(R.layout.list_row_statistics_layout, null);
                 viewHolder = new ViewHolder();
-                viewHolder.userName = (TextView) view.findViewById(R.id.tv_userName);
+                viewHolder.userName = (TextView) view.findViewById(R.id.et_userName);
                 viewHolder.userScore = (TextView) view.findViewById(R.id.tv_userScore);
                 viewHolder.userImage = (ImageView) view.findViewById(R.id.iv_rankImage);
                 view.setTag(viewHolder);

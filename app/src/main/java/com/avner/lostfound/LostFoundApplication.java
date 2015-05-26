@@ -74,7 +74,7 @@ public class LostFoundApplication extends Application {
 
     public String getUserDisplayName() {
 
-        return (String)ParseUser.getCurrentUser().get(Constants.USER_DISPLAY_NAME);
+        return (String)ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME);
     }
 
     public String getUserEmail() {

@@ -88,6 +88,7 @@
         android:layout_alignLeft="@+id/tv_itemListingAge"
         android:layout_alignStart="@+id/tv_itemListingAge"
         android:layout_alignTop="@+id/textView"
+        android:layout_toLeftOf="@+id/ib_editReport"
         android:text="@string/default_city"
         android:textColor="@color/abc_search_url_text" />
 

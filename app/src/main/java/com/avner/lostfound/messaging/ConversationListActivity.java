@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.ConversationListAdapter;
 import com.avner.lostfound.structs.Conversation;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -173,12 +175,30 @@ public class ConversationListActivity extends Activity {
 
     public void openConversation(int pos) {
 
-        conversations.get(pos).setUnreadCount(0);
-        conversationAdapter.notifyDataSetChanged();
+        updateUnreadCount(pos);
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
         intent.putExtra(Constants.Conversation.RECIPIENT_ID, conversations.get(pos).getUserId());
         intent.putExtra(Constants.Conversation.RECIPIENT_NAME, conversations.get(pos).getUserName());
         intent.putExtra(Constants.Conversation.ITEM_ID, conversations.get(pos).getItem().getId());
         startActivity(intent);
+    }
+
+    private void updateUnreadCount(int pos) {
+        Conversation conversation = conversations.get(pos);
+        conversation.setUnreadCount(0);
+        conversationAdapter.notifyDataSetChanged();
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversation.getId());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseConversation, ParseException e) {
+                if(parseConversation == null){
+                    Log.e(Constants.LOST_FOUND_TAG, "no conversation found. WTF");
+                    return;
+                }
+                parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 0);
+                parseConversation.saveInBackground();
+            }
+        });
     }
 }

@@ -20,7 +20,6 @@ public class Constants {
     public static final String signed_up = "signed_up";
     public static final String USER_NAME= "user_name";
     public static final String PASSWORD = "password";
-    public static final String USER_DISPLAY_NAME = "name";
     public static final java.lang.String LONGITUDE = "longitude";
     public static final java.lang.String LATITUDE = "latitude";
 
@@ -150,4 +149,6 @@ public class Constants {
         public static final String REPORTED_ITEM = "reportedItem";
 
     }
+
+
 }

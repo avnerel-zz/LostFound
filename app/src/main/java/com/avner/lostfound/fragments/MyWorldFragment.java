@@ -62,7 +62,9 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         // get all my lost items
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        query.fromLocalDatastore();
         query.orderByAscending(Constants.ParseQuery.CREATED_AT);
+        query.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override

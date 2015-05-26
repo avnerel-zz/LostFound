@@ -205,7 +205,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
         String name = Profile.getCurrentProfile().getName();
         ParseUser user = ParseUser.getCurrentUser();
-        user.put(Constants.USER_DISPLAY_NAME, name);
+        user.put(Constants.ParseUser.USER_DISPLAY_NAME, name);
 
         //TODO get email.
 
@@ -234,7 +234,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
                     finishLogin();
                     user.setEmail(userName);
-                    user.put(Constants.USER_DISPLAY_NAME, userName.split("@")[0]);
+                    user.put(Constants.ParseUser.USER_DISPLAY_NAME, userName.split("@")[0]);
                     user.saveInBackground();
                     ((LostFoundApplication)getApplication()).setUserName(userName);
                 } else {

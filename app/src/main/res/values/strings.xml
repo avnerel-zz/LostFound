@@ -68,5 +68,10 @@
     <string name="possible_matches">Possible Matches Found</string>
     <string name="ADD_ITEM_DESCRIPTION">add a detailed description</string>
     <string name="action_complete">Complete</string>
+    <string name="userDisplayName">Display Name:</string>
+    <string name="enter_new_password">Enter New Password</string>
+    <string name="enter_new_password_again">Enter Password Again</string>
+    <string name="passwords_match">Passwords Match</string>
+    <string name="passwords_not_equal">Passwords Don\'t Match</string>
 
 </resources>

@@ -15,9 +15,9 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:src="@drawable/empty_profile"
-            android:background="@android:color/white"
             android:scaleType="fitCenter"
             android:id="@+id/ib_user_image"
+            android:background="@drawable/image_border"
             android:layout_marginLeft="10dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
@@ -27,47 +27,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:id="@+id/tv_email"
-            android:text="@string/userEmail"
-
+            android:id="@+id/tv_display_name"
+            android:text="@string/userDisplayName"
             android:layout_marginLeft="60dp"
             android:layout_marginStart="60dp"
-            android:layout_alignBaseline="@+id/tv_userName"
-            android:layout_alignBottom="@+id/tv_userName"
-            android:layout_alignLeft="@+id/tv_userName"
-            android:layout_alignStart="@+id/tv_userName" />
+            android:layout_toRightOf="@+id/ib_user_image"
+            android:layout_alignBaseline="@+id/et_userName"
+            android:layout_alignBottom="@+id/et_userName" />
 
-        <TextView
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:id="@+id/tv_userName"
+            android:id="@+id/et_userName"
+            android:hint="@string/default_user_name"
+            android:layout_marginLeft="60dp"
+            android:layout_marginStart="60dp"
             android:textSize="@dimen/abc_text_size_medium_material"
-            android:text="@string/default_user_email"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/ib_user_image"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            />
     </RelativeLayout>
 
-    <LinearLayout
+
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center">
+        android:layout_height="50dp"
+        android:id="@+id/b_change_password"
+        android:text="@string/change_password"
+        android:background="@color/off_white"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/b_log_out"
+        android:text="@string/logout"
+        android:background="@color/off_white"/>
 
 
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:id="@+id/b_delete_user"
-            android:text="@string/delete_user"/>
-
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:id="@+id/b_change_password"
-            android:text="@string/change_password"/>
-    </LinearLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/b_delete_user"
+        android:text="@string/delete_user"
+        android:background="@color/off_white"/>
 
     <LinearLayout
         android:layout_width="match_parent"
