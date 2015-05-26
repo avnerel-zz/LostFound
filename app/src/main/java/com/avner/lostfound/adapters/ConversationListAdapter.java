@@ -172,6 +172,18 @@ public class ConversationListAdapter extends BaseAdapter {
                 }
             }
         });
+
+        ParseQuery<ParseObject> localQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        localQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, selectedConversation.getId());
+        localQuery.fromLocalDatastore();
+        localQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e== null){
+                    parseObject.unpinInBackground();
+                }
+            }
+        });
     }
 
     public void toggleSelection(int position) {
