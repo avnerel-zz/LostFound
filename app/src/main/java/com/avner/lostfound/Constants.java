@@ -66,7 +66,8 @@ public class Constants {
     }
 
     public class ParseReport{
-
+        public static final String updatedAt = "updatedAt";
+        public static final String objectId = "objectId";
         public static final String ITEM_NAME = "itemName";
         public static final String ITEM_DESCRIPTION = "itemDescription";
         public static final String TIME = "time";

@@ -50,7 +50,7 @@
     <string name="messageButtonContentDescription" />
     <string name="lossTimeDefaultHint">[[ Loss time ]]</string>
     <string name="locationDefaultHint">[[ Location ]]</string>
-    <string name="itemDescriptionDefaultHint">bla bla bla</string>
+    <string name="itemDescriptionDefaultHint">no description found</string>
     <string name="message_elipsis">Message...</string>
     <string name="default_user_name">Israel Israeli</string>
     <string name="default_user_email">Israel Israeli@gmail.com</string>
