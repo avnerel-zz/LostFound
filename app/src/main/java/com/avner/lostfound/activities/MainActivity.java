@@ -2,6 +2,7 @@ package com.avner.lostfound.activities;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.support.v4.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.location.Location;
@@ -16,13 +17,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
+import com.avner.lostfound.fragments.ListingFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener {
@@ -93,6 +98,7 @@ public class MainActivity extends FragmentActivity implements
             public void onPageSelected(int position) {
                 // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
+                selectedTabIndex = position;
 
                 if (isListingFragment(position)) {
                     // switched to a listing tab - enable search view
@@ -154,6 +160,31 @@ public class MainActivity extends FragmentActivity implements
 
         this.mi_search_menu_item = menu.findItem(R.id.search);
         this.sv_search = (SearchView) menu.findItem(R.id.search).getActionView();
+        this.sv_search.setSubmitButtonEnabled(true);
+        this.sv_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(getApplicationContext(), String.format("searched '%s'", query), Toast.LENGTH_SHORT).show();
+
+                if (!isListingFragment(selectedTabIndex)) {
+                    Log.d(Constants.LOST_FOUND_TAG, "WTF? somehow submitted search in a non-listing fragment. fragment index: " + selectedTabIndex);
+                    return false;
+                }
+
+                ListingFragment fragment = (ListingFragment) getCurrentFragment();
+                fragment.searchPhrase(getApplicationContext(), query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if ("".equals(newText) && isListingFragment(selectedTabIndex)) {
+                    ListingFragment fragment = (ListingFragment) getCurrentFragment();
+                    fragment.searchPhrase(getApplicationContext(), newText);
+                }
+                return true;
+            }
+        });
 
         if (!isListingFragment(actionBar.getSelectedNavigationIndex())) {
             hideSearchView();
@@ -162,6 +193,10 @@ public class MainActivity extends FragmentActivity implements
         settings.setOnMenuItemClickListener(this);
 
         return true;
+    }
+
+    private Fragment getCurrentFragment() {
+        return ((TabsPagerAdapter)this.viewPager.getAdapter()).getFragment(this.selectedTabIndex);
     }
 
     public SearchView getSearchView() {

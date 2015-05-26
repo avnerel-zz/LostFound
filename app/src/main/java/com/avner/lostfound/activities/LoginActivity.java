@@ -33,7 +33,6 @@ import com.parse.ParseUser;
 import java.io.File;
 
 
-
 public class LoginActivity extends Activity implements Button.OnClickListener, TextWatcher {
 
     private Button emailLoginButton;
@@ -50,25 +49,26 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         // already logged in.
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
-            finishLogin();
+            finishLogin(false);
             return;
         }
         setContentView(R.layout.activity_login);
 
         // hide action bar because it isn't needed.
         ActionBar actionBar = getActionBar();
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.hide();
         }
         initViews();
     }
+
 
     private void initViews() {
 
         Button signUpButton = (Button) findViewById(R.id.b_sign_up);
         signUpButton.setOnClickListener(this);
 
-        emailLoginButton= (Button) findViewById(R.id.b_email_login);
+        emailLoginButton = (Button) findViewById(R.id.b_email_login);
         emailLoginButton.setOnClickListener(this);
 
         LoginButton facebookLoginButton = (LoginButton) findViewById(R.id.b_login_facebook);
@@ -80,7 +80,10 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         password.addTextChangedListener(this);
     }
 
-    private void finishLogin() {
+    /**
+     * @param updateDB if true, then the local datastore will be updated
+     */
+    private void finishLogin(boolean updateDB) {
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 
@@ -91,14 +94,18 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
         startService(serviceIntent);
 
+        if (updateDB) {
+            ((LostFoundApplication) getApplication()).refreshLocalDatastore();
+        }
+
         finish();
 
     }
 
     private void fetchUserPhotoFromFacebookProfile() {
         Profile currentProfile = Profile.getCurrentProfile();
-        final Uri imageUri = currentProfile != null ? currentProfile.getProfilePictureUri(150, 150): null;
-        if(imageUri!= null){
+        final Uri imageUri = currentProfile != null ? currentProfile.getProfilePictureUri(150, 150) : null;
+        if (imageUri != null) {
 
             AsyncTask task = new AsyncTask() {
                 @Override
@@ -114,31 +121,30 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
     public static void saveFacebookProfilePictureToFile(String imageUri) {
 
         // make dir for the app if it isn't already created.
-        boolean success = (new File( Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME)).mkdir();
-        if (!success)
-        {
+        boolean success = (new File(Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME)).mkdir();
+        if (!success) {
             Log.d(Constants.LOST_FOUND_TAG, "directory already created");
         }
         Bitmap image = ImageUtils.decodeRemoteUrl(imageUri);
-        ImageUtils.saveImageToFile(image,Constants.USER_IMAGE_FILE_NAME);
+        ImageUtils.saveImageToFile(image, Constants.USER_IMAGE_FILE_NAME);
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
-        if(resultCode != RESULT_OK){
+        if (resultCode != RESULT_OK) {
 
             Log.e(Constants.LOST_FOUND_TAG, "result not o.k in login activity. request code: " + requestCode);
         }
-        if(requestCode == Constants.REQUEST_CODE_SIGN_UP){
+        if (requestCode == Constants.REQUEST_CODE_SIGN_UP) {
 
             String userName = data.getStringExtra(Constants.USER_NAME);
             String password = data.getStringExtra(Constants.PASSWORD);
             logInToParseWithAppLogin(userName, password);
 
-        }else if(requestCode == Constants.REQUEST_CODE_FACEBOOK_LOGIN){
+        } else if (requestCode == Constants.REQUEST_CODE_FACEBOOK_LOGIN) {
 
             ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
 
@@ -149,19 +155,19 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
     @Override
     public void onClick(View v) {
 
-        if(v.getId() == R.id.b_sign_up){
+        if (v.getId() == R.id.b_sign_up) {
 
             // go to sign up activity.
             Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
             startActivityForResult(intent, Constants.REQUEST_CODE_SIGN_UP);
 
-        } else if(v.getId() == R.id.b_email_login){
+        } else if (v.getId() == R.id.b_email_login) {
 
             String username = userName.getText().toString().toLowerCase();
             String pass = password.getText().toString();
             logInToParseWithAppLogin(username, pass);
 
-        } else if(v.getId() == R.id.b_login_facebook){
+        } else if (v.getId() == R.id.b_login_facebook) {
 
             loginWithFacebookButton();
         }
@@ -198,7 +204,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         getUserFacebookProfileDetails();
         // try to fetch user photo from facebook.
         fetchUserPhotoFromFacebookProfile();
-        finishLogin();
+        finishLogin(true);
     }
 
     private void getUserFacebookProfileDetails() {
@@ -215,6 +221,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
     /**
      * This method logs the user into parse with the app user name and password.
+     *
      * @param userName user name entered.
      * @param password password entered.
      */
@@ -232,14 +239,14 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
                 if (user != null) {
 
-                    finishLogin();
+                    finishLogin(true);
                     user.setEmail(userName);
                     user.put(Constants.ParseUser.USER_DISPLAY_NAME, userName.split("@")[0]);
                     user.saveInBackground();
-                    ((LostFoundApplication)getApplication()).setUserName(userName);
+                    ((LostFoundApplication) getApplication()).setUserName(userName);
                 } else {
                     Toast.makeText(getApplicationContext(),
-                           e.getLocalizedMessage(),
+                            e.getLocalizedMessage(),
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -247,17 +254,20 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
     }
 
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-        if(password.getText().toString().isEmpty() || userName.getText().toString().isEmpty() ){
+        if (password.getText().toString().isEmpty() || userName.getText().toString().isEmpty()) {
             emailLoginButton.setEnabled(false);
-        }else{
+        } else {
             emailLoginButton.setEnabled(true);
         }
     }
+
     @Override
-    public void afterTextChanged(Editable s) {}
+    public void afterTextChanged(Editable s) {
+    }
 }
