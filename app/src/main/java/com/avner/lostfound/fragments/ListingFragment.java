@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -47,6 +48,8 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private int myLayoutId;
     private String parseClassName; // used as parse queries identifier
     private ListFilter filters = new ListFilter();
+    private MainActivity myActivity;
+    private MenuItem mi_search_menu_item;
 
 
     @Override
@@ -62,6 +65,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.isLostFragment = getArguments().getBoolean("isLostFragment");
         this.myLayoutId = isLostFragment ? R.layout.fragment_lost_list : R.layout.fragment_found_list;
         this.parseClassName = Constants.ParseObject.PARSE_LOST ;//this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
+        this.myActivity = (MainActivity) getActivity();
     }
 
     @Override
@@ -84,7 +88,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         rootView = inflater.inflate(this.myLayoutId, container, false);
         lv_itemList = (ListView) rootView.findViewById(R.id.lv_myList);
 
-        initSearchView(((MainActivity)getActivity()).getSearchView());
+        initSearchView(myActivity.getSearchView(), myActivity.getSearchViewMenuItem());
 
         FloatingActionButton button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
         button.setOnClickListener(this);
@@ -93,10 +97,11 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         initLocationSpinner();
     }
 
-    private void initSearchView(SearchView searchView) {
+    private void initSearchView(SearchView searchView, MenuItem searchViewMenuItem) {
         if (null == searchView) return;
 
         this.sv_search = searchView;
+        this.mi_search_menu_item = searchViewMenuItem;
     }
 
     /**
@@ -108,7 +113,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         if (null == phrase) return;
 
         if (null == this.sv_search) { // don't count on inflation order of activity and fragments
-            initSearchView(((MainActivity)getActivity()).getSearchView());
+            initSearchView(((MainActivity)getActivity()).getSearchView(), myActivity.getSearchViewMenuItem());
         }
 
         if (null == this.sv_search) { // still null and couldn't initialize - skip refreshing
@@ -259,4 +264,46 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {}
+
+    private boolean searchBarExpanded = false;
+    private CharSequence searchBarQuery = "";
+
+    public void saveSearchViewState() {
+        if (null == this.sv_search) return; // wasn't setup yet, no need to save state
+
+        // query
+        this.searchBarQuery = this.sv_search.getQuery();
+
+        // expanded / collapsed
+        this.searchBarExpanded = this.mi_search_menu_item.isActionViewExpanded(); // maybe redundant
+
+        Log.d(Constants.LOST_FOUND_TAG, String.format("saved search bar state (query = '%s', expanded = %s)", this.searchBarQuery, this.searchBarExpanded));
+    }
+
+    public void restoreSearchViewState() {
+        Log.d(Constants.LOST_FOUND_TAG, "restoring search bar state");
+
+        // query
+        if (null == this.sv_search) return; // wasn't setup yet, no need to restore state
+
+        this.sv_search.setQuery(this.searchBarQuery, false);
+
+        // expanded / collapsed
+        if (this.searchBarExpanded) {
+            this.mi_search_menu_item.expandActionView();
+        }
+        else {
+            this.mi_search_menu_item.collapseActionView();
+        }
+
+        Log.d(Constants.LOST_FOUND_TAG, String.format("restored search bar state (query = '%s', expanded = %s)", this.searchBarQuery, this.searchBarExpanded));
+    }
+
+    public void searchBarExpanded() {
+        this.searchBarExpanded = true;
+    }
+
+    public void searchBarCollapsed() {
+        this.searchBarExpanded = false;
+    }
 }

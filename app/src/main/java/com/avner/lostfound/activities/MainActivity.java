@@ -98,16 +98,25 @@ public class MainActivity extends FragmentActivity implements
             public void onPageSelected(int position) {
                 // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
+                int prevSelectedTabIndex = selectedTabIndex;
                 selectedTabIndex = position;
+
+                Log.d(Constants.LOST_FOUND_TAG, String.format("changed from tab %d (%slisting) to %d (%slisting)",
+                        prevSelectedTabIndex, isListingFragment(prevSelectedTabIndex) ? "" : "non-",
+                        selectedTabIndex, isListingFragment(selectedTabIndex) ? "" : "non-"));
 
                 if (isListingFragment(position)) {
                     // switched to a listing tab - enable search view
-                    Log.d(Constants.LOST_FOUND_TAG, "changed to a listing tab - enabling search view");
                     showSearchView();
+
+                    if (isListingFragment(prevSelectedTabIndex)) {
+                        ((ListingFragment)getFragmentAt(prevSelectedTabIndex)).saveSearchViewState();
+                    }
+
+                    ((ListingFragment)getCurrentFragment()).restoreSearchViewState();
                 }
                 else {
                     // switched to a non-listing tab - disable search view
-                    Log.d(Constants.LOST_FOUND_TAG, "changed to a non-listing tab - disabling search view");
                     hideSearchView();
                 }
             }
@@ -158,9 +167,28 @@ public class MainActivity extends FragmentActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        initSearchBar(menu);
+
+        if (!isListingFragment(actionBar.getSelectedNavigationIndex())) {
+            hideSearchView();
+        }
+
+        MenuItem settings = menu.findItem(R.id.action_settings);
+        settings.setOnMenuItemClickListener(this);
+
+        return true;
+    }
+
+    private void initSearchBar(Menu menu) {
         this.mi_search_menu_item = menu.findItem(R.id.search);
         this.sv_search = (SearchView) menu.findItem(R.id.search).getActionView();
         this.sv_search.setSubmitButtonEnabled(true);
+
+        initSearchBarExpansionHandling();
+        initSearchBarQueryHandling();
+    }
+
+    private void initSearchBarQueryHandling() {
         this.sv_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -185,22 +213,50 @@ public class MainActivity extends FragmentActivity implements
                 return true;
             }
         });
+    }
 
-        if (!isListingFragment(actionBar.getSelectedNavigationIndex())) {
-            hideSearchView();
-        }
-        MenuItem settings = menu.findItem(R.id.action_settings);
-        settings.setOnMenuItemClickListener(this);
+    private void initSearchBarExpansionHandling() {
+        this.mi_search_menu_item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Log.d(Constants.LOST_FOUND_TAG, "search bar expanding...");
+                int selectedFragmentIndex = actionBar.getSelectedNavigationIndex();
 
-        return true;
+                if (isListingFragment(selectedFragmentIndex)) {
+                    ((ListingFragment) getFragmentAt(selectedFragmentIndex)).searchBarExpanded();
+                }
+
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.d(Constants.LOST_FOUND_TAG, "search bar collapsing...");
+                int selectedFragmentIndex = actionBar.getSelectedNavigationIndex();
+
+                if (isListingFragment(selectedFragmentIndex)) {
+                    ((ListingFragment) getFragmentAt(selectedFragmentIndex)).searchBarCollapsed();
+                }
+
+                return true;
+            }
+        });
     }
 
     private Fragment getCurrentFragment() {
-        return ((TabsPagerAdapter)this.viewPager.getAdapter()).getFragment(this.selectedTabIndex);
+        return getFragmentAt(this.selectedTabIndex);
+    }
+
+    private Fragment getFragmentAt(int position) {
+        return ((TabsPagerAdapter)this.viewPager.getAdapter()).getFragment(position);
     }
 
     public SearchView getSearchView() {
         return this.sv_search;
+    }
+
+    public MenuItem getSearchViewMenuItem() {
+        return this.mi_search_menu_item;
     }
 
     @Override
@@ -290,10 +346,17 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        if(item.getItemId() == R.id.action_settings){
-            Intent intent = new Intent(this,SettingsActivity.class);
-            startActivity(intent);
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this,SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.search:
+
         }
+
+
+
         return false;
     }
 }
