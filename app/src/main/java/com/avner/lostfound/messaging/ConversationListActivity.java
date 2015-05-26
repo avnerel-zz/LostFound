@@ -88,6 +88,7 @@ public class ConversationListActivity extends Activity {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
         query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, myUserId);
         query.include(Constants.ParseConversation.ITEM);
+        query.fromLocalDatastore();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> conversationList, ParseException e) {

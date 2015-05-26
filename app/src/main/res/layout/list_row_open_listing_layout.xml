@@ -53,6 +53,18 @@
         />
 
     <ImageButton
+        android:id="@+id/ib_deleteReport"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@android:drawable/ic_menu_delete" />
+
+
+    <ImageButton
         android:id="@+id/iv_potentialMatchImage"
         android:layout_width="40dp"
         android:layout_height="40dp"

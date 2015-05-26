@@ -81,7 +81,8 @@
         android:layout_height="50dp"
         android:id="@+id/b_delete_user"
         android:text="@string/delete_user"
-        android:background="@drawable/image_border"/>
+        android:enabled="false"
+    android:background="@drawable/image_border"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -93,17 +94,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/history_length"
+            android:enabled="false"
             />
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/sp_history_length"
             android:spinnerMode="dropdown"
+            android:enabled="false"
+
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/number_messages"
+            android:enabled="false"
             />
 
 
@@ -114,6 +119,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/push_notifications"
+        android:enabled="false"
         android:checked="true"/>
 
 

@@ -193,6 +193,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
                         parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_NAME, item.getUserDisplayName());
                         parseConversations.put(Constants.ParseConversation.ITEM, item.getParseItem());
                         parseConversations.put(Constants.ParseConversation.UNREAD_COUNT, 0);
+                        parseConversations.pinInBackground();
                         parseConversations.saveInBackground();
                     }
                 }

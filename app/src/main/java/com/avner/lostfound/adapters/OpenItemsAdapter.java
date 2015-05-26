@@ -32,6 +32,11 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -85,7 +90,6 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder.timeAdded = (TextView) view.findViewById(R.id.tv_itemListingAge);
             viewHolder.itemImage = (ImageView) view.findViewById(R.id.iv_itemListingImage);
 
-            initShareButton(view, item, viewHolder.itemImage);
             view.setTag(viewHolder);
         }
         else {
@@ -93,12 +97,33 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder = (ViewHolder) view.getTag();
         }
 
+        initShareButton(view, item, viewHolder.itemImage);
+        initDeleteButton(view,item, viewHolder);
         // Put the content in the view
         viewHolder.itemName.setText(item.getName());
         viewHolder.timeAdded.setText(item.timeAgo());
         Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(viewHolder.itemImage);
 
         return view;
+    }
+
+    private void initDeleteButton(View view, final Item item, ViewHolder viewHolder) {
+        viewHolder.deleteReport = (ImageButton) view.findViewById(R.id.ib_deleteReport);
+        viewHolder.deleteReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(Constants.LOST_FOUND_TAG, "pressed to delete item " + item.getName());
+                ParseQuery<ParseObject> deleteQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+                deleteQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
+                deleteQuery.getFirstInBackground(new GetCallback<ParseObject>(){
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        parseObject.deleteInBackground();
+                    }
+                });
+
+            }
+        });
     }
 
     private void initShareButton(View view, final Item item, final ImageView image) {
@@ -173,6 +198,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         TextView itemName;
         ImageView itemImage;
         TextView timeAdded;
+        public ImageButton deleteReport;
     }
 
 }

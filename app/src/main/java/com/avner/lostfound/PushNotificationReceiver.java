@@ -55,7 +55,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
     private void handlePushOfParseFound(JSONObject jsonData) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
         Log.d("PUSH_FOUND", reportedItem);
-        // TODO: create object from the data, as in handlePushOfParseLost
+        // TODO: create object from the data, as in handlePushOfParseLost. shouldn't happen cause there is no more found and lost.
     }
 
     private void handlePushOfParseLost(JSONObject jsonData) throws JSONException {
@@ -154,6 +154,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         query.whereContainedIn(Constants.ParseConversation.MY_USER_ID, Arrays.asList(userIds));
         query.whereContainedIn(Constants.ParseConversation.RECIPIENT_USER_ID, Arrays.asList(userIds));
         query.whereMatchesQuery(Constants.ParseConversation.ITEM, itemQuery);
+        query.include(Constants.ParseConversation.ITEM);
 
         addConversationIfNeeded(currentUserId, senderId, senderName, query);
 
@@ -190,6 +191,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                     parseConversation.put(Constants.ParseConversation.MY_USER_ID, currentUserId);
                     parseConversation.put(Constants.ParseConversation.RECIPIENT_USER_NAME, senderName);
                     parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 1);
+                    parseConversation.pinInBackground();
                     parseConversation.saveInBackground();
                 }
             }

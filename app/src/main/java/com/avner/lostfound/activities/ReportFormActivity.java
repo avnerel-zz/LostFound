@@ -546,7 +546,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, userLoginName);
         parseReport.saveInBackground();
-        parseReport.pinInBackground();
+//        parseReport.pinInBackground();
 
         Toast.makeText(this, "report has been shipped", Toast.LENGTH_SHORT).show();
 
