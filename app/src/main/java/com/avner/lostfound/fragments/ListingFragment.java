@@ -178,6 +178,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
      */
     private void getItemsFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClassName);
+        query.fromLocalDatastore();
         query.orderByAscending(Constants.ParseQuery.CREATED_AT); // TODO change to order by most recent
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
