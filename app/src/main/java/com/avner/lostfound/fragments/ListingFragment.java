@@ -1,5 +1,6 @@
 package com.avner.lostfound.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -118,8 +119,8 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         sv_search.clearFocus();
     }
 
-    public void searchPhrase(String phrase) {
-        if (this.filters.updateContentFilter(phrase)) {
+    public void searchPhrase(Context ctx, String phrase) {
+        if (this.filters.updateContentFilter(ctx, phrase)) {
             ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
             Log.d(Constants.LOST_FOUND_TAG, "content filter updated to \"" + this.filters.getContentFilter() + "\"");
         }

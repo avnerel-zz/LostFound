@@ -1,5 +1,8 @@
 package com.avner.lostfound.structs;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import com.avner.lostfound.Constants;
 
 import java.util.Arrays;
@@ -43,8 +46,13 @@ public class ListFilter {
         return (this.filter_time != prevFilter);
     }
 
-    public boolean updateContentFilter(String phrase) {
-        if (null == phrase || "".equals(phrase) || phrase.length() < Constants.MIN_CONTENT_FILTER_SIZE) { // invalid filter
+    public boolean updateContentFilter(Context ctx, String phrase) {
+        if (null == phrase) { // || "".equals(phrase) || phrase.length() < Constants.MIN_CONTENT_FILTER_SIZE) { // invalid filter
+            return false;
+        }
+
+        if (!"".equals(phrase) && phrase.length() < Constants.MIN_CONTENT_FILTER_SIZE) { // invalid phrase size
+            Toast.makeText(ctx, String.format("phrase must be at least %d letters long", Constants.MIN_CONTENT_FILTER_SIZE), Toast.LENGTH_SHORT).show();
             return false;
         }
 
