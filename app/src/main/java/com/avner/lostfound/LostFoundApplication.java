@@ -140,15 +140,11 @@ public class LostFoundApplication extends Application {
             query.whereEqualTo(usernameFieldName, myUsername);
         }
 
-        query.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> scoreList, ParseException e) {
-                if (e != null) {
-                    // Log.d("score", "Error: " + e.getMessage());
-                }
-                // Log.d("score", "Retrieved " + scoreList.size() + " scores");
-                ParseObject.pinAllInBackground(scoreList, saveCallback);
-            }
-        });
+        try {
+            ParseObject.pinAllInBackground(query.find(), saveCallback);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
 }
