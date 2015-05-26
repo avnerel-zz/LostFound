@@ -66,11 +66,11 @@ public class ListFilterUtils {
         while (it.hasNext()) {
             Item item = it.next(); // advance iterator
 
-            if (item.getDescription().contains(phrase)) { // found phrase in description - keep it
+            if (item.getDescription().toLowerCase().contains(phrase)) { // found phrase in description - keep it
                 continue;
             }
 
-            if (item.getName().contains(phrase)) { // found phrase in name - keep it
+            if (item.getName().toLowerCase().contains(phrase)) { // found phrase in name - keep it
                 continue;
             }
 

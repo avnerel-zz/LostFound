@@ -60,7 +60,7 @@ public class ListFilter {
             return false;
         }
 
-        this.filter_content = new String(phrase);
+        this.filter_content = new String(phrase.toLowerCase());
         return true;
     }
 
