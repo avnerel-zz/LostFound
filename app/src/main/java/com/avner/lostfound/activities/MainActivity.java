@@ -177,7 +177,10 @@ public class MainActivity extends FragmentActivity implements
 
             @Override
             public boolean onQueryTextChange(String newText) {
-//                Toast.makeText(getApplicationContext(), String.format("search view test changed to '%s'", newText), Toast.LENGTH_SHORT).show();
+                if ("".equals(newText) && isListingFragment(selectedTabIndex)) {
+                    ListingFragment fragment = (ListingFragment) getCurrentFragment();
+                    fragment.searchPhrase(getApplicationContext(), newText);
+                }
                 return true;
             }
         });

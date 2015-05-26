@@ -57,7 +57,10 @@ public class ListFilterUtils {
     public static void applyContentFilter(List<Item> items, ListFilter filter) {
         final String phrase = filter.getContentFilter();
 
-        if (phrase.equals(Constants.NO_CONTENT_FILTER)) return; // no content filter defined - skip
+        if (phrase.equals(Constants.NO_CONTENT_FILTER)) {
+            Log.d(Constants.LOST_FOUND_TAG, "no content filter defined, or cleared the filter");
+            return; // no content filter defined - skip
+        }
 
         Iterator<Item> it = items.iterator();
         while (it.hasNext()) {
