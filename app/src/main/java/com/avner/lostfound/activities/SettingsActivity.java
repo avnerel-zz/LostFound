@@ -28,12 +28,13 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
+import com.facebook.Profile;
 import com.parse.ParseUser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class SettingsActivity extends Activity implements AdapterView.OnItemSelectedListener, View.OnClickListener, View.OnFocusChangeListener {
+public class SettingsActivity extends Activity implements AdapterView.OnItemSelectedListener, View.OnClickListener{
 
     private static final String INFINITY = "\u221E";
     Spinner messageHistory;
@@ -55,7 +56,9 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
         userDisplayName = (EditText) findViewById(R.id.et_userName);
         LostFoundApplication app = (LostFoundApplication) getApplication();
         userDisplayName.setText(app.getUserDisplayName());
-        userDisplayName.setOnFocusChangeListener(this);
+
+        Button b_updateUserName = (Button) findViewById(R.id.b_updateUserName);
+        b_updateUserName.setOnClickListener(this);
 
         userPhotoImageButton = (ImageButton) findViewById(R.id.ib_user_image);
 
@@ -63,6 +66,10 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
         b_logout.setOnClickListener(this);
 
         Button b_changePassword = (Button) findViewById(R.id.b_change_password);
+        // can't change password if login was through facebook.
+        if(Profile.getCurrentProfile() != null){
+            b_changePassword.setVisibility(Button.INVISIBLE);
+        }
         b_changePassword.setOnClickListener(this);
 
         Button b_deleteUser = (Button) findViewById(R.id.b_delete_user);
@@ -132,7 +139,17 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
             case R.id.b_delete_user:
                 deleteUser();
                 break;
+            case R.id.b_updateUserName:
+                updateUserName();
+                break;
         }
+    }
+
+    private void updateUserName() {
+        String name = userDisplayName.getText().toString();
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser.put(Constants.ParseUser.USER_DISPLAY_NAME, name);
+        currentUser.saveInBackground();
     }
 
     private void deleteUser() {
@@ -194,17 +211,4 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
 
     }
 
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        switch(v.getId()){
-            case R.id.et_user_name:
-                if(!hasFocus){
-                    String name = userDisplayName.getText().toString();
-                    ParseUser currentUser = ParseUser.getCurrentUser();
-                    currentUser.put(Constants.ParseUser.USER_DISPLAY_NAME, name);
-                    currentUser.saveInBackground();
-                }
-                break;
-        }
-    }
 }

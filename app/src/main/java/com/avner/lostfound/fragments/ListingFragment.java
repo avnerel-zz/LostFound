@@ -220,7 +220,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         switch (v.getId()) {
             case R.id.b_add_item:
                 Intent intent = new Intent(rootView.getContext(), ReportFormActivity.class);
-                intent.putExtra(Constants.ReportForm.IS_LOST_FORM, true); // TODO maybe need to adjust for FOUND?
+                intent.putExtra(Constants.ReportForm.IS_LOST_FORM, isLostFragment);
                 intent.putExtra(Constants.ReportForm.IS_EDIT_FORM, false);
                 startActivity(intent);
                 break;

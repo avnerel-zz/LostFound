@@ -25,6 +25,7 @@ public class LostFoundApplication extends Application {
      */
     private ParseInstallation installation;
     private boolean isMessagingActive;
+    private String messagingItemId;
 
     @Override
     public void onCreate() {
@@ -82,13 +83,20 @@ public class LostFoundApplication extends Application {
         return (String)ParseUser.getCurrentUser().getEmail();
     }
 
-    public void updateMessagingStatus(boolean isActive) {
+    public void updateMessagingStatus(boolean isActive, String itemId) {
 
         isMessagingActive = isActive;
+        messagingItemId = itemId;
 
     }
 
+
+
     public boolean isMessagingActivityActive() {
         return isMessagingActive;
+    }
+
+    public String getMessagingActivityItemId() {
+        return messagingItemId;
     }
 }

@@ -88,7 +88,6 @@ public class Constants {
     public class ParseObject{
 
         public static final String PARSE_LOST = "ParseLost";
-        public static final String PARSE_FOUND = "ParseFound";
         public static final String PARSE_CONVERSATION= "ParseConversation";
         public static final String PARSE_MESSAGE= "ParseMessage";
     }
@@ -148,6 +147,10 @@ public class Constants {
         public static final String SENDER_NAME = "senderName";
         public static final String ITEM_ID = "itemId";
         public static final String REPORTED_ITEM = "reportedItem";
+
+        public static final String TYPE_LOST = "ParseLost";
+        public static final String TYPE_FOUND = "ParseFound";
+        public static final String TYPE_MESSAGE = "ParseMessage";
 
     }
 

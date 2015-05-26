@@ -10,10 +10,11 @@
     <string name="title_activity_report_form">ReportForm</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="title_activity_sign_up">Sign Up</string>
     <string name="title_activity_top_rated_fragment">TopRatedFragment</string>
-    <string name="title_activity_messaging">MessagingActivity</string>
-    <string name="title_activity_users_list">UsersListActivity</string>
+    <string name="title_activity_messaging">Messaging</string>
+    <string name="title_activity_conversation_list">Conversations</string>
+    <string name="title_activity_pick_location">Pick Location</string>
 
 
     <!-- CONFIGURATION -->
@@ -57,7 +58,6 @@
     <string name="search_title">Search</string>
     <string name="userEmail">Email:</string>
     <string name="password_hint">Password</string>
-    <string name="title_activity_pick_location">PickLocationActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="logout">Logout</string>
@@ -73,5 +73,6 @@
     <string name="enter_new_password_again">Enter Password Again</string>
     <string name="passwords_match">Passwords Match</string>
     <string name="passwords_not_equal">Passwords Don\'t Match</string>
+    <string name="update_user_name">Update</string>
 
 </resources>

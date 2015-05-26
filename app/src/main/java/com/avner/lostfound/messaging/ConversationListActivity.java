@@ -187,18 +187,5 @@ public class ConversationListActivity extends Activity {
         Conversation conversation = conversations.get(pos);
         conversation.setUnreadCount(0);
         conversationAdapter.notifyDataSetChanged();
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-        query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversation.getId());
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseConversation, ParseException e) {
-                if(parseConversation == null){
-                    Log.e(Constants.LOST_FOUND_TAG, "no conversation found. WTF");
-                    return;
-                }
-                parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 0);
-                parseConversation.saveInBackground();
-            }
-        });
     }
 }

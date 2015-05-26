@@ -39,7 +39,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="@string/login_with_email"
             android:textAllCaps="false"
             android:id="@+id/b_email_login"
@@ -54,42 +54,18 @@
             android:text="@string/or_login_with"
             android:gravity="center"/>
 
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal">
 
-            <com.google.android.gms.common.SignInButton
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:id="@+id/b_login_google"
-                android:foregroundGravity="fill"
-
-                android:minHeight="40dp" />
 
             <com.facebook.login.widget.LoginButton
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_weight="1"
                 android:id="@+id/b_login_facebook"
-                android:minHeight="40dp"
                 android:layout_marginTop="6dp"/>
-            <!--<ImageButton-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="40dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:id="@+id/b_login_facebook"-->
-                <!--android:src="@drawable/facebook_login"-->
-                <!--android:scaleType="fitStart"-->
-                <!--android:scaleX="1"-->
 
-            <!--/>-->
-
-
-
-        </LinearLayout>
 
 
     </LinearLayout>

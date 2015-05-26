@@ -74,16 +74,19 @@ public class MessagingActivity extends Activity implements TextWatcher {
         messageBodyField.addTextChangedListener(this);
 
         initSendButton();
-
         initMessageList();
-
         clearUnreadCount();
     }
 
     private void clearUnreadCount() {
+
+        ParseQuery<ParseObject> itemQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        itemQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemId);
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
         query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
         query.whereEqualTo(Constants.ParseConversation.RECIPIENT_USER_ID, recipientId);
+        query.whereMatchesQuery(Constants.ParseConversation.ITEM, itemQuery);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseConversation, ParseException e) {
@@ -163,13 +166,13 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
     @Override
     protected void onResume() {
-        ((LostFoundApplication)getApplication()).updateMessagingStatus(true);
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(true,itemId);
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        ((LostFoundApplication)getApplication()).updateMessagingStatus(false);
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(false,null);
         super.onPause();
     }
 

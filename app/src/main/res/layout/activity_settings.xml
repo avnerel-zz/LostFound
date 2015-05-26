@@ -6,10 +6,16 @@
     android:orientation="vertical"
     >
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
 
         <ImageButton
             android:layout_width="150dp"
@@ -22,33 +28,38 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:id="@+id/tv_display_name"
-            android:text="@string/userDisplayName"
-            android:layout_marginLeft="60dp"
-            android:layout_marginStart="60dp"
-            android:layout_toRightOf="@+id/ib_user_image"
-            android:layout_alignBaseline="@+id/et_userName"
-            android:layout_alignBottom="@+id/et_userName" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:id="@+id/et_userName"
-            android:hint="@string/default_user_name"
-            android:layout_marginLeft="60dp"
-            android:layout_marginStart="60dp"
-            android:textSize="@dimen/abc_text_size_medium_material"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/ib_user_image"
-            android:layout_marginRight="10dp"
-            />
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:id="@+id/tv_display_name"
+                android:text="@string/userDisplayName"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:id="@+id/et_userName"
+                android:hint="@string/default_user_name"
+                android:textSize="@dimen/abc_text_size_medium_material"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/update_user_name"
+                android:id="@+id/b_updateUserName"
+                android:background="@drawable/image_border"/>
+
+        </LinearLayout>
+    </LinearLayout>
 
 
     <Button
@@ -56,13 +67,13 @@
         android:layout_height="50dp"
         android:id="@+id/b_change_password"
         android:text="@string/change_password"
-        android:background="@color/off_white"/>
+        android:background="@drawable/image_border"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/b_log_out"
         android:text="@string/logout"
-        android:background="@color/off_white"/>
+        android:background="@drawable/image_border"/>
 
 
     <Button
@@ -70,7 +81,7 @@
         android:layout_height="50dp"
         android:id="@+id/b_delete_user"
         android:text="@string/delete_user"
-        android:background="@color/off_white"/>
+        android:background="@drawable/image_border"/>
 
     <LinearLayout
         android:layout_width="match_parent"

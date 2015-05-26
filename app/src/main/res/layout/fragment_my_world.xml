@@ -4,40 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+
+    <ImageButton
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="4">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/messages"
-            android:id="@+id/b_log_out"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:contentDescription="@string/logout" />
-
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text="@string/messages"
-            android:id="@+id/b_messages"
-            android:src="@android:drawable/ic_dialog_email"
-            android:contentDescription="@string/messages" />
-
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@android:drawable/ic_menu_preferences"
-            android:id="@+id/b_settings"
-            android:contentDescription="@string/settings" />
-
-
-    </LinearLayout>
+        android:layout_height="50dp"
+        android:text="@string/messages"
+        android:id="@+id/b_messages"
+        android:src="@android:drawable/ic_dialog_email"
+        android:background="@drawable/blue_image_border"
+        android:contentDescription="@string/messages" />
 
     <View
         android:layout_width="fill_parent"

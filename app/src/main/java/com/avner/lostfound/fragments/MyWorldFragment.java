@@ -40,11 +40,11 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
         ImageButton messagesButton = (ImageButton) rootView.findViewById(R.id.b_messages);
         messagesButton.setOnClickListener(this);
 
-        ImageButton settingsButton = (ImageButton) rootView.findViewById(R.id.b_settings);
-        settingsButton.setOnClickListener(this);
-
-        ImageButton logOutButton = (ImageButton) rootView.findViewById(R.id.b_log_out);
-        logOutButton.setOnClickListener(this);
+//        ImageButton settingsButton = (ImageButton) rootView.findViewById(R.id.b_settings);
+//        settingsButton.setOnClickListener(this);
+//
+//        ImageButton logOutButton = (ImageButton) rootView.findViewById(R.id.b_log_out);
+//        logOutButton.setOnClickListener(this);
 
         tv_openListingsNumber = (TextView) rootView.findViewById(R.id.tv_openListingsNumber);
 
@@ -84,7 +84,6 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
     private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
 
-        //TODO if not loading all items and just adding so remove this.
         items.clear();
         Item item = null;
         for (ParseObject parseItem : itemsList){
@@ -109,21 +108,21 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
         Intent intent;
         switch(v.getId()){
 
-            case R.id.b_settings:
-                intent = new Intent(rootView.getContext(),SettingsActivity.class);
-                startActivity(intent);
-                break;
+//            case R.id.b_settings:
+//                intent = new Intent(rootView.getContext(),SettingsActivity.class);
+//                startActivity(intent);
+//                break;
             case R.id.b_messages:
                 intent = new Intent(rootView.getContext(),ConversationListActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.b_log_out:
-                ParseUser.logOut();
-                intent = new Intent(rootView.getContext(),LoginActivity.class);
-                startActivity(intent);
-                // return to login screen.
-                getActivity().finish();
-                break;
+//            case R.id.b_log_out:
+//                ParseUser.logOut();
+//                intent = new Intent(rootView.getContext(),LoginActivity.class);
+//                startActivity(intent);
+//                // return to login screen.
+//                getActivity().finish();
+//                break;
         }
     }
 

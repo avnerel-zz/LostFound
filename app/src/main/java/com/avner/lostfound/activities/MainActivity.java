@@ -3,6 +3,7 @@ package com.avner.lostfound.activities;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -24,7 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends FragmentActivity implements
-        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener {
 
     private Location lastKnownLocation = null;
     private GoogleApiClient googleApiClient;
@@ -157,6 +158,8 @@ public class MainActivity extends FragmentActivity implements
         if (!isListingFragment(actionBar.getSelectedNavigationIndex())) {
             hideSearchView();
         }
+        MenuItem settings = menu.findItem(R.id.action_settings);
+        settings.setOnMenuItemClickListener(this);
 
         return true;
     }
@@ -248,5 +251,14 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if(item.getItemId() == R.id.action_settings){
+            Intent intent = new Intent(this,SettingsActivity.class);
+            startActivity(intent);
+        }
+        return false;
     }
 }
