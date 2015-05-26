@@ -112,12 +112,7 @@ public class LostFoundApplication extends Application {
         getInstancesOfParseObjectFromRemoteDB("ParseLost");
         getInstancesOfParseObjectFromRemoteDB("ParseConversation", true, "myUserId", userId);
         getInstancesOfParseObjectFromRemoteDB("ParseMessage", true, "recipientId", userId);
-        getInstancesOfParseObjectFromRemoteDB("ParseMessage", true, "senderId", userId, new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                // TODO: refresh
-            }
-        });
+        getInstancesOfParseObjectFromRemoteDB("ParseMessage", true, "senderId", userId);
     }
 
     private void getInstancesOfParseObjectFromRemoteDB(String objectName) {
@@ -125,15 +120,6 @@ public class LostFoundApplication extends Application {
     }
 
     private void getInstancesOfParseObjectFromRemoteDB(String objectName, boolean takeUserObjectsOnly, String usernameFieldName, String myUsername) {
-        getInstancesOfParseObjectFromRemoteDB(objectName, takeUserObjectsOnly, usernameFieldName, myUsername, new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                // NOP
-            }
-        });
-    }
-
-    private void getInstancesOfParseObjectFromRemoteDB(String objectName, boolean takeUserObjectsOnly, String usernameFieldName, String myUsername, final SaveCallback saveCallback) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(objectName);
 
         if (takeUserObjectsOnly) {
@@ -141,7 +127,7 @@ public class LostFoundApplication extends Application {
         }
 
         try {
-            ParseObject.pinAllInBackground(query.find(), saveCallback);
+            ParseObject.pinAllInBackground(query.find());
         } catch (ParseException e) {
             e.printStackTrace();
         }

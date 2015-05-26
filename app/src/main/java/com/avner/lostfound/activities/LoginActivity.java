@@ -80,6 +80,9 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         password.addTextChangedListener(this);
     }
 
+    /**
+     * @param updateDB if true, then the local datastore will be updated
+     */
     private void finishLogin(boolean updateDB) {
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -90,9 +93,11 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         startService(serviceIntent);
+
         if (updateDB) {
             ((LostFoundApplication) getApplication()).refreshLocalDatastore();
         }
+
         finish();
 
     }
