@@ -145,6 +145,9 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         final String senderId = jsonData.getString(Constants.ParsePush.SENDER_ID);
         final String senderName = jsonData.getString(Constants.ParsePush.SENDER_NAME);
         final String itemId = jsonData.getString(Constants.ParsePush.ITEM_ID);
+        final String messageId = jsonData.getString(Constants.ParseQuery.OBJECT_ID);
+
+        pinMessage(messageId);
 
         LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
         if (applicationContext.isMessagingActivityActive() && applicationContext.getMessagingActivityItemId().equals(senderId)) {
@@ -165,6 +168,20 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         addConversationIfNeeded(currentUserId, senderId, senderName, query);
 
         return true;
+    }
+
+    private void pinMessage(String messageId) {
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
+        query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, messageId);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(parseObject!= null){
+                    parseObject.pinInBackground();
+                }
+            }
+        });
     }
 
     private void addConversationIfNeeded(final String currentUserId, final String senderId, final String senderName, ParseQuery<ParseObject> query) {

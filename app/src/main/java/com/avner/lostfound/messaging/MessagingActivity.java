@@ -9,7 +9,6 @@ import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -26,6 +25,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.messaging.Message;
 import com.sinch.android.rtc.messaging.MessageClient;
@@ -87,6 +87,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
         query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
         query.whereEqualTo(Constants.ParseConversation.RECIPIENT_USER_ID, recipientId);
         query.whereMatchesQuery(Constants.ParseConversation.ITEM, itemQuery);
+        query.fromLocalDatastore();
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseConversation, ParseException e) {
@@ -247,13 +248,18 @@ public class MessagingActivity extends Activity implements TextWatcher {
                 public void done(List<ParseObject> messageList, com.parse.ParseException e) {
                     if (e == null) {
                         if (messageList.size() == 0) {
-                            ParseObject parseMessage = new ParseObject(Constants.ParseObject.PARSE_MESSAGE);
+                            final ParseObject parseMessage = new ParseObject(Constants.ParseObject.PARSE_MESSAGE);
                             parseMessage.put(Constants.ParseMessage.SENDER_ID, currentUserId);
                             parseMessage.put(Constants.ParseMessage.RECIPIENT_ID, writableMessage.getRecipientIds().get(0));
                             parseMessage.put(Constants.ParseMessage.MESSAGE_TEXT, writableMessage.getTextBody());
                             parseMessage.put(Constants.ParseMessage.SINCH_ID, writableMessage.getMessageId());
                             parseMessage.put(Constants.ParseMessage.ITEM_ID, itemId);
-                            parseMessage.saveInBackground();
+                            parseMessage.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    parseMessage.pinInBackground();
+                                }
+                            });
 
                             messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
                         }
