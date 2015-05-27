@@ -21,11 +21,9 @@ import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -148,7 +146,7 @@ public class ConversationListAdapter extends BaseAdapter {
         itemLocation.setMaxLines(2);
 
         TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
-        itemTime.setText(item.timeAgo());
+        itemTime.setText(item.getTimeAsString());
 
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
         Picasso.with(rootActivity).load(item.getImageUrl()).into(itemImage);

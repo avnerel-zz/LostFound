@@ -10,7 +10,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -44,6 +43,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
@@ -555,39 +555,25 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
         final ReportFormActivity activity = this;
-        new AsyncTask(){
-
+        parseReport.saveInBackground(new SaveCallback() {
             @Override
-            protected Object doInBackground(Object[] params) {
-
-                try {
-                    parseReport.save();
-                    parseReport.pin();
-                    return true;
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-
+            public void done(ParseException e) {
                 progressDialog.dismiss();
-                if((boolean)o) {
-
-                    setResult(RESULT_OK,null);
-                    finish();
-                    Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
-                }else {
-
+                if(e!=null){
+                    progressDialog.dismiss();
                     Toast.makeText(activity, "No Connection. Can't upload report", Toast.LENGTH_SHORT).show();
+                }else{
+                    try {
+                        parseReport.pin();
+                        progressDialog.dismiss();
+                        setResult(RESULT_OK,null);
+                        finish();
+                        Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
                 }
-
             }
-        }.execute();
-
-
-
+        });
     }
 }
