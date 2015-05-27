@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -126,10 +127,8 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
                 ImageUtils.selectItemImage(this);
                 break;
             case R.id.b_log_out:
-                ParseUser.logOut();
-                Intent intent = new Intent(this,LoginActivity.class);
-                startActivity(intent);
-                // return to login screen.
+                // return to main activity.
+                setResult(Constants.RESULT_CODE_LOGOUT, null);
                 finish();
                 break;
             case R.id.b_change_password:
@@ -168,11 +167,19 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
             public void afterTextChanged(Editable s) {
                 String strPass1 = password1.getText().toString();
                 String strPass2 = password2.getText().toString();
-                if (strPass1.equals(strPass2)) {
+                if(strPass1.length() < Constants.MIN_PASSWORD_LENGTH || strPass1.length() > Constants.MAX_PASSWORD_LENGTH){
+
+                    error.setText(R.string.password_too_short);
+                    error.setTextColor(Color.RED);
+
+                }
+                else if (strPass1.equals(strPass2)) {
                     error.setText(R.string.passwords_match);
+                    error.setTextColor(Color.BLACK);
 
                 } else {
                     error.setText(R.string.passwords_not_equal);
+                    error.setTextColor(Color.RED);
                 }
             }
 
@@ -180,7 +187,7 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter New Password");
+        builder.setTitle("Change Password");
         builder.setView(layout);
 
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -194,13 +201,15 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
             public void onClick(DialogInterface dialog, int which) {
                 String strPassword1 = password1.getText().toString();
                 String strPassword2 = password2.getText().toString();
-                if (strPassword1.equals(strPassword2)) {
+                if (strPassword1.equals(strPassword2) && strPassword1.length()> Constants.MIN_PASSWORD_LENGTH
+                                                      && strPassword1.length()< Constants.MAX_PASSWORD_LENGTH) {
                     dialog.dismiss();
                     ParseUser.getCurrentUser().setPassword(strPassword1);
                     ParseUser.getCurrentUser().saveInBackground();
+                    showPasswordsUpdatedDialog();
                 }else{
                     Toast.makeText(thisActivity,
-                            "Passwords Don't Match", Toast.LENGTH_SHORT).show();
+                            "Invalid password", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -209,6 +218,20 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
         passwordDialog.show();
 
 
+    }
+
+    private void showPasswordsUpdatedDialog() {
+
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.password_changed)
+                .setMessage(R.string.password_has_been_changed)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
     }
 
 }

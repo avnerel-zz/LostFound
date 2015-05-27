@@ -191,8 +191,9 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
             @Override
             public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
                 if (e == null) {
+                    allItems.clear();
                     for (int i = 0; i < itemsList.size(); i++) {
-                        convertParseListToItemList(itemsList, allItems);
+                        convertParseListToItemList(itemsList);
                     }
                     ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
                     Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
@@ -202,14 +203,14 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
     }
 
-    private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
-        //TODO if not loading all allItems and just adding so remove this.
-        items.clear();
+    private void convertParseListToItemList(List<ParseObject> itemsList) {
+
+        allItems.clear();
 
         for (ParseObject parseItem : itemsList){
             try {
                 if (null != parseItem) {
-                    items.add(new Item(parseItem));
+                    allItems.add(new Item(parseItem));
                 }
                 else {
                     Log.d(Constants.LOST_FOUND_TAG, "parseItem was null");

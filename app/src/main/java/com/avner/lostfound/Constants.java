@@ -15,25 +15,28 @@ public class Constants {
     public static final int REQUEST_CODE_FACEBOOK_LOGIN = 3;
     public static final int REQUEST_CODE_PICK_LOCATION = 4;
     public static final int REQUEST_CODE_REPORT_FORM = 5;
+    public static final int REQUEST_CODE_SETTINGS = 6;
     public static final int REQUEST_CODE_CAMERA = 10;
     public static final int REQUEST_CODE_SELECT_FILE = 11;
+
+    public static final int RESULT_CODE_LOGOUT = 1;
 
     public static final String signed_up = "signed_up";
     public static final String USER_NAME= "user_name";
     public static final String PASSWORD = "password";
+
     public static final java.lang.String LONGITUDE = "longitude";
     public static final java.lang.String LATITUDE = "latitude";
-
     public static final String APP_IMAGE_DIRECTORY_NAME = "/lostfound";
+
     public static final String USER_IMAGE_FILE_NAME = "userImage.png";
+
     public static final String USER_IMAGE_FILE_PATH = Environment.getExternalStorageDirectory()
             + Constants.APP_IMAGE_DIRECTORY_NAME + "/" + Constants.USER_IMAGE_FILE_NAME;
-
     /**
      * tag for logger.
      */
     public static final String LOST_FOUND_TAG = "LOST_FOUND_TAG";
-
     /**
      * for lists filtering
      */
@@ -45,6 +48,8 @@ public class Constants {
     public static final int MIN_CONTENT_FILTER_SIZE = 2;
     public static final String FOUND_SHORTCUT = "F";
     public static final String LOST_SHORTCUT = "L";
+    public static final int MIN_PASSWORD_LENGTH = 6;
+    public static final int MAX_PASSWORD_LENGTH = 12;
 
 
     public class TabTexts {
@@ -154,6 +159,7 @@ public class Constants {
         public static final String TYPE_LOST = "ParseLost";
         public static final String TYPE_FOUND = "ParseFound";
         public static final String TYPE_MESSAGE = "ParseMessage";
+        public static final String TYPE_DELETE_CONVERSATION = "ParseDeleteConversation";
 
     }
 

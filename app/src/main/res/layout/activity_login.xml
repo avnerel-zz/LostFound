@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/et_user_name"
             android:hint="@string/user_name_hint"
+            android:singleLine="true"
             android:textColorHint="@color/primary_dark_material_dark"
             android:textCursorDrawable="@null"
              />
@@ -32,6 +33,7 @@
             android:inputType="textPassword"
             android:hint="@string/password_hint"
             android:id="@+id/et_user_password"
+            android:singleLine="true"
             android:textColorHint="@color/primary_dark_material_dark"
             android:maxLength="@string/max_password_length"
             android:textCursorDrawable="@null"

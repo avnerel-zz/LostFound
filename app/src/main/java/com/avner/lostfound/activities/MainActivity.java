@@ -28,6 +28,7 @@ import com.avner.lostfound.fragments.MyWorldFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.parse.ParseUser;
 
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener {
@@ -273,6 +274,13 @@ public class MainActivity extends FragmentActivity implements
 
             updateLocalDataInFragments();
         }
+        if(requestCode == Constants.REQUEST_CODE_SETTINGS && resultCode == Constants.RESULT_CODE_LOGOUT){
+
+            ParseUser.logOut();
+            Intent intent = new Intent(this,LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private Fragment getCurrentFragment() {
@@ -381,7 +389,7 @@ public class MainActivity extends FragmentActivity implements
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Intent intent = new Intent(this,SettingsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
                 break;
             case R.id.search:
 

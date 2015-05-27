@@ -48,6 +48,7 @@
                     android:layout_alignStart="@+id/s_choose_item"
                     android:layout_marginLeft="5dp"
                     android:background="#dcdcdcdc"
+                    android:singleLine="true"
                     android:hint="Item name"
                     android:visibility="invisible" />
 
@@ -208,7 +209,7 @@
                 android:hint="@string/ADD_ITEM_DESCRIPTION"
                 android:gravity="top"
                 android:inputType="textMultiLine"
-                android:lines="10"
+                android:maxLines="10"
                 android:linksClickable="false"
                 android:textColor="#dc5a5a5a"
                 android:layout_alignParentBottom="true" />

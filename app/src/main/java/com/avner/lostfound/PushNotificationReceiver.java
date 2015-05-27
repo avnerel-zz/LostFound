@@ -28,7 +28,6 @@ import java.util.List;
  */
 public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -45,27 +44,41 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             case Constants.ParsePush.TYPE_MESSAGE:
                 return handlePushOfParseMessage(jsonData,context);
             case Constants.ParsePush.TYPE_LOST:
-                handlePushOfParseLost(jsonData);
-                LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
-                MainActivity mainActivity = applicationContext.getMainActivity();
-                if(mainActivity!= null){
-                    mainActivity.updateLocalDataInFragments();
-                }
+                handlePushOfParseLost(jsonData, context);
                 return false;
-            case Constants.ParsePush.TYPE_FOUND:
-                handlePushOfParseFound(jsonData);
+            case Constants.ParsePush.TYPE_DELETE_CONVERSATION:
+                handlePushOfDeleteConversation(jsonData);
                 return false;
         }
         return true;
     }
 
-    private void handlePushOfParseFound(JSONObject jsonData) throws JSONException {
+    private void handlePushOfDeleteConversation(JSONObject jsonData) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
-        Log.d("PUSH_FOUND", reportedItem);
-        // TODO: create object from the data, as in handlePushOfParseLost. shouldn't happen cause there is no more found and lost.
+        Log.d("PUSH_CONVERSATION", reportedItem);
+        JSONObject report = new JSONObject(reportedItem);
+
+        final String conversationId = report.get(Constants.ParseQuery.OBJECT_ID).toString();
+        Log.d("PUSH_CONVERSATION", conversationId);
+        ParseQuery<ParseObject> deleteConversationQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        deleteConversationQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversationId);
+        deleteConversationQuery.fromLocalDatastore();
+        deleteConversationQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                if(e!= null){
+                    Log.d("PUSH_CONVERSATION", "can't find conversation. " + e.getLocalizedMessage());
+                    return;
+                }
+                for(ParseObject conversation : parseObjects){
+                    conversation.unpinInBackground();
+                }
+            }
+        });
+
     }
 
-    private void handlePushOfParseLost(JSONObject jsonData) throws JSONException {
+    private void handlePushOfParseLost(JSONObject jsonData, final Context context) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
         Log.d("PUSH_LOST", reportedItem);
         JSONObject report = new JSONObject(reportedItem);
@@ -86,41 +99,59 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 if (e != null) {
                     Log.d("PUSH_LOST", "Could not get the data from server");
                     // could not retrieve the object from the server
-                    removeReportFromLocalDatastoreIfExists(objectId);
-                    return;
-                }
+                    removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            refreshFragments(context);
+                        }
+                    }, context);
+                }else{
 
-                // we first remove the existing object from the local datastore (if it exists)
-                // and insert a new one
-                Log.d("PUSH_LOST", "Got the data from server");
-                removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        Log.d("PUSH_LOST", "about to insert into local datastore");
-                        insertReportInLocalDatastore(parseObject);
-                    }
-                });
+                    // we first remove the existing object from the local datastore (if it exists)
+                    // and insert a new one
+                    Log.d("PUSH_LOST", "Got the data from server");
+                    removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Log.d("PUSH_LOST", "about to insert into local datastore");
+                            insertReportInLocalDatastore(parseObject,context);
+                        }
+                    }, context);
+                }
             }
         });
 
         // TODO: refresh screen if we are in the lost/found list tab
     }
 
-    private void insertReportInLocalDatastore(ParseObject parseObject) {
-        parseObject.pinInBackground();
+    private void refreshFragments(Context context) {
+        LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
+        MainActivity mainActivity = applicationContext.getMainActivity();
+        if(mainActivity!= null){
+            mainActivity.updateLocalDataInFragments();
+        }
     }
 
-    private void removeReportFromLocalDatastoreIfExists(String objectId) {
-        removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
+    private void insertReportInLocalDatastore(ParseObject parseObject, final Context context) {
+        parseObject.pinInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                // NOP
+                refreshFragments(context);
             }
         });
-
     }
 
-    private void removeReportFromLocalDatastoreIfExists(String objectId, final DeleteCallback callback) {
+//    private void removeReportFromLocalDatastoreIfExists(String objectId) {
+//        removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                // NOP
+//            }
+//        }, null);
+//
+//    }
+
+    private void removeReportFromLocalDatastoreIfExists(String objectId, final DeleteCallback callback, final Context context) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
         query.fromLocalDatastore();
         query.getInBackground(objectId, new GetCallback<ParseObject>() {
@@ -129,12 +160,19 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             public void done(ParseObject parseObject, ParseException e) {
                 if (e == null) {
                     Log.d("PUSH_LOST", "Removing existing object from local datastore");
-                    parseObject.unpinInBackground(callback);
+                    parseObject.unpinInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            callback.done(null);
+                            refreshFragments(context);
+                        }
+                    });
                     return;
                 } else {
                     Log.d("PUSH_LOST", "Trying to remove, but the item was not in the local datastore");
                 }
                 callback.done(null);
+                refreshFragments(context);
             }
         });
     }

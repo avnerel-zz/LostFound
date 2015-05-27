@@ -1,8 +1,10 @@
 package com.avner.lostfound.adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -100,7 +102,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder.lostFound.setText(Constants.FOUND_SHORTCUT);
             viewHolder.lostFound.setTextColor(Color.BLUE);
         }
-        Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(viewHolder.itemImage);
+        Picasso.with(rootView.getContext()).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
         return view;
     }
@@ -112,38 +114,64 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             public void onClick(View v) {
                 Log.d(Constants.LOST_FOUND_TAG, "pressed to delete item " + item.getName());
 
-                final ProgressDialog progressDialog = new ProgressDialog(rootView.getContext());
-                progressDialog.setTitle("Deleting");
-                progressDialog.setMessage("Please wait...");
-                progressDialog.show();
-                ParseQuery<ParseObject> deleteFromLocalQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-                deleteFromLocalQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
-                deleteFromLocalQuery.fromLocalDatastore();
-                deleteFromLocalQuery.getFirstInBackground(new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        parseObject.deleteInBackground(new DeleteCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                ((MainActivity)rootView.getContext()).updateLocalDataInFragments();
-                                progressDialog.dismiss();
+                new AlertDialog.Builder(rootView.getContext())
+                        .setMessage("Are you sure you want to delete?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                deleteItem(item);
                             }
-                        });
-                    }
-                });
-                ParseQuery<ParseObject> deleteQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-                deleteQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
-                deleteQuery.getFirstInBackground(new GetCallback<ParseObject>(){
-                    @Override
-                    public void done(ParseObject parseObject, ParseException e) {
-                        if(parseObject!= null){
-                            parseObject.deleteInBackground();
-                        }else{
-                            Log.e(Constants.LOST_FOUND_TAG, "item isn't in the parse data store. WTF???");
-                        }
-                    }
-                });
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+        });
+    }
 
+    private void deleteItem(final Item item) {
+        final ProgressDialog progressDialog = new ProgressDialog(rootView.getContext());
+        progressDialog.setTitle("Deleting");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+        ParseQuery<ParseObject> deleteFromLocalQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        deleteFromLocalQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
+        deleteFromLocalQuery.fromLocalDatastore();
+        deleteFromLocalQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e!=null){
+                    Log.e(Constants.LOST_FOUND_TAG, "item" + item.getName()
+                            + " had already been removed from local data store. " + e.getLocalizedMessage());
+                }
+                parseObject.unpinInBackground(new DeleteCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e(Constants.LOST_FOUND_TAG, "problem removing item" + item.getName()
+                                    + " from local data store. " + e.getLocalizedMessage());
+                            return;
+                        }
+                        ((MainActivity) rootView.getContext()).updateLocalDataInFragments();
+                        progressDialog.dismiss();
+                        deleteFromParse(item);
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void deleteFromParse(Item item) {
+        ParseQuery<ParseObject> deleteQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        deleteQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
+        deleteQuery.getFirstInBackground(new GetCallback<ParseObject>(){
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(parseObject!= null){
+                    parseObject.deleteInBackground();
+                }else{
+                    Log.e(Constants.LOST_FOUND_TAG, "item isn't in the parse data store. WTF???");
+                }
             }
         });
     }

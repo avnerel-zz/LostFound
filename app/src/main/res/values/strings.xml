@@ -42,7 +42,7 @@
     <string name="push_notifications">Enable Push Notifications</string>
     <string name="number_messages">Messages</string>
     <string name="days_ago"> days ago</string>
-    <string name="near">near: </string>
+    <string name="near">near:&#160;</string>
     <string name="default_city">Rehovot</string>
     <string name="default_description">very nice item</string>
     <string name="descriptionTitle">Description:</string>
@@ -74,5 +74,9 @@
     <string name="passwords_match">Passwords Match</string>
     <string name="passwords_not_equal">Passwords Don\'t Match</string>
     <string name="update_user_name">Update</string>
+    <string name="ok">O.K</string>
+    <string name="password_has_been_changed">Password has been successfully changed</string>
+    <string name="password_changed">Password changed</string>
+    <string name="password_too_short">Password too short</string>
 
 </resources>

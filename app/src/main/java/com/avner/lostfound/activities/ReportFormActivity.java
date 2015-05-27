@@ -404,7 +404,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
             if (addresses.isEmpty()) {
                 Log.d(Constants.LOST_FOUND_TAG, "Got no address from map activity, using unknown");
-                sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
+//                sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
+                sb.append(location_chosen.toString());
             }
             else {
                 Address address = addresses.get(0);
@@ -418,8 +419,10 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         } catch (IOException e) {
             Log.d(Constants.LOST_FOUND_TAG, "Exception when trying to get address description");
-            sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
+//            sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
+            sb.append(location_chosen.toString());
         }
+
 
         return sb.toString();
     }
@@ -487,31 +490,35 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 //        String parseClass = lostReport ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
         String parseClass = Constants.ParseObject.PARSE_LOST;
 
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        if(editReport){
+            progressDialog.setTitle("Updating Report");
+        }else{
+            progressDialog.setTitle("Creating Report");
+        }
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+
         if (editReport) {
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Loading");
-            progressDialog.setMessage("Please wait...");
-            progressDialog.show();
 
             ParseQuery query = ParseQuery.getQuery(parseClass);
-            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID,itemEdited.getId());
+            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemEdited.getId());
             query.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject parseObject, ParseException e) {
-                    progressDialog.dismiss();
-                    fillReport(parseObject);
+                    fillReport(parseObject, progressDialog);
                 }
             });
 
         }
         else {
             parseReport = new ParseObject(parseClass);
-            fillReport(parseReport);
+            fillReport(parseReport, progressDialog);
         }
 
     }
 
-    private void fillReport(final ParseObject parseReport) {
+    private void fillReport(final ParseObject parseReport, final ProgressDialog progressDialog) {
         parseReport.put(Constants.ParseReport.IS_LOST,lostReport);
         String itemName = et_itemName.getText().toString();
 
@@ -546,14 +553,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         }
 
         parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, userLoginName);
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        if(editReport){
-            progressDialog.setTitle("Updating Report");
-        }else{
-            progressDialog.setTitle("Creating Report");
-        }
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
         final ReportFormActivity activity = this;
         parseReport.saveInBackground(new SaveCallback() {
             @Override

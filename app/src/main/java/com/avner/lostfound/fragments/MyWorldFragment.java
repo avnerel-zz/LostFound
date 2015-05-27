@@ -77,6 +77,7 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
             @Override
             public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
                 if (e == null) {
+                    items.clear();
                     for (int i = 0; i < itemsList.size(); i++) {
                         convertParseListToItemList(itemsList, items);
                     }
@@ -135,6 +136,5 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
     public void updateData() {
 
         updateMyItems(items);
-        myOpenListingsAdapter.notifyDataSetInvalidated();
     }
 }

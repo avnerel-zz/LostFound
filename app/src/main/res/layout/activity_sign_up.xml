@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/et_user_name"
             android:hint="@string/user_name_hint"
+            android:singleLine="true"
             android:textColorHint="@color/primary_dark_material_dark"
             android:textCursorDrawable="@null"
 
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:hint="Password - 6-12 characters"
+            android:singleLine="true"
             android:id="@+id/et_user_password"
             android:textColorHint="@color/primary_dark_material_dark"
             android:maxLength="@string/max_password_length"
@@ -44,6 +46,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:hint="Retype Password"
+            android:singleLine="true"
             android:id="@+id/et_user_retype_password"
             android:textColorHint="@color/primary_dark_material_dark"
             android:maxLength="@string/max_password_length"

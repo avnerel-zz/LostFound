@@ -95,7 +95,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         startService(serviceIntent);
 
         if (updateDB) {
-            ((LostFoundApplication) getApplication()).refreshLocalDatastore();
+            ((LostFoundApplication) getApplication()).refreshLocalDataStore();
         }
 
         finish();
@@ -137,6 +137,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         if (resultCode != RESULT_OK) {
 
             Log.e(Constants.LOST_FOUND_TAG, "result not o.k in login activity. request code: " + requestCode);
+            return;
         }
         if (requestCode == Constants.REQUEST_CODE_SIGN_UP) {
 
@@ -245,7 +246,10 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
                     finishLogin(true);
                     user.setEmail(userName);
-                    user.put(Constants.ParseUser.USER_DISPLAY_NAME, userName.split("@")[0]);
+                    if(user.get(Constants.ParseUser.USER_DISPLAY_NAME)==null){
+
+                        user.put(Constants.ParseUser.USER_DISPLAY_NAME, userName.split("@")[0]);
+                    }
                     user.saveInBackground();
                     ((LostFoundApplication) getApplication()).setUserName(userName);
                 } else {

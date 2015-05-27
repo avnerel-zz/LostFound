@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -121,7 +122,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             viewHolder.editReport.setVisibility(ImageButton.INVISIBLE);
         }
 
-        Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(viewHolder.itemImage);
+        Picasso.with(rootView.getContext()).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
     }
 
     @Override
@@ -235,10 +236,11 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
 
         // get item image from url.
-        Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(itemImage);
+        Picasso.with(rootView.getContext()).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(itemImage);
 
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());
+        itemDescription.setMovementMethod(new ScrollingMovementMethod());
 
         dialog.setTitle("Item: " + item.getName());
     }

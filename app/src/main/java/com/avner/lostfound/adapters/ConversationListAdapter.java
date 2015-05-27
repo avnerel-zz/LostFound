@@ -102,7 +102,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
-        Picasso.with(rootActivity).load(item.getImageUrl()).into(viewHolder.itemImage);
+        Picasso.with(rootActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
         if (conversation.getUnreadCount() != 0){
 
@@ -149,7 +149,7 @@ public class ConversationListAdapter extends BaseAdapter {
         itemTime.setText(item.getTimeAsString());
 
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
-        Picasso.with(rootActivity).load(item.getImageUrl()).into(itemImage);
+        Picasso.with(rootActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(itemImage);
 
         TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());

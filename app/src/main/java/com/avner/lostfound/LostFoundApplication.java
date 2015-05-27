@@ -105,7 +105,7 @@ public class LostFoundApplication extends Application {
         return messagingItemId;
     }
 
-    public void refreshLocalDatastore() {
+    public void refreshLocalDataStore() {
         try {
             ParseObject.unpinAll();
         } catch (ParseException e) {

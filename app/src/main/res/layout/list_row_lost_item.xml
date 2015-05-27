@@ -25,6 +25,7 @@
         android:layout_marginStart="31dp"
         android:layout_toEndOf="@+id/iv_itemListingImage"
         android:layout_toRightOf="@+id/iv_itemListingImage"
+        android:singleLine="true"
         android:hint="Item name"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
@@ -59,6 +60,7 @@
         android:layout_alignLeft="@+id/tv_item_name"
         android:layout_alignStart="@+id/tv_item_name"
         android:layout_alignTop="@+id/textView"
+        android:singleLine="true"
         android:text="#"
         android:textColor="@color/abc_search_url_text" />
 
@@ -89,6 +91,7 @@
         android:layout_alignStart="@+id/tv_itemListingAge"
         android:layout_alignTop="@+id/textView"
         android:layout_toLeftOf="@+id/ib_editReport"
+        android:maxLines="2"
         android:text="@string/default_city"
         android:textColor="@color/abc_search_url_text" />
 
@@ -101,7 +104,7 @@
         android:layout_toLeftOf="@+id/ib_editReport"
         android:layout_alignStart="@+id/tv_number_of_days_ago"
         android:singleLine="true"
-        android:text="@string/default_description" />
+        />
 
 
 </RelativeLayout>
