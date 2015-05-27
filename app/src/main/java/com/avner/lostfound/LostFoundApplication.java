@@ -1,11 +1,10 @@
 package com.avner.lostfound;
 
 import android.app.Application;
-import android.content.Intent;
 import android.util.Log;
 
+import com.avner.lostfound.activities.MainActivity;
 import com.facebook.FacebookSdk;
-import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -13,9 +12,6 @@ import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import java.util.List;
 
 /**
  * Created by avner on 25/04/2015.
@@ -34,6 +30,7 @@ public class LostFoundApplication extends Application {
     private ParseInstallation installation;
     private boolean isMessagingActive;
     private String messagingItemId;
+    private MainActivity mainActivity;
 
     @Override
     public void onCreate() {
@@ -117,10 +114,10 @@ public class LostFoundApplication extends Application {
 
         String userId = ParseUser.getCurrentUser().getObjectId();
 
-        getInstancesOfParseObjectFromRemoteDB("ParseLost");
-        getInstancesOfParseObjectFromRemoteDB("ParseConversation", true, "myUserId", userId);
-        getInstancesOfParseObjectFromRemoteDB("ParseMessage", true, "recipientId", userId);
-        getInstancesOfParseObjectFromRemoteDB("ParseMessage", true, "senderId", userId);
+        getInstancesOfParseObjectFromRemoteDB(Constants.ParseObject.PARSE_LOST);
+        getInstancesOfParseObjectFromRemoteDB(Constants.ParseObject.PARSE_CONVERSATION, true, Constants.ParseConversation.MY_USER_ID, userId);
+        getInstancesOfParseObjectFromRemoteDB(Constants.ParseObject.PARSE_MESSAGE, true, Constants.ParseMessage.RECIPIENT_ID, userId);
+        getInstancesOfParseObjectFromRemoteDB(Constants.ParseObject.PARSE_MESSAGE, true, Constants.ParseMessage.SENDER_ID, userId);
     }
 
     private void getInstancesOfParseObjectFromRemoteDB(String objectName) {
@@ -139,6 +136,15 @@ public class LostFoundApplication extends Application {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+
     }
 
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
+
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
 }

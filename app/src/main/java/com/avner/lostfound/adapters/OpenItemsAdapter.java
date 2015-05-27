@@ -1,16 +1,13 @@
 package com.avner.lostfound.adapters;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,17 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.utils.ImageUtils;
+import com.avner.lostfound.R;
+import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.structs.Item;
-import com.avner.lostfound.R;
-import com.facebook.FacebookSdk;
-import com.facebook.share.ShareApi;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareDialog;
-import com.parse.FindCallback;
+import com.avner.lostfound.utils.ImageUtils;
+import com.parse.DeleteCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -40,8 +32,6 @@ import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -89,6 +79,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder.itemName = (TextView) view.findViewById(R.id.tv_itemListingName);
             viewHolder.timeAdded = (TextView) view.findViewById(R.id.tv_itemListingAge);
             viewHolder.itemImage = (ImageView) view.findViewById(R.id.iv_itemListingImage);
+            viewHolder.lostFound = (TextView) view.findViewById(R.id.tv_lost_found);
 
             view.setTag(viewHolder);
         }
@@ -102,6 +93,13 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         // Put the content in the view
         viewHolder.itemName.setText(item.getName());
         viewHolder.timeAdded.setText(item.timeAgo());
+        if(item.isLost()){
+            viewHolder.lostFound.setText(Constants.LOST_SHORTCUT);
+            viewHolder.lostFound.setTextColor(Color.RED);
+        }else{
+            viewHolder.lostFound.setText(Constants.FOUND_SHORTCUT);
+            viewHolder.lostFound.setTextColor(Color.BLUE);
+        }
         Picasso.with(rootView.getContext()).load(item.getImageUrl()).into(viewHolder.itemImage);
 
         return view;
@@ -113,12 +111,36 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             @Override
             public void onClick(View v) {
                 Log.d(Constants.LOST_FOUND_TAG, "pressed to delete item " + item.getName());
+
+                final ProgressDialog progressDialog = new ProgressDialog(rootView.getContext());
+                progressDialog.setTitle("Deleting");
+                progressDialog.setMessage("Please wait...");
+                progressDialog.show();
+                ParseQuery<ParseObject> deleteFromLocalQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+                deleteFromLocalQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
+                deleteFromLocalQuery.fromLocalDatastore();
+                deleteFromLocalQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(ParseObject parseObject, ParseException e) {
+                        parseObject.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                ((MainActivity)rootView.getContext()).updateLocalDataInFragments();
+                                progressDialog.dismiss();
+                            }
+                        });
+                    }
+                });
                 ParseQuery<ParseObject> deleteQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
                 deleteQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
                 deleteQuery.getFirstInBackground(new GetCallback<ParseObject>(){
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
-                        parseObject.deleteInBackground();
+                        if(parseObject!= null){
+                            parseObject.deleteInBackground();
+                        }else{
+                            Log.e(Constants.LOST_FOUND_TAG, "item isn't in the parse data store. WTF???");
+                        }
                     }
                 });
 
@@ -139,7 +161,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
                 ImageUtils.saveImageToFile(((BitmapDrawable)image.getDrawable()).getBitmap(), "tempImage.png");
                 File tempImageFile = new File(Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME + "/tempImage.png");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tempImageFile));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, item.getDescription());
+                shareIntent.putExtra(Intent.EXTRA_TEXT, item.getShareDescription());
                 shareIntent.setType("*/*");
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -190,7 +212,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         editItemIntent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
         editItemIntent.putExtra(Constants.ReportForm.ITEM, item);
 
-        rootView.getContext().startActivity(editItemIntent);
+        ((Activity)rootView.getContext()).startActivityForResult(editItemIntent, Constants.REQUEST_CODE_REPORT_FORM);
 
     }
 
@@ -198,6 +220,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         TextView itemName;
         ImageView itemImage;
         TextView timeAdded;
+        TextView lostFound;
         public ImageButton deleteReport;
     }
 

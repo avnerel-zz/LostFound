@@ -24,9 +24,7 @@ import java.util.List;
 
 public class StatsFragment extends Fragment {
 
-    private ListView lv_topLosers;
-
-    private ListView lv_topFinders;
+    private ListView lv_topUsers;
 
     private View rootView;
 
@@ -43,21 +41,16 @@ public class StatsFragment extends Fragment {
 	}
 
     private void updateLists() {
-        lv_topLosers = (ListView) rootView.findViewById(R.id.lv_topLosers);
-        lv_topFinders = (ListView) rootView.findViewById(R.id.lv_topFinders);
+        lv_topUsers = (ListView) rootView.findViewById(R.id.lv_topUsers);
 
-        List<User> topLosers = new ArrayList<>();
-        topLosers.add(new User("Itay",-10,R.drawable.profile4));
+        List<User> topUsers = new ArrayList<>();
+        topUsers.add(new User("Avner", 10, R.drawable.profile1));
+        topUsers.add(new User("Oded", 9, R.drawable.profile1));
+        topUsers.add(new User("Itay", 1, R.drawable.profile4));
 
-        List<User> topFinders = new ArrayList<>();
-        topFinders.add(new User("Avner",10,R.drawable.profile1));
-        topFinders.add(new User("Oded",10,R.drawable.profile1));
+        TopUsersAdapter topUsersAdapter = new TopUsersAdapter(topUsers);
 
-        TopUsersAdapter topFindersAdapter = new TopUsersAdapter(topFinders);
-        TopUsersAdapter topLosersAdapter = new TopUsersAdapter(topLosers);
-
-        lv_topLosers.setAdapter(topLosersAdapter);
-        lv_topFinders.setAdapter(topFindersAdapter);
+        lv_topUsers.setAdapter(topUsersAdapter);
     }
 
     private void setUserDetails() {

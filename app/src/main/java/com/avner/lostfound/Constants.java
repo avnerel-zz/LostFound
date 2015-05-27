@@ -14,6 +14,7 @@ public class Constants {
     public static final int REQUEST_CODE_SIGN_UP = 1;
     public static final int REQUEST_CODE_FACEBOOK_LOGIN = 3;
     public static final int REQUEST_CODE_PICK_LOCATION = 4;
+    public static final int REQUEST_CODE_REPORT_FORM = 5;
     public static final int REQUEST_CODE_CAMERA = 10;
     public static final int REQUEST_CODE_SELECT_FILE = 11;
 
@@ -42,6 +43,8 @@ public class Constants {
     public static final long MILLI_SECONDS_PER_DAY = 1000* 60 * 60 * 24;
     public static final Map<String, Long> daysFactor = initDaysFactorMap();
     public static final int MIN_CONTENT_FILTER_SIZE = 2;
+    public static final String FOUND_SHORTCUT = "F";
+    public static final String LOST_SHORTCUT = "L";
 
 
     public class TabTexts {

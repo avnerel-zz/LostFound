@@ -46,7 +46,8 @@
         android:layout_height="match_parent"
         android:id="@+id/lv_myList"
         android:layout_below="@+id/ll_filter_pane"
-
+        android:paddingBottom="40dp"
+        android:clipToPadding="false"
         />
 
 

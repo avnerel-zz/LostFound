@@ -1,5 +1,6 @@
 package com.avner.lostfound.adapters;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -100,7 +101,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
                 intent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost());
                 intent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
                 intent.putExtra(Constants.ReportForm.ITEM, item);
-                rootView.getContext().startActivity(intent);
+                ((Activity)rootView.getContext()).startActivityForResult(intent,Constants.REQUEST_CODE_REPORT_FORM);
 
             }
         });
@@ -229,7 +230,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         itemLocation.setMaxLines(2);
 
         TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
-        itemTime.setText(item.timeAgo());
+        itemTime.setText(item.getTimeAsString());
 
         final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
 

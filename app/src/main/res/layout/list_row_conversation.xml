@@ -36,7 +36,7 @@
         android:layout_height="40dp"
         android:gravity="center"
         android:text="0"
-        android:background="@drawable/badge_rectangle"
+        android:background="@drawable/red_badge_circle"
         android:id="@+id/tv_unread_count"
         android:layout_alignBottom="@+id/ib_conversation_item_image"
         android:layout_alignParentRight="true"

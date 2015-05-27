@@ -9,6 +9,7 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -129,6 +130,12 @@ public class Item implements Parcelable {
         return isLost;
     }
 
+    public String getTimeAsString(){
+
+        SimpleDateFormat formatter=new SimpleDateFormat("dd/MM/yyyy hh:mm");
+        return formatter.format(calender.getTime());
+    }
+
 
     @Override
     public int describeContents() {
@@ -186,4 +193,20 @@ public class Item implements Parcelable {
         }
     };
 
+    public String getShareDescription() {
+        StringBuilder sb = new StringBuilder();
+        if(isLost()){
+            sb.append("Lost ");
+        }else{
+            sb.append("Found ");
+        }
+        sb.append(name).append("\n");
+        sb.append("Description: ").append(description).append("\n");
+        if(location!= null){
+            sb.append("Location: ").append(locationAsString).append("\n");
+        }
+        sb.append("Time: ").append(getTimeAsString());
+
+        return sb.toString();
+    }
 }

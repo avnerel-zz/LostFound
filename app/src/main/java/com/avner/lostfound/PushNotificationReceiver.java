@@ -5,11 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.avner.lostfound.activities.MainActivity;
+import com.avner.lostfound.messaging.MessagingActivity;
 import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.avner.lostfound.messaging.MessagingActivity;
-import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParsePushBroadcastReceiver;
 import com.parse.ParseQuery;
@@ -44,6 +45,11 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 return handlePushOfParseMessage(jsonData,context);
             case Constants.ParsePush.TYPE_LOST:
                 handlePushOfParseLost(jsonData);
+                LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
+                MainActivity mainActivity = applicationContext.getMainActivity();
+                if(mainActivity!= null){
+                    mainActivity.updateLocalDataInFragments();
+                }
                 return false;
             case Constants.ParsePush.TYPE_FOUND:
                 handlePushOfParseFound(jsonData);
@@ -203,7 +209,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         if (intent.hasExtra(Constants.ParsePush.EXTRA_NAME)) {
             String stringData = intent.getStringExtra(Constants.ParsePush.EXTRA_NAME);
 
-            JSONObject jsonData = null;
+            JSONObject jsonData;
             try {
                 jsonData = new JSONObject(stringData);
                 Log.d("PUSH_RECEIVED", "jsonData: " + jsonData);
@@ -228,7 +234,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             super.onPushOpen(context, intent);
         }
         String stringData = intent.getStringExtra(Constants.ParsePush.EXTRA_NAME);
-        JSONObject jsonData = null;
+        JSONObject jsonData;
 
         try {
             jsonData = new JSONObject(stringData);

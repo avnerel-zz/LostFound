@@ -12,12 +12,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
+import com.avner.lostfound.R;
+import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.avner.lostfound.messaging.ConversationListActivity;
 import com.avner.lostfound.structs.Item;
-import com.avner.lostfound.activities.LoginActivity;
-import com.avner.lostfound.R;
-import com.avner.lostfound.activities.SettingsActivity;
-import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -30,6 +28,8 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
     private View rootView;
     private TextView tv_openListingsNumber;
+    private OpenItemsAdapter myOpenListingsAdapter;
+    private List<Item> items;
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,13 +57,20 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
 
         ListView lv_openListings = (ListView) rootView.findViewById(R.id.lv_openListings);
 
-        final List<Item> items = new ArrayList<>();
-        final OpenItemsAdapter myOpenListingsAdapter = new OpenItemsAdapter(items, rootView);
+        items = new ArrayList<>();
+        myOpenListingsAdapter = new OpenItemsAdapter(items, rootView);
+        updateMyItems(items);
 
+
+        lv_openListings.setAdapter(myOpenListingsAdapter);
+        lv_openListings.setOnItemClickListener(myOpenListingsAdapter);
+    }
+
+    private void updateMyItems(final List<Item> items) {
         // get all my lost items
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
         query.fromLocalDatastore();
-        query.orderByAscending(Constants.ParseQuery.CREATED_AT);
+        query.orderByDescending(Constants.ParseQuery.CREATED_AT);
         query.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -78,8 +85,6 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-        lv_openListings.setAdapter(myOpenListingsAdapter);
-        lv_openListings.setOnItemClickListener(myOpenListingsAdapter);
     }
 
     private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
@@ -127,4 +132,9 @@ public class MyWorldFragment extends Fragment implements View.OnClickListener {
     }
 
 
+    public void updateData() {
+
+        updateMyItems(items);
+        myOpenListingsAdapter.notifyDataSetInvalidated();
+    }
 }

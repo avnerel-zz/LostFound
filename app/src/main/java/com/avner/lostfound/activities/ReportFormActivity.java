@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,9 +30,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.R;
 import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.utils.ImageUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -510,7 +511,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     }
 
-    private void fillReport(ParseObject parseReport) {
+    private void fillReport(final ParseObject parseReport) {
         parseReport.put(Constants.ParseReport.IS_LOST,lostReport);
         String itemName = et_itemName.getText().toString();
 
@@ -545,11 +546,48 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         }
 
         parseReport.put(Constants.ParseReport.USER_DISPLAY_NAME, userLoginName);
-        parseReport.saveInBackground();
-//        parseReport.pinInBackground();
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        if(editReport){
+            progressDialog.setTitle("Updating Report");
+        }else{
+            progressDialog.setTitle("Creating Report");
+        }
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+        final ReportFormActivity activity = this;
+        new AsyncTask(){
 
-        Toast.makeText(this, "report has been shipped", Toast.LENGTH_SHORT).show();
+            @Override
+            protected Object doInBackground(Object[] params) {
 
-        finish();
+                try {
+                    parseReport.save();
+                    parseReport.pin();
+                    return true;
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+
+                progressDialog.dismiss();
+                if((boolean)o) {
+
+                    setResult(RESULT_OK,null);
+                    finish();
+                    Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
+                }else {
+
+                    Toast.makeText(activity, "No Connection. Can't upload report", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }.execute();
+
+
+
     }
 }

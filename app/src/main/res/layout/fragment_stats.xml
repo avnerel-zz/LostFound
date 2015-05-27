@@ -54,60 +54,57 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:weightSum="2">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="vertical">-->
 
             <TextView
-                android:id="@+id/tv_topFindersText"
+                android:id="@+id/tv_topUsersText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Top Finders"
+                android:text="Top Users"
                 android:textSize="28dp" />
 
             <ListView
-                android:id="@+id/lv_topFinders"
+                android:id="@+id/lv_topUsers"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:layout_marginBottom="5dp"
-            android:background="#c0c0c0" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_topLosersText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Top Losers"
-                android:textSize="28dp" />
-
-            <ListView
-                android:id="@+id/lv_topLosers"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_gravity="center_horizontal" />
-        </LinearLayout>
-
     </LinearLayout>
+
+        <!--<View-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="2dp"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:background="#c0c0c0" />-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="vertical">-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_topLosersText"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_horizontal"-->
+                <!--android:text="Top Losers"-->
+                <!--android:textSize="28dp" />-->
+
+            <!--<ListView-->
+                <!--android:id="@+id/lv_topLosers"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="120dp"-->
+                <!--android:layout_gravity="center_horizontal" />-->
+        <!--</LinearLayout>-->
+
+    <!--</LinearLayout>-->
 
 
 </LinearLayout>

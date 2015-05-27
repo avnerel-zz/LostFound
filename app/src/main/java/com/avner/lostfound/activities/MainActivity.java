@@ -2,12 +2,12 @@ package com.avner.lostfound.activities;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.support.v4.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -20,14 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
+import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
 import com.avner.lostfound.fragments.ListingFragment;
+import com.avner.lostfound.fragments.MyWorldFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener {
@@ -65,6 +65,7 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ((LostFoundApplication)getApplication()).setMainActivity(this);
         // Initialization
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
@@ -87,6 +88,7 @@ public class MainActivity extends FragmentActivity implements
             textView.setText(tabsStrings[i]);
 
             actionBar.addTab(tab);
+
         }
 
         /**
@@ -135,7 +137,16 @@ public class MainActivity extends FragmentActivity implements
                 .build();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ((LostFoundApplication)getApplication()).setMainActivity(null);
+    }
+
     private void showSearchView() {
+        if (null==sv_search){
+            return;
+        }
         sv_search.setVisibility(View.VISIBLE);
         sv_search.setEnabled(true);
         mi_search_menu_item.setVisible(true);
@@ -143,6 +154,9 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void hideSearchView() {
+        if (null==sv_search){
+            return;
+        }
         sv_search.setVisibility(View.INVISIBLE);
         sv_search.setEnabled(false);
         mi_search_menu_item.setVisible(false);
@@ -241,6 +255,24 @@ public class MainActivity extends FragmentActivity implements
                 return true;
             }
         });
+    }
+
+    public void updateLocalDataInFragments(){
+
+        Log.d(Constants.LOST_FOUND_TAG, "updating local data store in fragments");
+        ((MyWorldFragment)getFragmentAt(0)).updateData();
+        ((ListingFragment)getFragmentAt(1)).updateData();
+        ((ListingFragment)getFragmentAt(2)).updateData();
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == Constants.REQUEST_CODE_REPORT_FORM && resultCode == RESULT_OK){
+
+            updateLocalDataInFragments();
+        }
     }
 
     private Fragment getCurrentFragment() {
