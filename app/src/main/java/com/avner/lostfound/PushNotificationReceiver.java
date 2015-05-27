@@ -15,6 +15,7 @@ import com.parse.ParseObject;
 import com.parse.ParsePushBroadcastReceiver;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -208,14 +209,22 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                     }
                 }
                 if (!foundConversation) {
-                    ParseObject parseConversation = new ParseObject(Constants.ParseObject.PARSE_CONVERSATION);
+                    final ParseObject parseConversation = new ParseObject(Constants.ParseObject.PARSE_CONVERSATION);
                     parseConversation.put(Constants.ParseConversation.ITEM, parseItem);
                     parseConversation.put(Constants.ParseConversation.RECIPIENT_USER_ID, senderId);
                     parseConversation.put(Constants.ParseConversation.MY_USER_ID, currentUserId);
                     parseConversation.put(Constants.ParseConversation.RECIPIENT_USER_NAME, senderName);
                     parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 1);
-                    parseConversation.pinInBackground();
-                    parseConversation.saveInBackground();
+                    parseConversation.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+
+                            if(e==null){
+                                parseConversation.pinInBackground();
+                            }
+                        }
+                    });
+
                 }
             }
         });

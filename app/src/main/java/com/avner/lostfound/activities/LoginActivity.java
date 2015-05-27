@@ -18,10 +18,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.messaging.MessageService;
+import com.avner.lostfound.utils.ImageUtils;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.login.widget.LoginButton;
@@ -204,7 +204,12 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         getUserFacebookProfileDetails();
         // try to fetch user photo from facebook.
         fetchUserPhotoFromFacebookProfile();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
         finishLogin(true);
+        progressDialog.dismiss();
     }
 
     private void getUserFacebookProfileDetails() {
@@ -235,7 +240,6 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         ParseUser.logInInBackground(userName, password, new LogInCallback() {
             public void done(ParseUser user, com.parse.ParseException e) {
 
-                progressDialog.dismiss();
 
                 if (user != null) {
 
@@ -249,6 +253,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
                             e.getLocalizedMessage(),
                             Toast.LENGTH_SHORT).show();
                 }
+                progressDialog.dismiss();
             }
         });
     }
