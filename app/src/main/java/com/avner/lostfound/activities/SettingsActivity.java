@@ -2,7 +2,6 @@ package com.avner.lostfound.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,9 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.utils.ImageUtils;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
+import com.avner.lostfound.utils.ImageUtils;
 import com.facebook.Profile;
 import com.parse.ParseUser;
 
@@ -150,6 +149,7 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
         ParseUser currentUser = ParseUser.getCurrentUser();
         currentUser.put(Constants.ParseUser.USER_DISPLAY_NAME, name);
         currentUser.saveInBackground();
+        Toast.makeText(this,"Display name has been updated.", Toast.LENGTH_SHORT).show();
     }
 
     private void deleteUser() {
