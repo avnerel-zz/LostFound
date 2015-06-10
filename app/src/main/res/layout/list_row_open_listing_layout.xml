@@ -73,6 +73,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:visibility="invisible"
         android:src="@android:drawable/ic_menu_delete" />
 
 

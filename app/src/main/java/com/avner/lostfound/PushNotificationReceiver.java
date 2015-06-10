@@ -128,6 +128,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
         MainActivity mainActivity = applicationContext.getMainActivity();
         if(mainActivity!= null){
+            Log.d("REFRESH", "main activity is not null");
             mainActivity.updateLocalDataInFragments();
         }
     }
@@ -163,6 +164,12 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                     parseObject.unpinInBackground(new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
+                            if (e != null) {
+                                Log.e("PUSH_LOST", e.getMessage(), e);
+                                return;
+                            } else {
+                                Log.d("PUSH_LOST", "unpin in background");
+                            }
                             callback.done(null);
                             refreshFragments(context);
                         }
@@ -189,7 +196,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         pinMessage(messageId);
 
         LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
-        if (applicationContext.isMessagingActivityActive() && applicationContext.getMessagingActivityItemId().equals(senderId)) {
+        if (applicationContext.isMessagingActivityActive() && applicationContext.getMessagingActivityItemId().equals(itemId)) {
             // no need for popup notification. already in messaging session.
             return false;
         }
