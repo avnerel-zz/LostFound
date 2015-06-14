@@ -31,13 +31,18 @@ public class ImageUtils {
 
     /**
      * saves to default directory - "lostfound"
-     * @param thumbnail
+     * @param image
      * @param fileName
      */
-    public static void saveImageToFile(Bitmap thumbnail, String fileName) {
+    public static void saveImageToFile(Bitmap image, String fileName) {
 
-        saveImageToFile(thumbnail, Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME, fileName);
+        saveImageToFile(image, Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME, fileName);
 
+    }
+
+    public static void saveImageToFile(String imageUri, String fileName){
+        Bitmap image = decodeRemoteUrl(imageUri);
+        saveImageToFile(image,fileName);
     }
 
     public static void saveImageToFile(Bitmap image, String directoryPath, String fileName) {

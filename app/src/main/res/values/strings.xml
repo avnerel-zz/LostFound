@@ -78,5 +78,10 @@
     <string name="password_has_been_changed">Password has been successfully changed</string>
     <string name="password_changed">Password changed</string>
     <string name="password_too_short">Password too short</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">edit</string>
+    <string name="action_share">share</string>
+    <string name="item">Item:</string>
+    <string name="action_get_matches">Get Matches</string>
 
 </resources>

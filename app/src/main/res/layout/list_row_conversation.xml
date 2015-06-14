@@ -8,6 +8,17 @@
     android:descendantFocusability="blocksDescendants"
     android:background="?android:attr/activatedBackgroundIndicator">
 
+    <ImageButton
+        android:id="@+id/ib_conversation_item_image"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/image_unavailable"
+        android:layout_alignTop="@+id/tv_user_list_item"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
     <TextView
         android:id="@+id/tv_user_list_item"
         android:layout_width="wrap_content"
@@ -20,15 +31,30 @@
         android:layout_toRightOf="@+id/ib_conversation_item_image"
         android:layout_toEndOf="@+id/ib_conversation_item_image" />
 
-    <ImageButton
-        android:id="@+id/ib_conversation_item_image"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/image_unavailable"
-        android:layout_alignTop="@+id/tv_user_list_item"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/item"
+        android:id="@+id/tv_item_header"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:layout_alignBottom="@+id/ib_conversation_item_image"
+        android:layout_toRightOf="@+id/ib_conversation_item_image"
+        android:layout_toEndOf="@+id/ib_conversation_item_image" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/tv_item_name"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:layout_alignBottom="@+id/tv_item_header"
+        android:layout_toRightOf="@+id/tv_item_header"
+        android:layout_toEndOf="@+id/tv_item_header"
+        android:textColor="@color/abc_search_url_text" />
 
     <TextView
         android:layout_width="40dp"
@@ -38,6 +64,8 @@
         android:background="@drawable/red_badge_circle"
         android:id="@+id/tv_unread_count"
         android:layout_alignParentRight="true" />
-<!--android:layout_alignBottom="@+id/ib_conversation_item_image"-->
+
+
+    <!--android:layout_alignBottom="@+id/ib_conversation_item_image"-->
 </RelativeLayout>
 

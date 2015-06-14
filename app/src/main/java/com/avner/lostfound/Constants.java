@@ -85,6 +85,7 @@ public class Constants {
         public static final String ITEM_IMAGE = "itemImage";
         public static final String USER_DISPLAY_NAME = "name";
         public static final String IS_LOST = "isLost";
+        public static final String ALIVE = "alive";
     }
 
     public class ParseQuery{

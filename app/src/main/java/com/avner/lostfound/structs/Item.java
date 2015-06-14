@@ -95,15 +95,22 @@ public class Item implements Parcelable {
     }
 
     public String timeAgo() {
-        String returnValue = "";
         long diff = System.currentTimeMillis() - calender.getTimeInMillis();
         diff /= 1000; // seconds ago
 
         int days = (int) (diff / (60 * 60 * 24));
-//        int days = getDiff();
-        returnValue += days + " days ago";
+        if (days>0){
+            return  days + " days ago";
+        }
+        int hours = (int) (diff / (60* 60));
+        if(hours > 0){
+            return  hours + " hours ago";
+        }
+        int minutes = (int) (diff / (60));
+        return  minutes + " minutes ago";
 
-        return returnValue;
+
+
     }
 
     public String getUserId() {

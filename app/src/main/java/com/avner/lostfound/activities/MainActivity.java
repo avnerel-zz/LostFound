@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
 import com.avner.lostfound.fragments.ListingFragment;
 import com.avner.lostfound.fragments.MyWorldFragment;
+import com.avner.lostfound.messaging.ConversationListActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -58,6 +60,7 @@ public class MainActivity extends FragmentActivity implements
             R.drawable.chequered_flags,
             R.drawable.graph,
     };
+    private ActionMode actionMode;
 
 
     @Override
@@ -99,6 +102,10 @@ public class MainActivity extends FragmentActivity implements
 
             @Override
             public void onPageSelected(int position) {
+
+                if(actionMode != null){
+                    actionMode.finish();
+                }
                 // on changing the page make respected tab selected
                 actionBar.setSelectedNavigationItem(position);
                 int prevSelectedTabIndex = selectedTabIndex;
@@ -191,6 +198,9 @@ public class MainActivity extends FragmentActivity implements
         MenuItem settings = menu.findItem(R.id.action_settings);
         settings.setOnMenuItemClickListener(this);
 
+        MenuItem messaging = menu.findItem(R.id.messaging);
+        messaging.setOnMenuItemClickListener(this);
+
         return true;
     }
 
@@ -252,7 +262,6 @@ public class MainActivity extends FragmentActivity implements
                 if (isListingFragment(selectedFragmentIndex)) {
                     ((ListingFragment) getFragmentAt(selectedFragmentIndex)).searchBarCollapsed();
                 }
-
                 return true;
             }
         });
@@ -264,7 +273,6 @@ public class MainActivity extends FragmentActivity implements
         ((MyWorldFragment)getFragmentAt(0)).updateData();
         ((ListingFragment)getFragmentAt(1)).updateData();
         ((ListingFragment)getFragmentAt(2)).updateData();
-
 
     }
 
@@ -391,12 +399,18 @@ public class MainActivity extends FragmentActivity implements
                 Intent intent = new Intent(this,SettingsActivity.class);
                 startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
                 break;
-            case R.id.search:
-
+            case R.id.messaging:
+                Intent conversationIntent = new Intent(this,ConversationListActivity.class);
+                startActivity(conversationIntent);
+                break;
         }
 
 
 
         return false;
+    }
+
+    public void setActionMode(ActionMode actionMode) {
+        this.actionMode = actionMode;
     }
 }

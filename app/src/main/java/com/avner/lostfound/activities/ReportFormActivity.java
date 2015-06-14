@@ -530,6 +530,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         parseReport.put(Constants.ParseReport.ITEM_NAME, itemName);
         parseReport.put(Constants.ParseReport.ITEM_DESCRIPTION, et_description.getText().toString());
         parseReport.put(Constants.ParseReport.TIME, timeChosen.getTimeInMillis());
+        parseReport.put(Constants.ParseReport.ALIVE, true);
 
         if (cb_with_location.isChecked() && location_chosen != null){
             ParseGeoPoint location = new ParseGeoPoint(location_chosen.latitude, location_chosen.longitude);

@@ -5,14 +5,14 @@
     android:orientation="vertical">
 
 
-    <ImageButton
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="@string/messages"
-        android:id="@+id/b_messages"
-        android:src="@android:drawable/ic_dialog_email"
-        android:background="@drawable/blue_image_border"
-        android:contentDescription="@string/messages" />
+    <!--<ImageButton-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:text="@string/messages"-->
+        <!--android:id="@+id/b_messages"-->
+        <!--android:src="@android:drawable/ic_dialog_email"-->
+        <!--android:background="@drawable/blue_image_border"-->
+        <!--android:contentDescription="@string/messages" />-->
 
     <View
         android:layout_width="fill_parent"

@@ -11,5 +11,12 @@
         android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.SearchView" />
 
+    <item android:id="@+id/messaging"
+        android:title="@string/search_title"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:showAsAction="collapseActionView|ifRoom"
+        />
+
+
 
 </menu>

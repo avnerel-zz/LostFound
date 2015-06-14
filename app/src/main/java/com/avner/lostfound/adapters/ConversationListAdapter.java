@@ -76,6 +76,7 @@ public class ConversationListAdapter extends BaseAdapter {
             viewHolder.userDisplayName = (TextView) view.findViewById(R.id.tv_user_list_item);
             viewHolder.itemImage = (ImageButton) view.findViewById(R.id.ib_conversation_item_image);
             viewHolder.unreadCount = (TextView) view.findViewById(R.id.tv_unread_count);
+            viewHolder.itemName = (TextView) view.findViewById(R.id.tv_item_name);
             
             viewHolder.itemImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,6 +103,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
+        viewHolder.itemName.setText(item.getName());
         Picasso.with(rootActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
         if (conversation.getUnreadCount() != 0){
@@ -208,6 +210,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
     private class ViewHolder {
         TextView userDisplayName;
+        TextView itemName;
         ImageButton itemImage;
         TextView unreadCount;
     }

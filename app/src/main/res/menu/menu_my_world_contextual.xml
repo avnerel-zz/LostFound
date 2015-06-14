@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.avner.lostfound.messaging.MessagingActivity">
+    <item android:id="@+id/edit" android:title="@string/action_edit"
+        android:orderInCategory="1" android:showAsAction="ifRoom|collapseActionView"
+        android:icon="@android:drawable/ic_menu_edit"/>
+    <item android:id="@+id/share" android:title="@string/action_share"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:orderInCategory="2" android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_share"/>
+    <item android:id="@+id/delete" android:title="@string/action_delete"
+        android:orderInCategory="3" android:showAsAction="ifRoom|collapseActionView"
+        android:icon="@android:drawable/ic_menu_delete"/>
+    <item android:id="@+id/get_matches" android:title="@string/action_get_matches"
+        android:orderInCategory="3" android:showAsAction="never"
+        />
+</menu>
