@@ -50,6 +50,8 @@ public class Constants {
     public static final String LOST_SHORTCUT = "L";
     public static final int MIN_PASSWORD_LENGTH = 6;
     public static final int MAX_PASSWORD_LENGTH = 12;
+    public static final int LOST_ITEM_IMAGE = R.drawable.lost_item;
+    public static final int FOUND_ITEM_IMAGE = R.drawable.found_item;
 
 
     public class TabTexts {

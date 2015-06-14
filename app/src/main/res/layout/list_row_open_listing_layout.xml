@@ -8,17 +8,14 @@
     android:descendantFocusability="blocksDescendants"
     android:background="?android:attr/activatedBackgroundIndicator">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="L"
-        android:id="@+id/tv_lost_found"
-        android:textSize="@dimen/abc_text_size_large_material"
-        android:textColor="@color/material_blue_grey_800"
-        android:gravity="center"
-        android:layout_alignBottom="@+id/iv_potentialMatchImage"
+    <ImageView
+        android:layout_width="@android:dimen/app_icon_size"
+        android:layout_height="@android:dimen/app_icon_size"
+        android:id="@+id/iv_lost_or_found"
         android:layout_toLeftOf="@+id/iv_potentialMatchImage"
-        android:layout_toStartOf="@+id/iv_potentialMatchImage" />
+        android:layout_alignBottom="@+id/iv_potentialMatchImage"
+        android:layout_toStartOf="@+id/iv_potentialMatchImage"
+        android:src="@drawable/lost_item"/>
 
     <ImageView
         android:id="@+id/iv_itemListingImage"

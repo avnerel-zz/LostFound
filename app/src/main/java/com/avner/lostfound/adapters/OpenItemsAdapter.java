@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,16 +31,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemClickListener{
+public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 
     private List<Item> items;
-
     private View rootView;
     private int chosenItemPosition;
 
     public OpenItemsAdapter(List<Item> items, View rootView) {
         this.items = items;
-        this.rootView=rootView;
+        this.rootView = rootView;
     }
 
 
@@ -65,7 +63,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
         View view;
         final ViewHolder viewHolder;
-        final Item item = (Item)getItem(position);
+        final Item item = (Item) getItem(position);
 
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -75,11 +73,10 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder.itemName = (TextView) view.findViewById(R.id.tv_itemListingName);
             viewHolder.timeAdded = (TextView) view.findViewById(R.id.tv_itemListingAge);
             viewHolder.itemImage = (ImageView) view.findViewById(R.id.iv_itemListingImage);
-            viewHolder.lostFound = (TextView) view.findViewById(R.id.tv_lost_found);
+            viewHolder.lostFoundImage = (ImageView) view.findViewById(R.id.iv_lost_or_found);
 
             view.setTag(viewHolder);
-        }
-        else {
+        } else {
             view = convertView;
             viewHolder = (ViewHolder) view.getTag();
         }
@@ -87,13 +84,13 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         // Put the content in the view
         viewHolder.itemName.setText(item.getName());
         viewHolder.timeAdded.setText(item.timeAgo());
-        if(item.isLost()){
-            viewHolder.lostFound.setText(Constants.LOST_SHORTCUT);
-            viewHolder.lostFound.setTextColor(Color.RED);
-        }else{
-            viewHolder.lostFound.setText(Constants.FOUND_SHORTCUT);
-            viewHolder.lostFound.setTextColor(Color.BLUE);
+
+        if (item.isLost()) {
+            viewHolder.lostFoundImage.setImageResource(Constants.LOST_ITEM_IMAGE);
+        } else {
+            viewHolder.lostFoundImage.setImageResource(Constants.FOUND_ITEM_IMAGE);
         }
+
         Picasso.with(rootView.getContext()).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
         return view;
@@ -112,7 +109,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         deleteFromLocalQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseItem, ParseException e) {
-                if(e!=null){
+                if (e != null) {
                     Log.e(Constants.LOST_FOUND_TAG, "item" + item.getName()
                             + " had already been removed from local data store. " + e.getLocalizedMessage());
                 }
@@ -138,71 +135,18 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     private void deleteFromParse(Item item) {
         ParseQuery<ParseObject> deleteQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
         deleteQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
-        deleteQuery.getFirstInBackground(new GetCallback<ParseObject>(){
+        deleteQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseItem, ParseException e) {
-                if(parseItem!= null){
+                if (parseItem != null) {
                     parseItem.put(Constants.ParseReport.ALIVE, false);
                     parseItem.saveInBackground();
-                }else{
+                } else {
                     Log.e(Constants.LOST_FOUND_TAG, "item isn't in the parse data store. WTF???");
                 }
             }
         });
     }
-
-
-//    public void share(final Item item) {
-//
-//            final Intent shareIntent = new Intent();
-//            shareIntent.setAction(Intent.ACTION_SEND);
-//
-//            //TODO save image bitmap so don't need to get it from server.
-//            ImageUtils.saveImageToFile(item.getImageUrl(), "tempImage.png");
-//            File tempImageFile = new File(Environment.getExternalStorageDirectory() + Constants.APP_IMAGE_DIRECTORY_NAME + "/tempImage.png");
-//            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(tempImageFile));
-//            shareIntent.putExtra(Intent.EXTRA_TEXT, item.getShareDescription());
-//            shareIntent.setType("*/*");
-//            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//                final List<ResolveInfo> activities = rootView.getContext().getPackageManager().queryIntentActivities(shareIntent, 0);
-//
-//                List<String> appNames = new ArrayList<String>();
-//                for (ResolveInfo info : activities) {
-//                    appNames.add(info.loadLabel(rootView.getContext().getPackageManager()).toString());
-//                }
-//
-//                AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
-//                builder.setTitle("Complete Action using...");
-//                builder.setItems(appNames.toArray(new CharSequence[appNames.size()]), new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int activity) {
-//                        ResolveInfo info = activities.get(activity);
-//                        if (info.activityInfo.packageName.toLowerCase().contains("facebook")) {
-//       //                Facebook was chosen
-//                            ShareLinkContent content = new ShareLinkContent.Builder().setContentTitle("LostFound")
-//                                                                    .setImageUrl(Uri.parse(item.getImageUrl()))
-//                                                                    .setContentDescription(item.getDescription()).build();
-////                            SharePhoto photo = new SharePhoto.Builder().setBitmap(((BitmapDrawable) image.getDrawable()).getBitmap()).build();
-////                            SharePhotoContent content = new SharePhotoContent.Builder().setRef("avner")
-////                                    .oContent content = new SharePhotoContent.Builder().setRef("avner")
-////                                    .addPhoto(photo).build();
-//                            ShareDialog shareDialog = new ShareDialog((android.app.Activity) rootView.getContext());
-//                            shareDialog.show(content);
-//                        } else  {
-//                            // start the selected activity
-//                            shareIntent.setPackage(info.activityInfo.packageName);
-//                            rootView.getContext().startActivity(shareIntent);
-//                        }
-//
-//                    }
-//                });
-//                AlertDialog alert = builder.create();
-//                alert.show();
-////
-////                rootView.getContext().startActivity(Intent.createChooser(shareIntent, "Share to..."));
-////            }
-////        });
-//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -224,10 +168,11 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
 
         // no location specified.
-        if(location == null){
+        if (location == null) {
             ib_showMap.setVisibility(ImageButton.INVISIBLE);
             return;
         }
+
         ib_showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -262,62 +207,33 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     }
 
 
-    public void edit(Item item){
-
+    public void edit(Item item) {
         Intent editItemIntent = new Intent(rootView.getContext(), ReportFormActivity.class);
-        editItemIntent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost());
-        editItemIntent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
-        editItemIntent.putExtra(Constants.ReportForm.ITEM, item);
+        editItemIntent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost())
+                      .putExtra(Constants.ReportForm.IS_EDIT_FORM, true)
+                      .putExtra(Constants.ReportForm.ITEM, item);
 
-        ((Activity)rootView.getContext()).startActivityForResult(editItemIntent, Constants.REQUEST_CODE_REPORT_FORM);
-    }
-
-    public void setChosenItemPosition(int position) {
-        chosenItemPosition = position;
+        ((Activity) rootView.getContext()).startActivityForResult(editItemIntent, Constants.REQUEST_CODE_REPORT_FORM);
     }
 
     public int getChosenItemPosition() {
         return chosenItemPosition;
     }
 
+    public void setChosenItemPosition(int position) {
+        chosenItemPosition = position;
+    }
+
     public Item getChosenItem() {
         return items.get(chosenItemPosition);
     }
 
-//    public void remove(Item selectedItem) {
-//
-//        //TODO spinner while trying to remove.
-//        items.remove(selectedItem);
-//        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-//        query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, selectedItem.getId());
-//        query.getFirstInBackground(new GetCallback<ParseObject>() {
-//            @Override
-//            public void done(ParseObject parseObject, ParseException e) {
-//                if(e == null){
-//                    parseObject.deleteInBackground();
-//                }
-//            }
-//        });
-//
-//        ParseQuery<ParseObject> localQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-//        localQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, selectedItem.getId());
-//        localQuery.fromLocalDatastore();
-//        try {
-//            ParseObject parseItem = localQuery.getFirst();
-//            parseItem.unpin();
-//            notifyDataSetChanged();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//            Log.e(Constants.LOST_FOUND_TAG, "didn't find item to delete or couldn't delete.");
-//        }
-//    }
-
     public class ViewHolder {
-        TextView itemName;
         public ImageView itemImage;
-        TextView timeAdded;
-        TextView lostFound;
         public ImageButton deleteReport;
+        TextView itemName;
+        TextView timeAdded;
+        ImageView lostFoundImage;
     }
 
 }
