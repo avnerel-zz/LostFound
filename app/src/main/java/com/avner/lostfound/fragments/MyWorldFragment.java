@@ -77,7 +77,7 @@ public class MyWorldFragment extends Fragment {
         query.fromLocalDatastore();
         query.orderByDescending(Constants.ParseQuery.CREATED_AT);
         query.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
-        query.whereEqualTo(Constants.ParseReport.ALIVE, true);
+        query.whereEqualTo(Constants.ParseReport.IS_ALIVE, true);
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override

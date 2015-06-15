@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +53,8 @@ public class MessagingActivity extends Activity implements TextWatcher {
     private String itemId;
     private MenuItem action_complete;
     private String recipientName;
+    private boolean showCompleteConversation;
+    private String conversationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,8 @@ public class MessagingActivity extends Activity implements TextWatcher {
         recipientId = intent.getStringExtra(Constants.Conversation.RECIPIENT_ID);
         itemId = intent.getStringExtra(Constants.Conversation.ITEM_ID);
         recipientName = intent.getStringExtra(Constants.Conversation.RECIPIENT_NAME);
-
+        showCompleteConversation = intent.getBooleanExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION, true);
+        conversationId = intent.getStringExtra(Constants.ParseQuery.OBJECT_ID);
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
@@ -134,7 +138,11 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
         getMenuInflater().inflate(R.menu.menu_messaging, menu);
         action_complete = menu.findItem(R.id.action_complete);
+        if(!showCompleteConversation){
+            action_complete.setVisible(false);
+        }
         getActionBar().setTitle(recipientName);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -143,7 +151,25 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
         if(item.equals(action_complete)){
 
-            //TODO complete lost or found.
+            Log.d(Constants.LOST_FOUND_TAG, "user clicked on end conversation");
+            action_complete.setVisible(false);
+            Toast.makeText(this, "Complete Conversation has been sent. Awaiting response", Toast.LENGTH_SHORT).show();
+
+            // save complete conversation status in parse.
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversationId);
+            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseConversation, ParseException e) {
+                    if(e == null && parseConversation != null){
+                        parseConversation.put(Constants.ParseConversation.WAITING_FOR_COMPLETE, true);
+                        parseConversation.saveInBackground();
+                        parseConversation.pinInBackground();
+                    }
+                }
+            });
+
+            //TODO send complete message to recipient and disable this button until a response is received.
         }
         return super.onMenuItemSelected(featureId, item);
     }

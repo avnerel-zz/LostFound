@@ -28,6 +28,7 @@ public class Item implements Parcelable {
     private String itemId;
     private ParseObject parseItem;
     private boolean isLost;
+    private boolean isAlive;
 
     public Item(ParseObject parseItem) {
         this.parseItem = parseItem;
@@ -53,6 +54,7 @@ public class Item implements Parcelable {
         locationAsString = (String) parseItem.get(Constants.ParseReport.LOCATION_STRING);
         imageUrl = ((ParseFile) parseItem.get(Constants.ParseReport.ITEM_IMAGE)).getUrl();
         isLost = (boolean) parseItem.get(Constants.ParseReport.IS_LOST);
+        isAlive = (boolean) parseItem.get(Constants.ParseReport.IS_ALIVE);
     }
 
 
@@ -215,5 +217,9 @@ public class Item implements Parcelable {
         sb.append("Time: ").append(getTimeAsString());
 
         return sb.toString();
+    }
+
+    public boolean isAlive() {
+        return isAlive;
     }
 }

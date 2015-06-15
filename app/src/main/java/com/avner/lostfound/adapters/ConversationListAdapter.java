@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.location.Location;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -104,6 +105,9 @@ public class ConversationListAdapter extends BaseAdapter {
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
         viewHolder.itemName.setText(item.getName());
+        if(!item.isAlive()){
+            viewHolder.itemName.setPaintFlags(viewHolder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
         Picasso.with(rootActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
         if (conversation.getUnreadCount() != 0){
@@ -179,7 +183,7 @@ public class ConversationListAdapter extends BaseAdapter {
         localQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
-                if(e== null){
+                if (e == null) {
                     parseObject.unpinInBackground();
                 }
             }

@@ -113,7 +113,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
                     Log.e(Constants.LOST_FOUND_TAG, "item" + item.getName()
                             + " had already been removed from local data store. " + e.getLocalizedMessage());
                 }
-                parseItem.put(Constants.ParseReport.ALIVE, false);
+                parseItem.put(Constants.ParseReport.IS_ALIVE, false);
                 parseItem.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -139,7 +139,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             @Override
             public void done(ParseObject parseItem, ParseException e) {
                 if (parseItem != null) {
-                    parseItem.put(Constants.ParseReport.ALIVE, false);
+                    parseItem.put(Constants.ParseReport.IS_ALIVE, false);
                     parseItem.saveInBackground();
                 } else {
                     Log.e(Constants.LOST_FOUND_TAG, "item isn't in the parse data store. WTF???");

@@ -186,7 +186,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClassName);
         query.fromLocalDatastore();
         query.whereEqualTo(Constants.ParseReport.IS_LOST,isLostFragment);
-        query.whereEqualTo(Constants.ParseReport.ALIVE, true);
+        query.whereEqualTo(Constants.ParseReport.IS_ALIVE, true);
         query.orderByDescending(Constants.ParseQuery.CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override

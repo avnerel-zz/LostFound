@@ -2,9 +2,7 @@ package com.avner.lostfound.messaging;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -20,7 +18,6 @@ import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.ConversationListAdapter;
 import com.avner.lostfound.structs.Conversation;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -178,9 +175,14 @@ public class ConversationListActivity extends Activity {
 
         updateUnreadCount(pos);
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
-        intent.putExtra(Constants.Conversation.RECIPIENT_ID, conversations.get(pos).getUserId());
-        intent.putExtra(Constants.Conversation.RECIPIENT_NAME, conversations.get(pos).getUserName());
-        intent.putExtra(Constants.Conversation.ITEM_ID, conversations.get(pos).getItem().getId());
+        Conversation conversation = conversations.get(pos);
+        intent.putExtra(Constants.Conversation.RECIPIENT_ID, conversation.getUserId());
+        intent.putExtra(Constants.Conversation.RECIPIENT_NAME, conversation.getUserName());
+        intent.putExtra(Constants.Conversation.ITEM_ID, conversation.getItem().getId());
+
+        boolean showCompleteConversation = (!conversation.isWaitingForComplete()) && conversation.getItem().isAlive();
+        intent.putExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION, showCompleteConversation);
+        intent.putExtra(Constants.ParseQuery.OBJECT_ID, conversation.getId());
         startActivity(intent);
     }
 

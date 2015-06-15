@@ -14,6 +14,7 @@ public class Conversation  implements Parcelable{
     public final String userId;
     public final Item item;
     public int unreadCount;
+    private boolean waitingForComplete;
 
     public Conversation(ParseObject parseConversation){
 
@@ -27,6 +28,7 @@ public class Conversation  implements Parcelable{
         this.item = new Item(parseItem);
         this.conversationId = parseConversation.getObjectId();
         this.unreadCount = (int) parseConversation.get(Constants.ParseConversation.UNREAD_COUNT);
+        this.waitingForComplete = (boolean) parseConversation.get(Constants.ParseConversation.WAITING_FOR_COMPLETE);
     }
 
     public Item getItem() {
@@ -88,7 +90,11 @@ public class Conversation  implements Parcelable{
         this.unreadCount = unreadCount;
     }
 
-    public Object getId() {
+    public String getId() {
         return conversationId;
+    }
+
+    public boolean isWaitingForComplete() {
+        return waitingForComplete;
     }
 }

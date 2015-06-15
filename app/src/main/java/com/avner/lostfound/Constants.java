@@ -87,7 +87,7 @@ public class Constants {
         public static final String ITEM_IMAGE = "itemImage";
         public static final String USER_DISPLAY_NAME = "name";
         public static final String IS_LOST = "isLost";
-        public static final String ALIVE = "alive";
+        public static final String IS_ALIVE = "alive";
     }
 
     public class ParseQuery{
@@ -113,6 +113,7 @@ public class Constants {
         public static final String ITEM_ID = "itemId";
         public static final String RECIPIENT_ID = "recipientId";
         public static final String RECIPIENT_NAME = "recipientName";
+        public static final String SHOW_COMPLETE_CONVERSATION = "showCompleteConversation";
     }
 
     public class ParseConversation{
@@ -122,7 +123,7 @@ public class Constants {
         public static final String RECIPIENT_USER_NAME = "recipientUserName";
         public static final String ITEM = "item";
         public static final String UNREAD_COUNT = "unreadCount";
-
+        public static final String WAITING_FOR_COMPLETE = "waitingForComplete";
     }
 
     public class ParseMessage{
