@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
@@ -108,13 +109,15 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         deleteFromLocalQuery.fromLocalDatastore();
         deleteFromLocalQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseItem, ParseException e) {
+            public void done(final ParseObject parseItem, ParseException e) {
                 if (e != null) {
                     Log.e(Constants.LOST_FOUND_TAG, "item" + item.getName()
                             + " had already been removed from local data store. " + e.getLocalizedMessage());
+                    progressDialog.dismiss();
+                    Toast.makeText(rootView.getContext(), "Couldn't delete item from server, please check your connection.", Toast.LENGTH_SHORT);
                 }
                 parseItem.put(Constants.ParseReport.IS_ALIVE, false);
-                parseItem.saveInBackground(new SaveCallback() {
+                parseItem.pinInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
@@ -124,26 +127,45 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
                         }
                         ((MainActivity) rootView.getContext()).updateLocalDataInFragments();
                         progressDialog.dismiss();
-                        deleteFromParse(item);
+                        deleteFromParse(item, parseItem);
                     }
                 });
             }
         });
-
     }
 
-    private void deleteFromParse(Item item) {
+    private void deleteFromParse(Item item, final ParseObject localParseItem) {
         ParseQuery<ParseObject> deleteQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
         deleteQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, item.getId());
         deleteQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseItem, ParseException e) {
+            public void done(final ParseObject parseItem, ParseException e) {
                 if (parseItem != null) {
                     parseItem.put(Constants.ParseReport.IS_ALIVE, false);
-                    parseItem.saveInBackground();
+                    parseItem.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            // couldn't remove from server.
+                            if(e!= null){
+                                restoreLocalParseItem(localParseItem);
+                            }
+                        }
+                    });
                 } else {
-                    Log.e(Constants.LOST_FOUND_TAG, "item isn't in the parse data store. WTF???");
+                    Log.e(Constants.LOST_FOUND_TAG, "item couldn't be retrieved for deletion from the parse data store.");
+                    restoreLocalParseItem(localParseItem);
                 }
+            }
+        });
+    }
+
+    private void restoreLocalParseItem(ParseObject localParseItem) {
+        localParseItem.put(Constants.ParseReport.IS_ALIVE, true);
+        localParseItem.pinInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Toast.makeText(rootView.getContext(), "Couldn't delete item from server, please check your connection.", Toast.LENGTH_SHORT).show();
+                ((MainActivity) rootView.getContext()).updateLocalDataInFragments();
             }
         });
     }

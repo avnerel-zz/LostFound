@@ -17,79 +17,17 @@
             android:src="@drawable/lf_background"
             android:adjustViewBounds="true" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/et_user_name"
-            android:hint="@string/user_name_hint"
-            android:singleLine="true"
-            android:textColorHint="@color/primary_dark_material_dark"
-            android:textCursorDrawable="@null"
-             />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:hint="@string/password_hint"
-            android:id="@+id/et_user_password"
-            android:singleLine="true"
-            android:textColorHint="@color/primary_dark_material_dark"
-            android:maxLength="@string/max_password_length"
-            android:textCursorDrawable="@null"
-            />
-
-        <Button
+        <com.facebook.login.widget.LoginButton
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="@string/login_with_email"
-            android:textAllCaps="false"
-            android:id="@+id/b_email_login"
-            android:enabled="false"
-            android:background="#ff72ff99"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/or_login_with"
-            android:gravity="center"/>
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal">
-
-
-            <com.facebook.login.widget.LoginButton
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:id="@+id/b_login_facebook"
-                android:layout_marginTop="6dp"/>
-
-
+            android:minHeight="50dp"
+            android:textSize="16sp"
+            android:paddingTop="10sp"
+            android:paddingBottom="10sp"
+            android:id="@+id/b_login_facebook"
+            android:layout_marginTop="50dp"/>
 
     </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:layout_alignParentBottom="true"
-        >
-
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/sign_up"
-            android:id="@+id/b_sign_up"
-            android:textAllCaps="false"
-            android:background="#ff91abff"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"/>
-    </LinearLayout>
-
 
 </RelativeLayout>

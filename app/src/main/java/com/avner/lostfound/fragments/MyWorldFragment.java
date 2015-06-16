@@ -230,6 +230,9 @@ public class MyWorldFragment extends Fragment {
     }
 
     public void updateData() {
+        if(items == null){
+            return;
+        }
         updateMyItems(items);
     }
 

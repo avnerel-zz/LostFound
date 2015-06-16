@@ -113,7 +113,8 @@ public class Constants {
         public static final String ITEM_ID = "itemId";
         public static final String RECIPIENT_ID = "recipientId";
         public static final String RECIPIENT_NAME = "recipientName";
-        public static final String SHOW_COMPLETE_CONVERSATION = "showCompleteConversation";
+        public static final String SHOW_COMPLETE_CONVERSATION_ICON = "showCompleteConversationIcon";
+        public static final String SHOW_COMPLETE_CONVERSATION_REQUEST_DIALOG = "showCompleteConversationRequest";
     }
 
     public class ParseConversation{
@@ -123,7 +124,8 @@ public class Constants {
         public static final String RECIPIENT_USER_NAME = "recipientUserName";
         public static final String ITEM = "item";
         public static final String UNREAD_COUNT = "unreadCount";
-        public static final String WAITING_FOR_COMPLETE = "waitingForComplete";
+        public static final String SENT_COMPLETE = "sentComplete";
+        public static final String RECEIVED_COMPLETE = "receivedComplete";
     }
 
     public class ParseMessage{
@@ -165,7 +167,14 @@ public class Constants {
         public static final String TYPE_MESSAGE = "ParseMessage";
         public static final String TYPE_DELETE_CONVERSATION = "ParseDeleteConversation";
 
+        public static final String COMPLETE_CONVERSATION_REQUEST = "ParseCompleteConversationRequest";
+        public static final String COMPLETE_CONVERSATION_REPLY = "ParseCompleteConversationReply";
+        public static final String TYPE_CONVERSATION = "ParseConversation";
     }
 
 
+    public class ParseCloudMethods {
+        public static final String COMPLETE_CONVERSATION_REQUEST = "completeConversationRequest";
+        public static final String COMPLETE_CONVERSATION_REPLY = "completeConversationReply";
+    }
 }

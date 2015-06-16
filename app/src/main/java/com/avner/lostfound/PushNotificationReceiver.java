@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.messaging.MessagingActivity;
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -46,37 +45,64 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             case Constants.ParsePush.TYPE_LOST:
                 handlePushOfParseLost(jsonData, context);
                 return false;
-            case Constants.ParsePush.TYPE_DELETE_CONVERSATION:
-                handlePushOfDeleteConversation(jsonData);
+//            case Constants.ParsePush.TYPE_DELETE_CONVERSATION:
+//                handlePushOfDeleteConversation(jsonData);
+//                return true;
+            case Constants.ParsePush.COMPLETE_CONVERSATION_REQUEST:
+                return handlePushOfCompleteConversationRequest(jsonData, context);
+            case Constants.ParsePush.COMPLETE_CONVERSATION_REPLY:
+                handlePushOfCompleteConversationReply(jsonData, context);
+                return true;
+            case Constants.ParsePush.TYPE_CONVERSATION:
+                handlePushOfParseConversation(jsonData, context);
                 return false;
         }
         return true;
     }
 
-    private void handlePushOfDeleteConversation(JSONObject jsonData) throws JSONException {
+    private void handlePushOfParseConversation(JSONObject jsonData, final Context context) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
         Log.d("PUSH_CONVERSATION", reportedItem);
         JSONObject report = new JSONObject(reportedItem);
 
-        final String conversationId = report.get(Constants.ParseQuery.OBJECT_ID).toString();
-        Log.d("PUSH_CONVERSATION", conversationId);
-        ParseQuery<ParseObject> deleteConversationQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-        deleteConversationQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversationId);
-        deleteConversationQuery.fromLocalDatastore();
-        deleteConversationQuery.findInBackground(new FindCallback<ParseObject>() {
+        final String objectId = report.get(Constants.ParseQuery.OBJECT_ID).toString();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("ParseConversation");
+        query.getInBackground(objectId, new GetCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                if(e!= null){
-                    Log.d("PUSH_CONVERSATION", "can't find conversation. " + e.getLocalizedMessage());
-                    return;
-                }
-                for(ParseObject conversation : parseObjects){
-                    conversation.unpinInBackground();
+            public void done(final ParseObject parseConversation, ParseException e) {
+
+                if (e != null) {
+                    Log.e("PUSH_CONVERSATION", "Could not get the data from server");
+                }else{
+
+                    Log.d("PUSH_CONVERSATION", "Got the data from server");
+                    parseConversation.pinInBackground();
                 }
             }
         });
+    }
+
+    private void handlePushOfCompleteConversationReply(JSONObject jsonData, Context context) throws JSONException {
 
     }
+
+    private boolean handlePushOfCompleteConversationRequest(JSONObject jsonData, Context context) throws JSONException {
+
+        final String senderId = jsonData.getString(Constants.ParsePush.SENDER_ID);
+        final String itemId = jsonData.getString(Constants.ParsePush.ITEM_ID);
+
+        LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
+        if (applicationContext.getMessagingActivity()!=null &&
+                itemId.equals(applicationContext.getMessagingActivityItemId())&&
+                senderId.equals(applicationContext.getMessagingRecipientId())){
+            applicationContext.getMessagingActivity().showCompleteConversationDialog();
+            return false;
+        }
+        return true;
+    }
+
+//    }
 
     private void handlePushOfParseLost(JSONObject jsonData, final Context context) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
@@ -89,39 +115,26 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         query.getInBackground(objectId, new GetCallback<ParseObject>() {
             @Override
             public void done(final ParseObject parseObject, ParseException e) {
-                /*
-                 if e!=null, there was a problem retrieving the object from the server, so we delete
-                 it from the local datastore. Otherwise, we need to update it, i.e. remove the existing
-                 object from the local datastore and insert the new (or updated) version.
-                 Either way - we remove the object from the local datastore.
-                */
 
                 if (e != null) {
                     Log.d("PUSH_LOST", "Could not get the data from server");
                     // could not retrieve the object from the server
-                    removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            refreshFragments(context);
-                        }
-                    }, context);
                 }else{
 
-                    // we first remove the existing object from the local datastore (if it exists)
-                    // and insert a new one
                     Log.d("PUSH_LOST", "Got the data from server");
-                    removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            Log.d("PUSH_LOST", "about to insert into local datastore");
-                            insertReportInLocalDatastore(parseObject,context);
-                        }
-                    }, context);
+                    insertReportInLocalDataStore(parseObject, context);
                 }
             }
         });
+    }
 
-        // TODO: refresh screen if we are in the lost/found list tab
+    private void insertReportInLocalDataStore(ParseObject parseObject, final Context context) {
+        parseObject.pinInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                refreshFragments(context);
+            }
+        });
     }
 
     private void refreshFragments(Context context) {
@@ -133,58 +146,6 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
-    private void insertReportInLocalDatastore(ParseObject parseObject, final Context context) {
-        parseObject.pinInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                refreshFragments(context);
-            }
-        });
-    }
-
-//    private void removeReportFromLocalDatastoreIfExists(String objectId) {
-//        removeReportFromLocalDatastoreIfExists(objectId, new DeleteCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                // NOP
-//            }
-//        }, null);
-//
-//    }
-
-    private void removeReportFromLocalDatastoreIfExists(String objectId, final DeleteCallback callback, final Context context) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-        query.fromLocalDatastore();
-        query.getInBackground(objectId, new GetCallback<ParseObject>() {
-
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                if (e == null) {
-                    Log.d("PUSH_LOST", "Removing existing object from local datastore");
-                    parseObject.unpinInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                Log.e("PUSH_LOST", e.getMessage(), e);
-                                return;
-                            } else {
-                                Log.d("PUSH_LOST", "unpin in background");
-                            }
-                            callback.done(null);
-                            refreshFragments(context);
-                        }
-                    });
-                    return;
-                } else {
-                    Log.d("PUSH_LOST", "Trying to remove, but the item was not in the local datastore");
-                }
-                callback.done(null);
-                refreshFragments(context);
-            }
-        });
-    }
-
-
     private boolean handlePushOfParseMessage(JSONObject jsonData, Context context) throws JSONException {
 
         final String currentUserId = ParseUser.getCurrentUser().getObjectId();
@@ -193,10 +154,11 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         final String itemId = jsonData.getString(Constants.ParsePush.ITEM_ID);
         final String messageId = jsonData.getString(Constants.ParseQuery.OBJECT_ID);
 
-        pinMessage(messageId);
-
         LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
-        if (applicationContext.isMessagingActivityActive() && applicationContext.getMessagingActivityItemId().equals(itemId)) {
+        pinMessage(messageId,applicationContext, itemId, senderId);
+        if (applicationContext.getMessagingActivity()!=null &&
+                itemId.equals(applicationContext.getMessagingActivityItemId())&&
+                senderId.equals(applicationContext.getMessagingRecipientId())){
             // no need for popup notification. already in messaging session.
             return false;
         }
@@ -216,16 +178,30 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         return true;
     }
 
-    private void pinMessage(String messageId) {
+    private void pinMessage(String messageId, final LostFoundApplication applicationContext, final String itemId, final String senderId) {
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
         query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, messageId);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
-                if(parseObject!= null){
-                    parseObject.pinInBackground();
+                if(parseObject == null || e!= null){
+                    Log.e(Constants.LOST_FOUND_TAG, e.getLocalizedMessage());
                 }
+                parseObject.pinInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e!= null){
+                            Log.e(Constants.LOST_FOUND_TAG, e.getLocalizedMessage());
+                        }
+                        MessagingActivity messagingActivity = applicationContext.getMessagingActivity();
+                        String messagingUserId = applicationContext.getMessagingRecipientId();
+                        String messagingItemId = applicationContext.getMessagingActivityItemId();
+                        if(messagingActivity != null && itemId.equals(messagingItemId) && senderId.equals(messagingUserId)){
+                            messagingActivity.updateMessages();
+                        }
+                    }
+                });
             }
         });
     }
@@ -312,8 +288,10 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             String pushType = (String) jsonData.get(Constants.ParsePush.PUSH_TYPE);
             switch (pushType) {
                 case Constants.ParsePush.TYPE_MESSAGE:
-
-                    openMessagingActivity(context, jsonData);
+                    openMessagingActivity(context, jsonData,false);
+                    break;
+                case Constants.ParsePush.COMPLETE_CONVERSATION_REQUEST:
+                    openMessagingActivity(context, jsonData,true);
                     break;
                 default:
                     super.onPushOpen(context, intent);
@@ -325,7 +303,8 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     }
 
-    private void openMessagingActivity(Context context, JSONObject jsonData) throws JSONException {
+    private void openMessagingActivity(Context context, JSONObject jsonData,boolean showCompleteRequestDialog) throws JSONException {
+
         String senderId = jsonData.getString(Constants.ParsePush.SENDER_ID);
         String senderName = jsonData.getString(Constants.ParsePush.SENDER_NAME);
         String itemId = jsonData.getString(Constants.ParsePush.ITEM_ID);
@@ -334,6 +313,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         messagingIntent.putExtra(Constants.Conversation.RECIPIENT_NAME, senderName);
         messagingIntent.putExtra(Constants.Conversation.ITEM_ID, itemId);
         messagingIntent.putExtra(Constants.Conversation.RECIPIENT_ID, senderId);
+        messagingIntent.putExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_REQUEST_DIALOG, showCompleteRequestDialog);
         messagingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(messagingIntent);
     }

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.avner.lostfound.activities.MainActivity;
+import com.avner.lostfound.messaging.MessagingActivity;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -28,9 +29,10 @@ public class LostFoundApplication extends Application {
      * used to get push notifications
      */
     private ParseInstallation installation;
-    private boolean isMessagingActive;
     private String messagingItemId;
     private MainActivity mainActivity;
+    private String messagingRecipientId;
+    private MessagingActivity messagingActivity;
 
     @Override
     public void onCreate() {
@@ -88,17 +90,18 @@ public class LostFoundApplication extends Application {
         return (String) ParseUser.getCurrentUser().getEmail();
     }
 
-    public void updateMessagingStatus(boolean isActive, String itemId) {
+    public void updateMessagingStatus(MessagingActivity messagingActivity, String itemId, String recipientId) {
 
-        isMessagingActive = isActive;
+        this.messagingActivity = messagingActivity;
         messagingItemId = itemId;
+        messagingRecipientId = recipientId;
 
     }
 
 
 
-    public boolean isMessagingActivityActive() {
-        return isMessagingActive;
+    public MessagingActivity getMessagingActivity() {
+        return messagingActivity;
     }
 
     public String getMessagingActivityItemId() {
@@ -146,5 +149,9 @@ public class LostFoundApplication extends Application {
 
     public MainActivity getMainActivity() {
         return mainActivity;
+    }
+
+    public String getMessagingRecipientId() {
+        return messagingRecipientId;
     }
 }

@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +31,7 @@ import com.parse.ParseUser;
 import java.io.File;
 
 
-public class LoginActivity extends Activity implements Button.OnClickListener, TextWatcher {
+public class LoginActivity extends Activity implements Button.OnClickListener{
 
     private Button emailLoginButton;
 
@@ -65,19 +63,19 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
     private void initViews() {
 
-        Button signUpButton = (Button) findViewById(R.id.b_sign_up);
-        signUpButton.setOnClickListener(this);
-
-        emailLoginButton = (Button) findViewById(R.id.b_email_login);
-        emailLoginButton.setOnClickListener(this);
+//        Button signUpButton = (Button) findViewById(R.id.b_sign_up);
+//        signUpButton.setOnClickListener(this);
+//
+//        emailLoginButton = (Button) findViewById(R.id.b_email_login);
+//        emailLoginButton.setOnClickListener(this);
 
         LoginButton facebookLoginButton = (LoginButton) findViewById(R.id.b_login_facebook);
         facebookLoginButton.setOnClickListener(this);
 
-        userName = (EditText) findViewById(R.id.et_user_name);
-        userName.addTextChangedListener(this);
-        password = (EditText) findViewById(R.id.et_user_password);
-        password.addTextChangedListener(this);
+//        userName = (EditText) findViewById(R.id.et_user_name);
+//        userName.addTextChangedListener(this);
+//        password = (EditText) findViewById(R.id.et_user_password);
+//        password.addTextChangedListener(this);
     }
 
     /**
@@ -85,20 +83,40 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
      */
     private void finishLogin(boolean updateDB) {
 
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-
-        startActivity(intent);
-
         // start messaging service.
         final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
 
         startService(serviceIntent);
 
         if (updateDB) {
-            ((LostFoundApplication) getApplication()).refreshLocalDataStore();
-        }
 
-        finish();
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Initializing");
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+
+            final LostFoundApplication application = (LostFoundApplication) getApplication();
+
+            new AsyncTask<Void,Void,Void>(){
+                @Override
+                protected Void doInBackground(Void... v) {
+                    application.refreshLocalDataStore();
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void v) {
+                    progressDialog.dismiss();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }.execute();
+        }else{
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
     }
 
@@ -139,16 +157,9 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
             Log.e(Constants.LOST_FOUND_TAG, "result not o.k in login activity. request code: " + requestCode);
             return;
         }
-        if (requestCode == Constants.REQUEST_CODE_SIGN_UP) {
-
-            String userName = data.getStringExtra(Constants.USER_NAME);
-            String password = data.getStringExtra(Constants.PASSWORD);
-            logInToParseWithAppLogin(userName, password);
-
-        } else if (requestCode == Constants.REQUEST_CODE_FACEBOOK_LOGIN) {
+        if (requestCode == Constants.REQUEST_CODE_FACEBOOK_LOGIN) {
 
             ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
-
         }
     }
 
@@ -156,19 +167,7 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
     @Override
     public void onClick(View v) {
 
-        if (v.getId() == R.id.b_sign_up) {
-
-            // go to sign up activity.
-            Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-            startActivityForResult(intent, Constants.REQUEST_CODE_SIGN_UP);
-
-        } else if (v.getId() == R.id.b_email_login) {
-
-            String username = userName.getText().toString().toLowerCase();
-            String pass = password.getText().toString();
-            logInToParseWithAppLogin(username, pass);
-
-        } else if (v.getId() == R.id.b_login_facebook) {
+        if (v.getId() == R.id.b_login_facebook) {
 
             loginWithFacebookButton();
         }
@@ -181,6 +180,10 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, null, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
+                if(err != null){
+                    Toast.makeText(getApplicationContext(), "problem connection to facebook, please check your connection.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (user == null) {
                     Log.d(Constants.LOST_FOUND_TAG, "Uh oh. The user cancelled the Facebook login.");
                 } else if (user.isNew()) {
@@ -205,12 +208,12 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
         getUserFacebookProfileDetails();
         // try to fetch user photo from facebook.
         fetchUserPhotoFromFacebookProfile();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
+//        progressDialog = new ProgressDialog(this);
+//        progressDialog.setTitle("Loading");
+//        progressDialog.setMessage("Please wait...");
+//        progressDialog.show();
         finishLogin(true);
-        progressDialog.dismiss();
+//        progressDialog.dismiss();
     }
 
     private void getUserFacebookProfileDetails() {
@@ -225,58 +228,39 @@ public class LoginActivity extends Activity implements Button.OnClickListener, T
 
     }
 
-    /**
-     * This method logs the user into parse with the app user name and password.
-     *
-     * @param userName user name entered.
-     * @param password password entered.
-     */
-    private void logInToParseWithAppLogin(final String userName, String password) {
+//    /**
+//     * This method logs the user into parse with the app user name and password.
+//     *
+//     * @param userName user name entered.
+//     * @param password password entered.
+//     */
+//    private void logInToParseWithAppLogin(final String userName, String password) {
+//
+//        progressDialog = new ProgressDialog(this);
+//        progressDialog.setTitle("Loading");
+//        progressDialog.setMessage("Please wait...");
+//        progressDialog.show();
+//
+//        ParseUser.logInInBackground(userName, password, new LogInCallback() {
+//            public void done(ParseUser user, com.parse.ParseException e) {
+//                if (user != null) {
+//
+//                    finishLogin(true);
+//                    user.setEmail(userName);
+//                    if(user.get(Constants.ParseUser.USER_DISPLAY_NAME)==null){
+//
+//                        user.put(Constants.ParseUser.USER_DISPLAY_NAME, userName.split("@")[0]);
+//                    }
+//                    user.saveInBackground();
+//                    ((LostFoundApplication) getApplication()).setUserName(userName);
+//                } else {
+//                    Toast.makeText(getApplicationContext(),
+//                            e.getLocalizedMessage(),
+//                            Toast.LENGTH_SHORT).show();
+//                }
+//                progressDialog.dismiss();
+//            }
+//        });
+//    }
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
-
-        ParseUser.logInInBackground(userName, password, new LogInCallback() {
-            public void done(ParseUser user, com.parse.ParseException e) {
-
-
-                if (user != null) {
-
-                    finishLogin(true);
-                    user.setEmail(userName);
-                    if(user.get(Constants.ParseUser.USER_DISPLAY_NAME)==null){
-
-                        user.put(Constants.ParseUser.USER_DISPLAY_NAME, userName.split("@")[0]);
-                    }
-                    user.saveInBackground();
-                    ((LostFoundApplication) getApplication()).setUserName(userName);
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            e.getLocalizedMessage(),
-                            Toast.LENGTH_SHORT).show();
-                }
-                progressDialog.dismiss();
-            }
-        });
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        if (password.getText().toString().isEmpty() || userName.getText().toString().isEmpty()) {
-            emailLoginButton.setEnabled(false);
-        } else {
-            emailLoginButton.setEnabled(true);
-        }
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-    }
 }

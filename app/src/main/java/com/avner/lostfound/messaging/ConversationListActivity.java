@@ -181,7 +181,7 @@ public class ConversationListActivity extends Activity {
         intent.putExtra(Constants.Conversation.ITEM_ID, conversation.getItem().getId());
 
         boolean showCompleteConversation = (!conversation.isWaitingForComplete()) && conversation.getItem().isAlive();
-        intent.putExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION, showCompleteConversation);
+        intent.putExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_ICON, showCompleteConversation);
         intent.putExtra(Constants.ParseQuery.OBJECT_ID, conversation.getId());
         startActivity(intent);
     }

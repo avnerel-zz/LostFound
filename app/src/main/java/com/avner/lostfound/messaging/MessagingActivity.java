@@ -1,9 +1,14 @@
 package com.avner.lostfound.messaging;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Editable;
@@ -22,6 +27,7 @@ import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -36,10 +42,11 @@ import com.sinch.android.rtc.messaging.MessageFailureInfo;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 
-public class MessagingActivity extends Activity implements TextWatcher {
+public class MessagingActivity extends Activity implements TextWatcher, View.OnClickListener, DialogInterface.OnClickListener {
     private String recipientId;
     private EditText messageBodyField;
     private String messageBody;
@@ -53,8 +60,9 @@ public class MessagingActivity extends Activity implements TextWatcher {
     private String itemId;
     private MenuItem action_complete;
     private String recipientName;
-    private boolean showCompleteConversation;
+    private boolean showCompleteConversationIcon;
     private String conversationId;
+    private ParseObject parseConversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +78,8 @@ public class MessagingActivity extends Activity implements TextWatcher {
         recipientId = intent.getStringExtra(Constants.Conversation.RECIPIENT_ID);
         itemId = intent.getStringExtra(Constants.Conversation.ITEM_ID);
         recipientName = intent.getStringExtra(Constants.Conversation.RECIPIENT_NAME);
-        showCompleteConversation = intent.getBooleanExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION, true);
+//        showCompleteConversationIcon = intent.getBooleanExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_ICON, true);
+//        boolean showCompleteConversationRequestDialog = intent.getBooleanExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_REQUEST_DIALOG, false);
         conversationId = intent.getStringExtra(Constants.ParseQuery.OBJECT_ID);
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
@@ -80,6 +89,56 @@ public class MessagingActivity extends Activity implements TextWatcher {
         initSendButton();
         initMessageList();
         clearUnreadCount();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initCompleteConversation();
+    }
+
+    private void initCompleteConversation() {
+
+        ParseQuery<ParseObject> innerQuery = new ParseQuery(Constants.ParseObject.PARSE_LOST);
+        innerQuery.fromLocalDatastore();
+        innerQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemId);
+
+        ParseQuery<ParseObject> conversationQuery = new ParseQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        conversationQuery.fromLocalDatastore();
+        conversationQuery.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        conversationQuery.whereEqualTo(Constants.ParseConversation.RECIPIENT_USER_ID, recipientId);
+        conversationQuery.whereMatchesQuery(Constants.ParseConversation.ITEM, innerQuery);
+
+        conversationQuery.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject conversationObject, ParseException e) {
+
+                if (e != null || conversationObject == null) {
+                    Log.e(Constants.LOST_FOUND_TAG, "couldn't retrieve conversation from local data store.");
+                    return;
+                }
+                if (conversationObject.get(Constants.ParseConversation.SENT_COMPLETE) != true &&
+                        ((ParseObject)conversationObject.get(Constants.ParseConversation.ITEM)).get(Constants.ParseReport.IS_ALIVE) == true) {
+                    action_complete.setVisible(true);
+                }
+                if (conversationObject.get(Constants.ParseConversation.RECEIVED_COMPLETE) == true) {
+                    showCompleteConversationDialog();
+                }
+
+                parseConversation = conversationObject;
+            }
+        });
+    }
+
+    public void showCompleteConversationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Complete Conversation")
+                .setMessage("Are you sure you the correct item was found?")
+                .setPositiveButton(android.R.string.yes, this)
+                .setNegativeButton(android.R.string.no, this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     private void clearUnreadCount() {
@@ -95,7 +154,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseConversation, ParseException e) {
-                if(e==null){
+                if (e == null) {
 
                     parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 0);
                     parseConversation.saveInBackground();
@@ -109,19 +168,24 @@ public class MessagingActivity extends Activity implements TextWatcher {
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
 
+        updateMessages();
+    }
+
+    public void updateMessages() {
         String[] userIds = {currentUserId, recipientId};
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
         query.whereContainedIn(Constants.ParseMessage.SENDER_ID, Arrays.asList(userIds));
         query.whereContainedIn(Constants.ParseMessage.RECIPIENT_ID, Arrays.asList(userIds));
         query.whereEqualTo(Constants.ParseMessage.ITEM_ID, itemId);
         query.orderByAscending(Constants.ParseMessage.CREATED_AT);
+        query.fromLocalDatastore();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> messageList, com.parse.ParseException e) {
+            public void done(List<ParseObject> messageList, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < messageList.size(); i++) {
                         WritableMessage message = new WritableMessage(messageList.get(i).get(Constants.ParseMessage.RECIPIENT_ID).toString(),
-                                                                    messageList.get(i).get(Constants.ParseMessage.MESSAGE_TEXT).toString());
+                                messageList.get(i).get(Constants.ParseMessage.MESSAGE_TEXT).toString());
                         if (messageList.get(i).get(Constants.ParseMessage.SENDER_ID).toString().equals(currentUserId)) {
                             messageAdapter.addMessage(message, MessageAdapter.DIRECTION_OUTGOING);
                         } else {
@@ -138,7 +202,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
         getMenuInflater().inflate(R.menu.menu_messaging, menu);
         action_complete = menu.findItem(R.id.action_complete);
-        if(!showCompleteConversation){
+        if(!showCompleteConversationIcon){
             action_complete.setVisible(false);
         }
         getActionBar().setTitle(recipientName);
@@ -162,13 +226,19 @@ public class MessagingActivity extends Activity implements TextWatcher {
                 @Override
                 public void done(ParseObject parseConversation, ParseException e) {
                     if(e == null && parseConversation != null){
-                        parseConversation.put(Constants.ParseConversation.WAITING_FOR_COMPLETE, true);
-                        parseConversation.saveInBackground();
+                        parseConversation.put(Constants.ParseConversation.SENT_COMPLETE, true);
                         parseConversation.pinInBackground();
+                        parseConversation.saveInBackground();
                     }
                 }
             });
 
+            HashMap<String, Object> params = new HashMap<String, Object>();
+            params.put(Constants.ParseMessage.RECIPIENT_ID, recipientId);
+            params.put(Constants.ParseMessage.ITEM_ID, itemId);
+            params.put("senderName", ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
+
+            ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.COMPLETE_CONVERSATION_REQUEST, params);
             //TODO send complete message to recipient and disable this button until a response is received.
         }
         return super.onMenuItemSelected(featureId, item);
@@ -178,28 +248,42 @@ public class MessagingActivity extends Activity implements TextWatcher {
 
         sendButton = (ImageButton) findViewById(R.id.sendButton);
         //listen for a click on the send button
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        sendButton.setOnClickListener(this);
 
-                messageBody = messageBodyField.getText().toString();
-                messageService.sendMessage(recipientId, messageBody,itemId);
-
-                //reset message
-                messageBodyField.setText("");
-            }
-        });
     }
 
     @Override
+    public void onClick(View view) {
+
+        if(view.getId() == sendButton.getId()){
+
+            ConnectivityManager cm =
+                    (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
+
+            if(isConnected){
+                messageBody = messageBodyField.getText().toString();
+                messageService.sendMessage(recipientId, messageBody,itemId);
+                //reset message
+                messageBodyField.setText("");
+            }else{
+                Log.d(Constants.LOST_FOUND_TAG, "tried to send message but no connection.");
+                Toast.makeText(this, "Message not sent, Please check your connection", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    @Override
     protected void onResume() {
-        ((LostFoundApplication)getApplication()).updateMessagingStatus(true,itemId);
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(this,itemId,recipientId);
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        ((LostFoundApplication)getApplication()).updateMessagingStatus(false,null);
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(null,null,null);
         super.onPause();
     }
 
@@ -228,6 +312,24 @@ public class MessagingActivity extends Activity implements TextWatcher {
     @Override
     public void afterTextChanged(Editable s) {}
 
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        boolean reply = DialogInterface.BUTTON_POSITIVE == which;
+        Log.d(Constants.LOST_FOUND_TAG, "sent reply for complete conversation: " + reply + ". which: " + which);
+        HashMap<String, Object> params = new HashMap();
+        params.put(Constants.ParseMessage.RECIPIENT_ID, recipientId);
+        params.put(Constants.ParseMessage.ITEM_ID, itemId);
+        params.put("senderName", ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
+        params.put("reply", reply);
+
+        parseConversation.put(Constants.ParseConversation.RECEIVED_COMPLETE, false);
+        parseConversation.pinInBackground();
+        parseConversation.saveInBackground();
+        //TODO add in cloud code to put false in sent complete of other user.
+        ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.COMPLETE_CONVERSATION_REPLY, params);
+    }
+
 
     private class MyServiceConnection implements ServiceConnection {
         @Override
@@ -254,10 +356,10 @@ public class MessagingActivity extends Activity implements TextWatcher {
         }
         @Override
         public void onIncomingMessage(MessageClient client, Message message) {
-            if (message.getSenderId().equals(recipientId) && message.getHeaders().get(Constants.SinchMessage.ITEM_ID).equals(itemId)) {
-                WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
-                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
-            }
+//            if (message.getSenderId().equals(recipientId) && message.getHeaders().get(Constants.SinchMessage.ITEM_ID).equals(itemId)) {
+//                WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+//                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
+//            }
         }
         @Override
         public void onMessageSent(MessageClient client, Message message, String recipientId) {
@@ -268,6 +370,7 @@ public class MessagingActivity extends Activity implements TextWatcher {
             ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
 
             query.whereEqualTo(Constants.ParseMessage.SINCH_ID, message.getMessageId());
+            query.fromLocalDatastore();
 
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override

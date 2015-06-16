@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -151,7 +152,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
         // can't message myself.
         if(item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())){
-            ib_startConversation.setEnabled(false);
+            ib_startConversation.setVisibility(Button.INVISIBLE);
             return;
         }
         ib_startConversation.setOnClickListener(new View.OnClickListener() {
