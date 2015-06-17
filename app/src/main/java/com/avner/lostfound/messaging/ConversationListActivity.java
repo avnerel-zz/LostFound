@@ -45,6 +45,7 @@ public class ConversationListActivity extends Activity {
     private TextView tv_lossTime;
     private TextView tv_location;
     private TextView tv_descriptionContent;
+    private TextView tv_descriptionTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class ConversationListActivity extends Activity {
         this.tv_lossTime = (TextView)findViewById(R.id.tv_lossTime);
         this.tv_location = (TextView)findViewById(R.id.tv_location);
         this.tv_descriptionContent = (TextView)findViewById(R.id.tv_descriptionContent);
+        this.tv_descriptionTitle = (TextView)findViewById(R.id.tv_descriptionTitle);
 
         if (null == iv_itemImage) {
             Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
@@ -71,25 +73,30 @@ public class ConversationListActivity extends Activity {
         }
 
         if (null == tv_lossTime) {
-            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            Log.d(Constants.LOST_FOUND_TAG, "tv_lossTime is null");
             return;
         }
 
         if (null == tv_location) {
-            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            Log.d(Constants.LOST_FOUND_TAG, "tv_location is null");
             return;
         }
 
         if (null == tv_descriptionContent) {
-            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            Log.d(Constants.LOST_FOUND_TAG, "tv_descriptionContent is null");
             return;
         }
 
-        Log.d(Constants.LOST_FOUND_TAG, "init conversation-activity with item-info widgets: " +
-                this.iv_itemImage.getId() + " " +
-                this.tv_lossTime.getId() + " " +
-                this.tv_location.getId() + " " +
-                this.tv_descriptionContent.getId());
+        if (null == tv_descriptionTitle) {
+            Log.d(Constants.LOST_FOUND_TAG, "tv_descriptionTitle is null");
+            return;
+        }
+
+//        Log.d(Constants.LOST_FOUND_TAG, "init conversation-activity with item-info widgets: " +
+//                this.iv_itemImage.getId() + " " +
+//                this.tv_lossTime.getId() + " " +
+//                this.tv_location.getId() + " " +
+//                this.tv_descriptionContent.getId());
     }
 
 
@@ -293,7 +300,11 @@ public class ConversationListActivity extends Activity {
         conversationAdapter.notifyDataSetChanged();
     }
 
-    public void setDisplayedItem(final Item item) {
+    public boolean setDisplayedItem(final Item item) {
+        if (!showItemInfoWidgets()) {
+            return false;
+        }
+
         if (null != this.iv_itemImage) {
             Picasso.with(this).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
         }
@@ -309,5 +320,24 @@ public class ConversationListActivity extends Activity {
         if (null != this.tv_descriptionContent) {
             this.tv_descriptionContent.setText(item.getDescription());
         }
+
+        return true;
+    }
+
+    private boolean showItemInfoWidgets() {
+        if (null == findViewById(R.id.item_info)) {
+            return false;
+        }
+
+        this.iv_itemImage.setVisibility(View.VISIBLE);
+//        this.ib_sendMessage.setVisibility(View.VISIBLE);
+//        this.ib_showMap.setVisibility(View.VISIBLE);
+        this.tv_lossTime.setVisibility(View.VISIBLE);
+        this.tv_location.setVisibility(View.VISIBLE);
+        this.tv_descriptionContent.setVisibility(View.VISIBLE);
+        this.tv_descriptionTitle.setVisibility(View.VISIBLE);
+
+//        this.itemInfoWidgetsVisible = true;
+        return true;
     }
 }

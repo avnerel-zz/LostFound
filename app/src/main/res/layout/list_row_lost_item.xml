@@ -73,17 +73,28 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView"
         android:layout_toRightOf="@+id/textView1"
-        android:maxLines="2"
+        android:layout_toLeftOf="@+id/ib_editReport"
+        android:singleLine="true"
         android:text="@string/default_city"
         android:textColor="@color/abc_search_url_text" />
+
+    <TextView
+        android:id="@+id/tv_description_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_near_address"
+        android:layout_alignLeft="@+id/tv_number_of_days_ago"
+        android:layout_alignStart="@+id/tv_number_of_days_ago"
+        android:text="Description: "
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/tv_item_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_near_address"
-        android:layout_alignLeft="@+id/tv_number_of_days_ago"
-        android:layout_alignStart="@+id/tv_number_of_days_ago"
+        android:layout_toRightOf="@+id/tv_description_text"
+        android:layout_toEndOf="@+id/tv_description_text"
         android:width="180dp"
         android:hint="@string/itemDescriptionDefaultHint"
         android:singleLine="true" />

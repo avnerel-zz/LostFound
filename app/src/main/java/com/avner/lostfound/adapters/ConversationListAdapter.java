@@ -86,12 +86,17 @@ public class ConversationListAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     Item item = conversation.getItem();
 
-                    if (rootActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                        Log.d("BLA BLA BLA", "clicked item in PORTRAIT mode");
+                    if (null == item) {
+                        Log.d(Constants.LOST_FOUND_TAG, "Failed to retrieve item from adapter list, at position " + position);
+                        return;
+                    }
+
+                    if (!rootActivity.setDisplayedItem(item)) {
                         showItemInDialog(item, position);
-                    } else { // in Landscape mode
-                        Log.d("BLA BLA BLA", "clicked item in LANDSCAPE mode");
-                        rootActivity.setDisplayedItem(item);
+                        Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
+                    }
+                    else {
+                        Log.d("BLA BLA BLA", "clicked item in LANDSCAPE & large mode");
                     }
                 }
             });

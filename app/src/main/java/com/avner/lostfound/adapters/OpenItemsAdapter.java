@@ -22,6 +22,7 @@ import com.avner.lostfound.R;
 import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
+import com.avner.lostfound.fragments.MyWorldFragment;
 import com.avner.lostfound.structs.Item;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -34,13 +35,15 @@ import java.util.List;
 
 public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 
+    private final MyWorldFragment myFragment;
     private List<Item> items;
     private View rootView;
     private int chosenItemPosition;
 
-    public OpenItemsAdapter(List<Item> items, View rootView) {
+    public OpenItemsAdapter(List<Item> items, View rootView,MyWorldFragment worldFragment) {
         this.items = items;
         this.rootView = rootView;
+        this.myFragment = worldFragment;
     }
 
 
@@ -172,8 +175,18 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
         Item item = (Item) getItem(position);
+
+        if (!myFragment.setDisplayedItem(item)) {
+            showItemInDialog(item, position);
+            Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
+        }
+        else {
+            Log.d("BLA BLA BLA", "clicked item in LANDSCAPE & large mode");
+        }
+    }
+
+    private void showItemInDialog(Item item, int position) {
         final Dialog dialog = new Dialog(rootView.getContext());
         dialog.setContentView(R.layout.dialog_item_details_layout);
         initMapButton(item, position, dialog);
@@ -181,7 +194,6 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
         setDialogContents(dialog, item);
         dialog.show();
-
     }
 
     private void initMapButton(final Item item, final int position, Dialog dialog) {

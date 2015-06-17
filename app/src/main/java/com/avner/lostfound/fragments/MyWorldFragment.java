@@ -1,8 +1,10 @@
 package com.avner.lostfound.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ShareActionProvider;
@@ -25,6 +28,7 @@ import android.widget.Toast;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.MainActivity;
+import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.utils.ImageUtils;
@@ -32,6 +36,7 @@ import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,13 +44,31 @@ import java.util.List;
 
 public class MyWorldFragment extends Fragment {
 
+    private MainActivity myActivity;
     private View rootView;
     private TextView tv_openListingsNumber;
     private OpenItemsAdapter myOpenListingsAdapter;
     private List<Item> items;
     private ShareActionProvider shareActionProvider;
     private ActionMode actionMode;
+
     private ListView lv_openListings;
+    // item info widgets
+    private ImageButton ib_sendMessage;
+    private ImageButton ib_showMap;
+    private TextView tv_lossTime;
+    private TextView tv_location;
+    private TextView tv_descriptionContent;
+    private ImageView iv_itemImage;
+    private TextView tv_descriptionTitle;
+    private boolean itemInfoWidgetsVisible = false;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        this.myActivity = (MainActivity) getActivity();
+    }
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,8 +77,27 @@ public class MyWorldFragment extends Fragment {
 		rootView = inflater.inflate(R.layout.fragment_my_world, container, false);
         tv_openListingsNumber = (TextView) rootView.findViewById(R.id.tv_openListingsNumber);
         initOpenListings();
+
+        initItemInfoWidgets(); // won't do anything if not shown
+
         return rootView;
 	}
+
+    private void initItemInfoWidgets() {
+        View item_info = this.rootView.findViewById(R.id.item_info);
+
+        if (null == item_info) { // probably not in land + xlarge config
+            return;
+        }
+
+        this.iv_itemImage = (ImageView) item_info.findViewById(R.id.iv_itemImage);
+        this.tv_lossTime = (TextView) item_info.findViewById(R.id.tv_lossTime);
+        this.tv_location = (TextView) item_info.findViewById(R.id.tv_location);
+        this.tv_descriptionContent = (TextView) item_info.findViewById(R.id.tv_descriptionContent);
+        this.ib_sendMessage = (ImageButton) item_info.findViewById(R.id.ib_sendMessage);
+        this.ib_showMap = (ImageButton) item_info.findViewById(R.id.ib_showMap);
+        this.tv_descriptionTitle = (TextView) item_info.findViewById(R.id.tv_descriptionTitle);
+    }
 
     private void initOpenListings() {
 
@@ -63,9 +105,8 @@ public class MyWorldFragment extends Fragment {
         setContextualBar(lv_openListings);
 
         items = new ArrayList<>();
-        myOpenListingsAdapter = new OpenItemsAdapter(items, rootView);
+        myOpenListingsAdapter = new OpenItemsAdapter(items, rootView, this);
         updateMyItems(items);
-
 
         lv_openListings.setAdapter(myOpenListingsAdapter);
         lv_openListings.setOnItemClickListener(myOpenListingsAdapter);
@@ -238,5 +279,57 @@ public class MyWorldFragment extends Fragment {
 
     public void setActionMode(ActionMode actionMode) {
         this.actionMode = actionMode;
+    }
+
+    private boolean showItemInfoWidgets() {
+        if (null == this.rootView.findViewById(R.id.item_info)) {
+            return false;
+        }
+
+        this.iv_itemImage.setVisibility(View.VISIBLE);
+//        this.ib_sendMessage.setVisibility(View.VISIBLE);
+        this.ib_showMap.setVisibility(View.VISIBLE);
+        this.tv_lossTime.setVisibility(View.VISIBLE);
+        this.tv_location.setVisibility(View.VISIBLE);
+        this.tv_descriptionContent.setVisibility(View.VISIBLE);
+        this.tv_descriptionTitle.setVisibility(View.VISIBLE);
+
+        this.itemInfoWidgetsVisible = true;
+        return true;
+    }
+
+
+    public boolean setDisplayedItem(final Item item) {
+        if (!showItemInfoWidgets()) {
+            return false;
+        }
+
+        Picasso.with(myActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
+        this.tv_lossTime.setText(item.getTimeAsString());
+        this.tv_location.setText(item.getLocationString());
+        this.tv_descriptionContent.setText(item.getDescription());
+
+        initMapButton(item);
+
+        return true;
+    }
+
+    private void initMapButton(final Item item) {
+        final Location location = item.getLocation();
+        // no location specified.
+        if (location == null) {
+            ib_showMap.setVisibility(ImageButton.INVISIBLE);
+            return;
+        }
+
+        this.ib_showMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
+                intent.putExtra(Constants.LATITUDE, location.getLatitude());
+                intent.putExtra(Constants.LONGITUDE, location.getLongitude());
+                rootView.getContext().startActivity(intent);
+            }
+        });
     }
 }

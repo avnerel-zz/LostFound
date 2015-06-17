@@ -2,7 +2,7 @@ package com.avner.lostfound.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -23,13 +24,16 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
+import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
+import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.structs.ListFilter;
 import com.avner.lostfound.utils.ListFilterUtils;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.software.shell.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -304,7 +308,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     }
 
 
-    public boolean setDisplayedItem(Item item) {
+    public boolean setDisplayedItem(final Item item) {
         if (!showItemInfoWidgets()) {
             return false;
         }
@@ -314,7 +318,48 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.tv_location.setText(item.getLocationString());
         this.tv_descriptionContent.setText(item.getDescription());
 
+        initMapButton(item);
+        initConversationButton(item);
+
         return true;
+    }
+
+    private void initConversationButton(final Item item) {
+        // can't message myself.
+        if (item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())){
+            ib_sendMessage.setVisibility(Button.INVISIBLE);
+            return;
+        }
+
+        ib_sendMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
+                intent.putExtra(Constants.Conversation.RECIPIENT_ID, item.getUserId());
+                intent.putExtra(Constants.Conversation.RECIPIENT_NAME, item.getUserDisplayName());
+                intent.putExtra(Constants.Conversation.ITEM_ID, item.getId());
+                rootView.getContext().startActivity(intent);
+            }
+        });
+    }
+
+    private void initMapButton(Item item) {
+        final Location location = item.getLocation();
+        // no location specified.
+        if (location == null) {
+            ib_showMap.setVisibility(ImageButton.INVISIBLE);
+            return;
+        }
+
+        this.ib_showMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
+                intent.putExtra(Constants.LATITUDE, location.getLatitude());
+                intent.putExtra(Constants.LONGITUDE, location.getLongitude());
+                rootView.getContext().startActivity(intent);
+            }
+        });
     }
 
     private boolean showItemInfoWidgets() {
