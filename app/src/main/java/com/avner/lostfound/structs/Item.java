@@ -101,16 +101,17 @@ public class Item implements Parcelable {
         diff /= 1000; // seconds ago
 
         int days = (int) (diff / (60 * 60 * 24));
-        if (days>0){
-            return  days + " days ago";
+        if (days > 0) {
+            return days + " days ago";
         }
-        int hours = (int) (diff / (60* 60));
-        if(hours > 0){
-            return  hours + " hours ago";
-        }
-        int minutes = (int) (diff / (60));
-        return  minutes + " minutes ago";
 
+        int hours = (int) (diff / (60 * 60));
+        if (hours > 0) {
+            return hours + " hours ago";
+        }
+
+        int minutes = (int) (diff / (60));
+        return minutes + " minutes ago";
 
 
     }

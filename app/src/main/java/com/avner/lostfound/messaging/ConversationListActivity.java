@@ -3,6 +3,7 @@ package com.avner.lostfound.messaging;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
@@ -32,6 +34,9 @@ public class ConversationListActivity extends Activity {
     private String myUserId;
     private ConversationListAdapter conversationAdapter;
     private List<Conversation> conversations;
+    private List<Conversation> filteredConversations;
+    private SearchView sv_search;
+    private String currentFilter = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,7 @@ public class ConversationListActivity extends Activity {
         myUserId = ParseUser.getCurrentUser().getObjectId();
         conversations = new ArrayList<>();
 
+        filteredConversations = new ArrayList<>();
         initConversationList();
     }
 
@@ -49,7 +55,68 @@ public class ConversationListActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_conversation_list, menu);
+        initSearchView(menu);
         return true;
+    }
+
+    private void initSearchView(Menu menu) {
+        sv_search = (SearchView) menu.findItem(R.id.search_conversation).getActionView();
+        sv_search.setSubmitButtonEnabled(true);
+        sv_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (null == query || query.length() < 2) {
+                    return false;
+                }
+
+                applyFilter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (null == newText) {
+                    return false;
+                }
+
+                if (newText.isEmpty()) {
+                    clearFilter();
+                }
+
+                return true;
+            }
+        });
+    }
+
+    private void clearFilter() {
+        applyFilter("");
+    }
+
+    private void applyFilter(String query) {
+        if (null == query) {
+            Log.d(Constants.LOST_FOUND_TAG, "can't apply a null filter");
+            return;
+        }
+
+        currentFilter = query.toLowerCase();
+        filteredConversations.clear();
+
+        if (query.isEmpty()) { // for empty filter - add all conversations
+            filteredConversations.addAll(conversations);
+        } else {
+            for (Conversation c : conversations) {
+                if (c.getItem().getName().toLowerCase().contains(currentFilter)
+                        || c.getUserName().toLowerCase().contains(currentFilter)) {
+                    filteredConversations.add(c);
+                }
+            }
+        }
+
+        conversationAdapter.notifyDataSetInvalidated();
+    }
+
+    private void reapplyCurrentFilter() {
+        applyFilter(currentFilter);
     }
 
     @Override
@@ -72,7 +139,7 @@ public class ConversationListActivity extends Activity {
         ListView usersListView = (ListView) findViewById(R.id.lv_user_list);
 
         setContextualBar(usersListView);
-        conversationAdapter = new ConversationListAdapter(conversations, this);
+        conversationAdapter = new ConversationListAdapter(filteredConversations, this);
         usersListView.setAdapter(conversationAdapter);
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,7 +157,7 @@ public class ConversationListActivity extends Activity {
             @Override
             public void done(List<ParseObject> conversationList, ParseException e) {
                 // Exception thrown from parse.
-                if(e!=null){
+                if (e != null) {
                     Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -146,42 +213,35 @@ public class ConversationListActivity extends Activity {
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                // TODO Auto-generated method stub
                 conversationAdapter.removeSelection();
             }
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
     }
 
     private void updateConversations(List<ParseObject> conversationList) {
-
         conversations.clear();
+        filteredConversations.clear();
 
-        for (int i=0; i<conversationList.size(); i++) {
-
-            ParseObject parseConversation = conversationList.get(i);
-            Conversation conversation = new Conversation(parseConversation);
-            conversations.add(conversation);
+        for (ParseObject parseConversation : conversationList) {
+            conversations.add(new Conversation(parseConversation));
         }
-        conversationAdapter.notifyDataSetChanged();
+
+        filteredConversations.addAll(conversations);
+        reapplyCurrentFilter();
     }
 
     public void openConversation(int pos) {
-
         updateUnreadCount(pos);
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
         Conversation conversation = conversations.get(pos);
         intent.putExtra(Constants.Conversation.RECIPIENT_ID, conversation.getUserId());
         intent.putExtra(Constants.Conversation.RECIPIENT_NAME, conversation.getUserName());
         intent.putExtra(Constants.Conversation.ITEM_ID, conversation.getItem().getId());
-
-        boolean showCompleteConversation = (!conversation.isWaitingForComplete()) && conversation.getItem().isAlive();
-        intent.putExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_ICON, showCompleteConversation);
         startActivity(intent);
     }
 

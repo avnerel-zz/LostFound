@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
@@ -65,7 +64,6 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -92,7 +90,6 @@ public class MainActivity extends FragmentActivity implements
             textView.setText(tabsStrings[i]);
 
             actionBar.addTab(tab);
-
         }
 
         /**
@@ -217,7 +214,8 @@ public class MainActivity extends FragmentActivity implements
         this.sv_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(getApplicationContext(), String.format("searched '%s'", query), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), String.format("searched '%s'", query), Toast.LENGTH_SHORT).show();
+                Log.d(Constants.LOST_FOUND_TAG, String.format("searched for '%s'", query));
 
                 if (!isListingFragment(selectedTabIndex)) {
                     Log.d(Constants.LOST_FOUND_TAG, "WTF? somehow submitted search in a non-listing fragment. fragment index: " + selectedTabIndex);

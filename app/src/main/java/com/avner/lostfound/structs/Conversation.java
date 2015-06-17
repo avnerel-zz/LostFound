@@ -17,14 +17,15 @@ public class Conversation  implements Parcelable{
     private boolean waitingForComplete;
 
     public Conversation(ParseObject parseConversation){
-
         this.userName  = (String) parseConversation.get(Constants.ParseConversation.RECIPIENT_USER_NAME);
         this.userId    = (String) parseConversation.get(Constants.ParseConversation.RECIPIENT_USER_ID);
 
         ParseObject parseItem = (ParseObject) parseConversation.get(Constants.ParseConversation.ITEM);
-        if(parseItem == null){
+
+        if (parseItem == null) {
             Log.e(Constants.LOST_FOUND_TAG, "item is null, probably removed.");
         }
+
         this.item = new Item(parseItem);
         this.conversationId = parseConversation.getObjectId();
         this.unreadCount = (int) parseConversation.get(Constants.ParseConversation.UNREAD_COUNT);

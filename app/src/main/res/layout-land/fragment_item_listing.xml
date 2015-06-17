@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/tv_filter_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter By:" />
+
+        <Spinner
+            android:id="@+id/s_location_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_filter_text"
+            android:layout_weight="1">
+
+        </Spinner>
+
+        <Spinner
+            android:id="@+id/s_time_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/s_location_filter"
+            android:layout_weight="1">
+
+        </Spinner>
+
+
+        <ListView
+            android:id="@+id/lv_myList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/s_time_filter"
+            android:clipToPadding="false"
+            android:paddingBottom="40dp" />
+
+
+        <com.software.shell.fab.FloatingActionButton
+            android:id="@+id/b_add_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            fab:button_color="@color/fab_material_red_500"
+            fab:image="@drawable/fab_plus_icon" />
+
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/item_info"
+        layout="@layout/item_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1" />
+
+</LinearLayout>

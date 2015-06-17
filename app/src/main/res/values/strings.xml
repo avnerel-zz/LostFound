@@ -41,8 +41,8 @@
     <string name="history_length">History Length:</string>
     <string name="push_notifications">Enable Push Notifications</string>
     <string name="number_messages">Messages</string>
-    <string name="days_ago"> days ago</string>
-    <string name="near">near:&#160;</string>
+    <string name="days_ago">&#160;days ago</string>
+    <string name="near">&#160;near:&#160;</string>
     <string name="default_city">Rehovot</string>
     <string name="default_description">very nice item</string>
     <string name="descriptionTitle">Description:</string>

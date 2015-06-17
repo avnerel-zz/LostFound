@@ -91,25 +91,21 @@ public class Constants {
     }
 
     public class ParseQuery{
-
         public static final String CREATED_AT = "createdAt";
         public static final String OBJECT_ID = "objectId";
     }
 
     public class ParseObject{
-
         public static final String PARSE_LOST = "ParseLost";
         public static final String PARSE_CONVERSATION= "ParseConversation";
         public static final String PARSE_MESSAGE= "ParseMessage";
     }
 
     public class ParseUser{
-
         public static final String USER_DISPLAY_NAME = "name";
     }
 
     public class Conversation{
-
         public static final String ITEM_ID = "itemId";
         public static final String RECIPIENT_ID = "recipientId";
         public static final String RECIPIENT_NAME = "recipientName";
@@ -118,7 +114,6 @@ public class Constants {
     }
 
     public class ParseConversation{
-
         public static final String MY_USER_ID = "myUserId";
         public static final String RECIPIENT_USER_ID = "recipientUserId";
         public static final String RECIPIENT_USER_NAME = "recipientUserName";
@@ -135,7 +130,6 @@ public class Constants {
         public static final String SINCH_ID = "sinchId";
         public static final String ITEM_ID = "itemId";
         public static final String CREATED_AT = "createdAt";
-
     }
 
     public class ReportForm{

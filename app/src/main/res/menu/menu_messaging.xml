@@ -1,8 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.avner.lostfound.messaging.MessagingActivity">
-    <item android:id="@+id/action_complete" android:title="@string/action_complete"
-        android:orderInCategory="1" android:showAsAction="ifRoom"
+
+    <item
+        android:id="@+id/action_complete"
         android:icon="@mipmap/ic_handshake"
+        android:orderInCategory="1"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_complete"
         android:visible="false"/>
 </menu>
