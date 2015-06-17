@@ -2,6 +2,7 @@ package com.avner.lostfound.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -79,7 +80,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
      */
     private void initMembers() {
         this.isLostFragment = getArguments().getBoolean("isLostFragment");
-        this.myLayoutId =  R.layout.fragment_item_listing;
+        this.myLayoutId = R.layout.fragment_item_listing;
         this.parseClassName = Constants.ParseObject.PARSE_LOST ;//this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
         this.myActivity = (MainActivity) getActivity();
     }
@@ -96,7 +97,10 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         initWidgets(inflater, container);
         initItemsList();
-        initItemInfoWidgets();
+
+        if (myActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            initItemInfoWidgets();
+        }
 
         return rootView;
     }
@@ -131,6 +135,10 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private void initItemInfoWidgets() {
         View item_info = this.rootView.findViewById(R.id.item_info);
 
+        if (null == item_info) { // probably not in land + xlarge config
+            return;
+        }
+
         this.iv_itemImage = (ImageView) item_info.findViewById(R.id.iv_itemImage);
         this.tv_lossTime = (TextView) item_info.findViewById(R.id.tv_lossTime);
         this.tv_location = (TextView) item_info.findViewById(R.id.tv_location);
@@ -138,12 +146,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.ib_sendMessage = (ImageButton) item_info.findViewById(R.id.ib_sendMessage);
         this.ib_showMap = (ImageButton) item_info.findViewById(R.id.ib_showMap);
         this.tv_descriptionTitle = (TextView) item_info.findViewById(R.id.tv_descriptionTitle);
-
-//        Log.d(Constants.LOST_FOUND_TAG, "init listing-fragment with item-info widgets: " +
-//                this.iv_itemImage.getId() + " " +
-//                this.tv_lossTime.getId() + " " +
-//                this.tv_location.getId() + " " +
-//                this.tv_descriptionContent.getId());
     }
 
     /**

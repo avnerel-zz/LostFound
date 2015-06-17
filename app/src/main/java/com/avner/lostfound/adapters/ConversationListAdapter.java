@@ -101,7 +101,7 @@ public class ConversationListAdapter extends BaseAdapter {
             view = convertView;
             viewHolder = (ViewHolder) view.getTag();
         }
-        
+
         final Item item = conversation.getItem();
         String userName = conversation.getUserName();
 
