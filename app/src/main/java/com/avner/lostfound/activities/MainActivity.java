@@ -31,6 +31,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.parse.ParseUser;
 
+import java.util.List;
+
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener {
 
@@ -60,6 +62,7 @@ public class MainActivity extends FragmentActivity implements
             R.drawable.graph,
     };
     private ActionMode actionMode;
+    private List<View> itemInfoViews;
 
 
     @Override
@@ -76,21 +79,7 @@ public class MainActivity extends FragmentActivity implements
         viewPager.setAdapter(mAdapter);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setHomeButtonEnabled(false);
-
-        // Adding Tabs with icons
-        for (int i = 0; i < tabsStrings.length; ++i) {
-            Tab tab = actionBar.newTab()
-                    .setCustomView(R.layout.action_bar_tab_layout)
-                    .setTabListener(this);
-
-            ImageView imageView = (ImageView) tab.getCustomView().findViewById(R.id.iv_tabIcon);
-            imageView.setImageResource(tabsIcons[i]);
-
-            TextView textView = (TextView) tab.getCustomView().findViewById(R.id.tv_tabText);
-            textView.setText(tabsStrings[i]);
-
-            actionBar.addTab(tab);
-        }
+        addTabs();
 
         /**
          * on swiping the viewpager make respective tab selected
@@ -141,6 +130,24 @@ public class MainActivity extends FragmentActivity implements
                 .addApi(LocationServices.API)
                 .build();
     }
+
+    private void addTabs() {
+        // Adding Tabs with icons
+        for (int i = 0; i < tabsStrings.length; ++i) {
+            Tab tab = actionBar.newTab()
+                    .setCustomView(R.layout.action_bar_tab_layout)
+                    .setTabListener(this);
+
+            ImageView imageView = (ImageView) tab.getCustomView().findViewById(R.id.iv_tabIcon);
+            imageView.setImageResource(tabsIcons[i]);
+
+            TextView textView = (TextView) tab.getCustomView().findViewById(R.id.tv_tabText);
+            textView.setText(tabsStrings[i]);
+
+            actionBar.addTab(tab);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

@@ -6,7 +6,7 @@
     android:padding="10dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center_horizontal"
@@ -18,7 +18,7 @@
             android:layout_height="140dp"
             android:contentDescription="@string/itemImageContentDescription"
             android:padding="5dp"
-            android:src="@drawable/image_unavailable" />
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,6 +31,7 @@
                 android:id="@+id/ib_showMap"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:visibility="invisible"
                 android:contentDescription="@string/showOnMapContentDescription"
                 android:src="@android:drawable/ic_dialog_map" />
 
@@ -38,6 +39,7 @@
                 android:id="@+id/ib_sendMessage"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:visibility="invisible"
                 android:contentDescription="@string/messageButtonContentDescription"
                 android:src="@android:drawable/ic_dialog_email" />
 
@@ -47,6 +49,7 @@
             android:id="@+id/tv_lossTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:hint="@string/lossTimeDefaultHint"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -54,6 +57,7 @@
             android:id="@+id/tv_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:hint="@string/locationDefaultHint"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -63,6 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:text="@string/descriptionTitle"
+            android:visibility="invisible"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -74,6 +79,7 @@
             android:layout_gravity="start"
             android:layout_weight="1.0"
             android:hint="@string/itemDescriptionDefaultHint"
+            android:visibility="invisible"
             android:maxLines="4"
             android:scrollbars="vertical"
             android:textAppearance="?android:attr/textAppearanceMedium" />
