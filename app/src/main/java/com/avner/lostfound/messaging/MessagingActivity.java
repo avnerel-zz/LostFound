@@ -136,28 +136,6 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
                 .show();
     }
 
-    private void clearUnreadCount() {
-
-        ParseQuery<ParseObject> itemQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-        itemQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemId);
-
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-        query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
-        query.whereEqualTo(Constants.ParseConversation.RECIPIENT_USER_ID, recipientId);
-        query.whereMatchesQuery(Constants.ParseConversation.ITEM, itemQuery);
-        query.fromLocalDatastore();
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseConversation, ParseException e) {
-                if (e == null) {
-
-                    parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 0);
-                    parseConversation.saveInBackground();
-                }
-            }
-        });
-    }
-
     private void initMessageList() {
         messagesList = (ListView) findViewById(R.id.lv_messages_list);
         messageAdapter = new MessageAdapter(this);
@@ -212,27 +190,13 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
             action_complete.setVisible(false);
             Toast.makeText(this, "Complete Conversation has been sent. Awaiting response", Toast.LENGTH_SHORT).show();
 
-//            // save complete conversation status in parse.
-//            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-//            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversationId);
-//            query.getFirstInBackground(new GetCallback<ParseObject>() {
-//                @Override
-//                public void done(ParseObject parseConversation, ParseException e) {
-//                    if(e == null && parseConversation != null){
-//                        parseConversation.put(Constants.ParseConversation.SENT_COMPLETE, true);
-//                        parseConversation.pinInBackground();
-//                        parseConversation.saveInBackground();
-//                    }
-//                }
-//            });
-
-            HashMap<String, Object> params = new HashMap<String, Object>();
+            HashMap<String, Object> params = new HashMap();
             params.put(Constants.ParseMessage.RECIPIENT_ID, recipientId);
             params.put(Constants.ParseMessage.ITEM_ID, itemId);
             params.put("senderName", ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
+            params.put("recipientName", recipientName);
 
             ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.COMPLETE_CONVERSATION_REQUEST, params);
-            //TODO send complete message to recipient and disable this button until a response is received.
         }
         return super.onMenuItemSelected(featureId, item);
     }
@@ -320,11 +284,8 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         params.put(Constants.ParseMessage.ITEM_ID, itemId);
         params.put("senderName", ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
         params.put("reply", positiveReply);
+        params.put("recipientName", recipientName);
 
-//        parseConversation.put(Constants.ParseConversation.RECEIVED_COMPLETE, false);
-//        parseConversation.pinInBackground();
-//        parseConversation.saveInBackground();
-        //TODO add in cloud code to put false in sent complete of other user.
         ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.COMPLETE_CONVERSATION_REPLY, params);
     }
 
