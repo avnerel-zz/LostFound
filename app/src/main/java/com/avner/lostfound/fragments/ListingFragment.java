@@ -55,18 +55,16 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private ListFilter filters = new ListFilter();
     private MainActivity myActivity;
     private MenuItem mi_search_menu_item;
+
+    // item info widgets
     private ImageButton ib_sendMessage;
     private ImageButton ib_showMap;
     private TextView tv_lossTime;
     private TextView tv_location;
     private TextView tv_descriptionContent;
     private ImageView iv_itemImage;
-    private boolean itemInfoWidgetsVisible = false;
     private TextView tv_descriptionTitle;
-//    private ImageView iv_itemImage;
-//    private TextView tv_lossTime;
-//    private TextView tv_location;
-//    private TextView tv_descriptionContent;
+    private boolean itemInfoWidgetsVisible = false;
 
 
     @Override
@@ -97,10 +95,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         initWidgets(inflater, container);
         initItemsList();
-
-        if (myActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            initItemInfoWidgets();
-        }
+        initItemInfoWidgets(); // won't do anything if not shown
 
         return rootView;
     }
@@ -309,18 +304,24 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     }
 
 
-    public void setDisplayedItem(Item item) {
-        if (!this.itemInfoWidgetsVisible) {
-            showItemInfoWidgets();
+    public boolean setDisplayedItem(Item item) {
+        if (!showItemInfoWidgets()) {
+            return false;
         }
 
         Picasso.with(myActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
         this.tv_lossTime.setText(item.getTimeAsString());
         this.tv_location.setText(item.getLocationString());
         this.tv_descriptionContent.setText(item.getDescription());
+
+        return true;
     }
 
-    private void showItemInfoWidgets() {
+    private boolean showItemInfoWidgets() {
+        if (null == this.rootView.findViewById(R.id.item_info)) {
+            return false;
+        }
+
         this.iv_itemImage.setVisibility(View.VISIBLE);
         this.ib_sendMessage.setVisibility(View.VISIBLE);
         this.ib_showMap.setVisibility(View.VISIBLE);
@@ -330,6 +331,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.tv_descriptionTitle.setVisibility(View.VISIBLE);
 
         this.itemInfoWidgetsVisible = true;
+        return true;
     }
 
     private void hideItemInfoWidgets() {

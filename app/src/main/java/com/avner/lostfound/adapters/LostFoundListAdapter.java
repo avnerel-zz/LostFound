@@ -138,14 +138,14 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
             return;
         }
 
-        if (myFragment.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Log.d("BLA BLA BLA", "clicked item in PORTRAIT mode");
+        if (!myFragment.setDisplayedItem(item)) {
             showItemInDialog(parent, item, position);
-        } else { // in Landscape mode
-            Log.d("BLA BLA BLA", "clicked item in LANDSCAPE mode");
-            myFragment.setDisplayedItem(item);
+            Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
         }
+        else {
+            Log.d("BLA BLA BLA", "clicked item in LANDSCAPE & large mode");
 
+        }
     }
 
     private void showItemInDialog(AdapterView<?> parent, Item item, int position) {

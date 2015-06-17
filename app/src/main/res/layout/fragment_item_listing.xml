@@ -26,18 +26,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:id="@+id/s_location_filter"
-            >
-
-        </Spinner>
+            ></Spinner>
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:id="@+id/s_time_filter"
-            >
-
-        </Spinner>
+            ></Spinner>
 
     </LinearLayout>
 
@@ -50,7 +46,6 @@
         android:clipToPadding="false"
         />
 
-
     <com.software.shell.fab.FloatingActionButton
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -62,8 +57,5 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:id="@+id/b_add_item" />
-
-
-
 
 </RelativeLayout>
