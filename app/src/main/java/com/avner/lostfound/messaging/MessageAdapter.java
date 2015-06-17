@@ -70,4 +70,8 @@ public class MessageAdapter extends BaseAdapter {
         txtMessage.setText(message.getTextBody());
         return convertView;
     }
+
+    public void clear(){
+        messages.clear();
+    }
 }

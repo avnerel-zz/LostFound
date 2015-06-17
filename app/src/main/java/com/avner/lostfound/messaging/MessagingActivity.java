@@ -60,9 +60,6 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
     private String itemId;
     private MenuItem action_complete;
     private String recipientName;
-    private boolean showCompleteConversationIcon;
-    private String conversationId;
-    private ParseObject parseConversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,9 +75,6 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         recipientId = intent.getStringExtra(Constants.Conversation.RECIPIENT_ID);
         itemId = intent.getStringExtra(Constants.Conversation.ITEM_ID);
         recipientName = intent.getStringExtra(Constants.Conversation.RECIPIENT_NAME);
-//        showCompleteConversationIcon = intent.getBooleanExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_ICON, true);
-//        boolean showCompleteConversationRequestDialog = intent.getBooleanExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_REQUEST_DIALOG, false);
-        conversationId = intent.getStringExtra(Constants.ParseQuery.OBJECT_ID);
         currentUserId = ParseUser.getCurrentUser().getObjectId();
 
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
@@ -88,8 +82,6 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
 
         initSendButton();
         initMessageList();
-        clearUnreadCount();
-
     }
 
     @Override
@@ -126,15 +118,18 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
                     showCompleteConversationDialog();
                 }
 
-                parseConversation = conversationObject;
+                if (conversationObject.get(Constants.ParseConversation.UNREAD_COUNT) != 0) {
+                    conversationObject.put(Constants.ParseConversation.UNREAD_COUNT, 0);
+                    conversationObject.pinInBackground();
+                }
             }
         });
     }
 
     public void showCompleteConversationDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Complete Conversation")
-                .setMessage("Are you sure you the correct item was found?")
+                .setTitle("Complete Conversation request has been sent from " + recipientName)
+                .setMessage("Are you sure that the correct item was found?")
                 .setPositiveButton(android.R.string.yes, this)
                 .setNegativeButton(android.R.string.no, this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -183,6 +178,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
             @Override
             public void done(List<ParseObject> messageList, ParseException e) {
                 if (e == null) {
+                    messageAdapter.clear();
                     for (int i = 0; i < messageList.size(); i++) {
                         WritableMessage message = new WritableMessage(messageList.get(i).get(Constants.ParseMessage.RECIPIENT_ID).toString(),
                                 messageList.get(i).get(Constants.ParseMessage.MESSAGE_TEXT).toString());
@@ -202,9 +198,6 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
 
         getMenuInflater().inflate(R.menu.menu_messaging, menu);
         action_complete = menu.findItem(R.id.action_complete);
-        if(!showCompleteConversationIcon){
-            action_complete.setVisible(false);
-        }
         getActionBar().setTitle(recipientName);
 
         return super.onCreateOptionsMenu(menu);
@@ -219,19 +212,19 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
             action_complete.setVisible(false);
             Toast.makeText(this, "Complete Conversation has been sent. Awaiting response", Toast.LENGTH_SHORT).show();
 
-            // save complete conversation status in parse.
-            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversationId);
-            query.getFirstInBackground(new GetCallback<ParseObject>() {
-                @Override
-                public void done(ParseObject parseConversation, ParseException e) {
-                    if(e == null && parseConversation != null){
-                        parseConversation.put(Constants.ParseConversation.SENT_COMPLETE, true);
-                        parseConversation.pinInBackground();
-                        parseConversation.saveInBackground();
-                    }
-                }
-            });
+//            // save complete conversation status in parse.
+//            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+//            query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, conversationId);
+//            query.getFirstInBackground(new GetCallback<ParseObject>() {
+//                @Override
+//                public void done(ParseObject parseConversation, ParseException e) {
+//                    if(e == null && parseConversation != null){
+//                        parseConversation.put(Constants.ParseConversation.SENT_COMPLETE, true);
+//                        parseConversation.pinInBackground();
+//                        parseConversation.saveInBackground();
+//                    }
+//                }
+//            });
 
             HashMap<String, Object> params = new HashMap<String, Object>();
             params.put(Constants.ParseMessage.RECIPIENT_ID, recipientId);
@@ -315,17 +308,22 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
-        boolean reply = DialogInterface.BUTTON_POSITIVE == which;
-        Log.d(Constants.LOST_FOUND_TAG, "sent reply for complete conversation: " + reply + ". which: " + which);
+        boolean positiveReply = DialogInterface.BUTTON_POSITIVE == which;
+        Log.d(Constants.LOST_FOUND_TAG, "sent reply for complete conversation: " + positiveReply + ". which: " + which);
+
+        // hide complete button.
+        if(positiveReply){
+            action_complete.setVisible(false);
+        }
         HashMap<String, Object> params = new HashMap();
         params.put(Constants.ParseMessage.RECIPIENT_ID, recipientId);
         params.put(Constants.ParseMessage.ITEM_ID, itemId);
         params.put("senderName", ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME));
-        params.put("reply", reply);
+        params.put("reply", positiveReply);
 
-        parseConversation.put(Constants.ParseConversation.RECEIVED_COMPLETE, false);
-        parseConversation.pinInBackground();
-        parseConversation.saveInBackground();
+//        parseConversation.put(Constants.ParseConversation.RECEIVED_COMPLETE, false);
+//        parseConversation.pinInBackground();
+//        parseConversation.saveInBackground();
         //TODO add in cloud code to put false in sent complete of other user.
         ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.COMPLETE_CONVERSATION_REPLY, params);
     }

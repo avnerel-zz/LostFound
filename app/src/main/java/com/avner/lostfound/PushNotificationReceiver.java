@@ -19,7 +19,6 @@ import com.parse.SaveCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,9 +44,6 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             case Constants.ParsePush.TYPE_LOST:
                 handlePushOfParseLost(jsonData, context);
                 return false;
-//            case Constants.ParsePush.TYPE_DELETE_CONVERSATION:
-//                handlePushOfDeleteConversation(jsonData);
-//                return true;
             case Constants.ParsePush.COMPLETE_CONVERSATION_REQUEST:
                 return handlePushOfCompleteConversationRequest(jsonData, context);
             case Constants.ParsePush.COMPLETE_CONVERSATION_REPLY:
@@ -102,8 +98,6 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         return true;
     }
 
-//    }
-
     private void handlePushOfParseLost(JSONObject jsonData, final Context context) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
         Log.d("PUSH_LOST", reportedItem);
@@ -148,14 +142,14 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     private boolean handlePushOfParseMessage(JSONObject jsonData, Context context) throws JSONException {
 
-        final String currentUserId = ParseUser.getCurrentUser().getObjectId();
+//        final String currentUserId = ParseUser.getCurrentUser().getObjectId();
         final String senderId = jsonData.getString(Constants.ParsePush.SENDER_ID);
-        final String senderName = jsonData.getString(Constants.ParsePush.SENDER_NAME);
+//        final String senderName = jsonData.getString(Constants.ParsePush.SENDER_NAME);
         final String itemId = jsonData.getString(Constants.ParsePush.ITEM_ID);
         final String messageId = jsonData.getString(Constants.ParseQuery.OBJECT_ID);
 
         LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
-        pinMessage(messageId,applicationContext, itemId, senderId);
+        pinMessage(messageId,applicationContext);
         if (applicationContext.getMessagingActivity()!=null &&
                 itemId.equals(applicationContext.getMessagingActivityItemId())&&
                 senderId.equals(applicationContext.getMessagingRecipientId())){
@@ -163,47 +157,62 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             return false;
         }
 
-        ParseQuery<ParseObject> itemQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
-        itemQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemId);
-
-        String[] userIds = {currentUserId, senderId};
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-        query.whereContainedIn(Constants.ParseConversation.MY_USER_ID, Arrays.asList(userIds));
-        query.whereContainedIn(Constants.ParseConversation.RECIPIENT_USER_ID, Arrays.asList(userIds));
-        query.whereMatchesQuery(Constants.ParseConversation.ITEM, itemQuery);
-        query.include(Constants.ParseConversation.ITEM);
-
-        addConversationIfNeeded(currentUserId, senderId, senderName, query);
-
+        // find local conversation and update unread count.
+        updateUnreadCount(senderId, itemId);
         return true;
     }
 
-    private void pinMessage(String messageId, final LostFoundApplication applicationContext, final String itemId, final String senderId) {
+    private void updateUnreadCount(String senderId, String itemId) {
+        ParseQuery<ParseObject> itemQuery = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
+        itemQuery.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemId);
+
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(Constants.ParseConversation.RECIPIENT_USER_ID, senderId);
+        query.whereMatchesQuery(Constants.ParseConversation.ITEM, itemQuery);
+        query.fromLocalDatastore();
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseConversation, ParseException e) {
+
+                if(e!=null || parseConversation == null){
+                    Log.e("PARSE_MESSAGE", "couldn't retrieve conversation from local data store.");
+                    return;
+                }
+                int unreadCount = (int) parseConversation.get(Constants.ParseConversation.UNREAD_COUNT);
+                parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, ++unreadCount);
+                parseConversation.pinInBackground();
+
+            }
+        });
+    }
+
+    private void pinMessage(String messageId, final LostFoundApplication applicationContext) {
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
         query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, messageId);
-        query.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                if(parseObject == null || e!= null){
-                    Log.e(Constants.LOST_FOUND_TAG, e.getLocalizedMessage());
-                }
-                parseObject.pinInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if(e!= null){
-                            Log.e(Constants.LOST_FOUND_TAG, e.getLocalizedMessage());
-                        }
-                        MessagingActivity messagingActivity = applicationContext.getMessagingActivity();
-                        String messagingUserId = applicationContext.getMessagingRecipientId();
-                        String messagingItemId = applicationContext.getMessagingActivityItemId();
-                        if(messagingActivity != null && itemId.equals(messagingItemId) && senderId.equals(messagingUserId)){
-                            messagingActivity.updateMessages();
-                        }
-                    }
-                });
+        try {
+            ParseObject parseMessage = query.getFirst();
+            if(parseMessage == null ){
+                Log.e("PARSE_MESSAGE", "couldn't retrieve message from server.");
             }
-        });
+            final String senderId = parseMessage.getString(Constants.ParsePush.SENDER_ID);
+            final String itemId = parseMessage.getString(Constants.ParsePush.ITEM_ID);
+
+            parseMessage.pin();
+            MessagingActivity messagingActivity = applicationContext.getMessagingActivity();
+            String messagingUserId = applicationContext.getMessagingRecipientId();
+            String messagingItemId = applicationContext.getMessagingActivityItemId();
+            if(messagingActivity != null && itemId.equals(messagingItemId) && senderId.equals(messagingUserId)){
+                messagingActivity.updateMessages();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.e("PARSE_MESSAGE", e.getLocalizedMessage());
+
+        }
+
     }
 
     private void addConversationIfNeeded(final String currentUserId, final String senderId, final String senderName, ParseQuery<ParseObject> query) {

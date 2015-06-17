@@ -23,9 +23,6 @@ import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
-import com.parse.FindCallback;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
@@ -163,7 +160,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
                     Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
                     return;
                 }
-                saveConversationToParse(item);
+//                saveConversationToParse(item);
 
                 Intent intent = new Intent(rootView.getContext(), MessagingActivity.class);
                 intent.putExtra(Constants.Conversation.RECIPIENT_ID, item.getUserId());
@@ -175,34 +172,34 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
     }
 
-    private void saveConversationToParse(final Item item) {
-
-        //only add conversation to parse database if it doesn't already exist there
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
-
-        query.whereEqualTo(Constants.ParseConversation.ITEM, item.getParseItem());
-        query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
-
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> messageList, com.parse.ParseException e) {
-                if (e == null) {
-                    // this conversation hasn't been added already, so add it.
-                    if (messageList.size() == 0) {
-                        ParseObject parseConversations = new ParseObject(Constants.ParseObject.PARSE_CONVERSATION);
-                        parseConversations.put(Constants.ParseConversation.MY_USER_ID,
-                                                ParseUser.getCurrentUser().getObjectId());
-                        parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_ID, item.getUserId());
-                        parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_NAME, item.getUserDisplayName());
-                        parseConversations.put(Constants.ParseConversation.ITEM, item.getParseItem());
-                        parseConversations.put(Constants.ParseConversation.UNREAD_COUNT, 0);
-                        parseConversations.pinInBackground();
-                        parseConversations.saveInBackground();
-                    }
-                }
-            }
-        });
-    }
+//    private void saveConversationToParse(final Item item) {
+//
+//        //only add conversation to parse database if it doesn't already exist there
+//        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+//
+//        query.whereEqualTo(Constants.ParseConversation.ITEM, item.getParseItem());
+//        query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+//
+//        query.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> messageList, com.parse.ParseException e) {
+//                if (e == null) {
+//                    // this conversation hasn't been added already, so add it.
+//                    if (messageList.size() == 0) {
+//                        ParseObject parseConversations = new ParseObject(Constants.ParseObject.PARSE_CONVERSATION);
+//                        parseConversations.put(Constants.ParseConversation.MY_USER_ID,
+//                                                ParseUser.getCurrentUser().getObjectId());
+//                        parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_ID, item.getUserId());
+//                        parseConversations.put(Constants.ParseConversation.RECIPIENT_USER_NAME, item.getUserDisplayName());
+//                        parseConversations.put(Constants.ParseConversation.ITEM, item.getParseItem());
+//                        parseConversations.put(Constants.ParseConversation.UNREAD_COUNT, 0);
+//                        parseConversations.pinInBackground();
+//                        parseConversations.saveInBackground();
+//                    }
+//                }
+//            }
+//        });
+//    }
 
     private void initMapButton(final AdapterView<?> parent, final int position, Dialog dialog) {
 
