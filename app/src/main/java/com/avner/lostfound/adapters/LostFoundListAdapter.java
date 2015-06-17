@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -19,8 +20,10 @@ import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
+import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
+import com.avner.lostfound.fragments.ListingFragment;
 import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.parse.ParseUser;
@@ -33,12 +36,14 @@ import java.util.List;
  */
 public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener{
 
+    private final ListingFragment myFragment;
     private List<Item> items;
     private View rootView;
 
-    public LostFoundListAdapter(List<Item> items, View rootView) {
+    public LostFoundListAdapter(List<Item> items, View rootView, ListingFragment myFragment) {
         this.items = items;
-        this.rootView=rootView;
+        this.rootView = rootView;
+        this.myFragment = myFragment;
     }
 
 
@@ -128,19 +133,31 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         final Item item = (Item) parent.getItemAtPosition(position);
         Log.d(Constants.LOST_FOUND_TAG, "clicked item " + item.getName() + ", at position " + position);
 
-        final Dialog dialog = new Dialog(rootView.getContext());
-        dialog.setContentView(R.layout.dialog_item_details_layout);
-
         if (null == item) {
             Log.d(Constants.LOST_FOUND_TAG, "Failed to retrieve item from adapter list, at position " + position);
             return;
         }
 
+        if (myFragment.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Log.d("BLA BLA BLA", "clicked item in PORTRAIT mode");
+            showItemInDialog(parent, item, position);
+        } else { // in Landscape mode
+            Log.d("BLA BLA BLA", "clicked item in LANDSCAPE mode");
+            myFragment.setDisplayedItem(item);
+        }
+
+    }
+
+    private void showItemInDialog(AdapterView<?> parent, Item item, int position) {
+        final Dialog dialog = new Dialog(myFragment.getActivity());
+
+        dialog.setContentView(R.layout.dialog_item_details_layout);
         initMapButton(parent, position, dialog);
         initConversationButton(parent, position, dialog);
         setDialogContents(dialog, item);
         dialog.show();
     }
+
 
     private void initConversationButton (final AdapterView<?> parent, final int position, Dialog dialog) {
 

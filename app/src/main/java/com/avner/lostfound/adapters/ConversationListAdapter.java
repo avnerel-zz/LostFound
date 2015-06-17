@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.location.Location;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.ViewLocationActivity;
+import com.avner.lostfound.messaging.ConversationListActivity;
 import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
 import com.parse.GetCallback;
@@ -36,13 +38,12 @@ import java.util.List;
 public class ConversationListAdapter extends BaseAdapter {
 
     private List<Conversation> conversations;
-
-    private Activity rootActivity;
+    private ConversationListActivity rootActivity;
     private SparseBooleanArray selectedItemIds;
 
-    public ConversationListAdapter(List<Conversation> conversations, Activity rootActivity) {
+    public ConversationListAdapter(List<Conversation> conversations, ConversationListActivity rootActivity) {
         this.conversations = conversations;
-        this.rootActivity =rootActivity;
+        this.rootActivity = rootActivity;
         selectedItemIds = new SparseBooleanArray();
     }
 
@@ -69,6 +70,7 @@ public class ConversationListAdapter extends BaseAdapter {
         final ViewHolder viewHolder;
 
         final Conversation conversation = conversations.get(position);
+
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = li.inflate(R.layout.list_row_conversation, null);
@@ -78,47 +80,56 @@ public class ConversationListAdapter extends BaseAdapter {
             viewHolder.itemImage = (ImageButton) view.findViewById(R.id.ib_conversation_item_image);
             viewHolder.unreadCount = (TextView) view.findViewById(R.id.tv_unread_count);
             viewHolder.itemName = (TextView) view.findViewById(R.id.tv_item_name);
-            
+
             viewHolder.itemImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Item item = conversation.getItem();
-                    final Dialog dialog = new Dialog(rootActivity);
-                    dialog.setContentView(R.layout.dialog_item_details_layout);
-                    initMapButton(item, position, dialog);
-                    ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
-                    ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
-                    setDialogContents(dialog, item);
-                    dialog.show();
+
+                    if (rootActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        Log.d("BLA BLA BLA", "clicked item in PORTRAIT mode");
+                        showItemInDialog(item, position);
+                    } else { // in Landscape mode
+                        Log.d("BLA BLA BLA", "clicked item in LANDSCAPE mode");
+                        rootActivity.setDisplayedItem(item);
+                    }
                 }
             });
-            view.setTag(viewHolder);
-        }
-        else {
-            view = convertView;
 
+            view.setTag(viewHolder);
+        } else {
+            view = convertView;
             viewHolder = (ViewHolder) view.getTag();
         }
+        
         final Item item = conversation.getItem();
         String userName = conversation.getUserName();
 
         // Put the content in the view
         viewHolder.userDisplayName.setText(userName);
         viewHolder.itemName.setText(item.getName());
-        if(!item.isAlive()){
+        if (!item.isAlive()) {
             viewHolder.itemName.setPaintFlags(viewHolder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
         Picasso.with(rootActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
-        if (conversation.getUnreadCount() != 0){
-
+        if (conversation.getUnreadCount() != 0) {
             viewHolder.unreadCount.setText(String.valueOf(conversation.getUnreadCount()));
-
-        }else{
+        } else {
             viewHolder.unreadCount.setVisibility(TextView.INVISIBLE);
         }
 
         return view;
+    }
+
+    private void showItemInDialog(Item item, int position) {
+        final Dialog dialog = new Dialog(rootActivity);
+        dialog.setContentView(R.layout.dialog_item_details_layout);
+        initMapButton(item, position, dialog);
+        ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
+        ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
+        setDialogContents(dialog, item);
+        dialog.show();
     }
 
     private void initMapButton(final Item item, final int position, Dialog dialog) {

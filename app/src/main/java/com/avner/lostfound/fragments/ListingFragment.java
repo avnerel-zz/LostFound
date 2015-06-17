@@ -11,9 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
@@ -27,6 +30,7 @@ import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.software.shell.fab.FloatingActionButton;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +54,18 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private ListFilter filters = new ListFilter();
     private MainActivity myActivity;
     private MenuItem mi_search_menu_item;
+    private ImageButton ib_sendMessage;
+    private ImageButton ib_showMap;
+    private TextView tv_lossTime;
+    private TextView tv_location;
+    private TextView tv_descriptionContent;
+    private ImageView iv_itemImage;
+    private boolean itemInfoWidgetsVisible = false;
+    private TextView tv_descriptionTitle;
+//    private ImageView iv_itemImage;
+//    private TextView tv_lossTime;
+//    private TextView tv_location;
+//    private TextView tv_descriptionContent;
 
 
     @Override
@@ -68,12 +84,19 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.myActivity = (MainActivity) getActivity();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+//    private void initItemInfoWidgets() {
+//        this.iv_itemImage = (ImageView) myActivity.findViewById(R.id.iv_itemImage);
+//        this.tv_lossTime = (TextView) myActivity.findViewById(R.id.tv_lossTime);
+//        this.tv_location = (TextView) myActivity.findViewById(R.id.tv_location);
+//        this.tv_descriptionContent = (TextView) myActivity.findViewById(R.id.tv_descriptionContent);
+//    }
 
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         initWidgets(inflater, container);
         initItemsList();
+        initItemInfoWidgets();
 
         return rootView;
     }
@@ -102,6 +125,25 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
         this.sv_search = searchView;
         this.mi_search_menu_item = searchViewMenuItem;
+    }
+
+
+    private void initItemInfoWidgets() {
+        View item_info = this.rootView.findViewById(R.id.item_info);
+
+        this.iv_itemImage = (ImageView) item_info.findViewById(R.id.iv_itemImage);
+        this.tv_lossTime = (TextView) item_info.findViewById(R.id.tv_lossTime);
+        this.tv_location = (TextView) item_info.findViewById(R.id.tv_location);
+        this.tv_descriptionContent = (TextView) item_info.findViewById(R.id.tv_descriptionContent);
+        this.ib_sendMessage = (ImageButton) item_info.findViewById(R.id.ib_sendMessage);
+        this.ib_showMap = (ImageButton) item_info.findViewById(R.id.ib_showMap);
+        this.tv_descriptionTitle = (TextView) item_info.findViewById(R.id.tv_descriptionTitle);
+
+//        Log.d(Constants.LOST_FOUND_TAG, "init listing-fragment with item-info widgets: " +
+//                this.iv_itemImage.getId() + " " +
+//                this.tv_lossTime.getId() + " " +
+//                this.tv_location.getId() + " " +
+//                this.tv_descriptionContent.getId());
     }
 
     /**
@@ -164,7 +206,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.allItems = new ArrayList<>();
         this.itemsToDisplay = new ArrayList<>();
 
-        this.adapter = new LostFoundListAdapter(this.allItems, rootView);
+        this.adapter = new LostFoundListAdapter(this.allItems, rootView, this);
         Log.d(Constants.LOST_FOUND_TAG, "raw items list contains " + this.allItems.size() + " items. filtered items: " + this.itemsToDisplay.size());
 
         this.lv_itemList.setClickable(true);
@@ -262,6 +304,42 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
             default:
                 Log.d(Constants.LOST_FOUND_TAG, "WTF?! some unknown selection...");
         }
+    }
+
+
+    public void setDisplayedItem(Item item) {
+        if (!this.itemInfoWidgetsVisible) {
+            showItemInfoWidgets();
+        }
+
+        Picasso.with(myActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
+        this.tv_lossTime.setText(item.getTimeAsString());
+        this.tv_location.setText(item.getLocationString());
+        this.tv_descriptionContent.setText(item.getDescription());
+    }
+
+    private void showItemInfoWidgets() {
+        this.iv_itemImage.setVisibility(View.VISIBLE);
+        this.ib_sendMessage.setVisibility(View.VISIBLE);
+        this.ib_showMap.setVisibility(View.VISIBLE);
+        this.tv_lossTime.setVisibility(View.VISIBLE);
+        this.tv_location.setVisibility(View.VISIBLE);
+        this.tv_descriptionContent.setVisibility(View.VISIBLE);
+        this.tv_descriptionTitle.setVisibility(View.VISIBLE);
+
+        this.itemInfoWidgetsVisible = true;
+    }
+
+    private void hideItemInfoWidgets() {
+        this.iv_itemImage.setVisibility(View.INVISIBLE);
+        this.ib_sendMessage.setVisibility(View.INVISIBLE);
+        this.ib_showMap.setVisibility(View.INVISIBLE);
+        this.tv_lossTime.setVisibility(View.INVISIBLE);
+        this.tv_location.setVisibility(View.INVISIBLE);
+        this.tv_descriptionContent.setVisibility(View.INVISIBLE);
+        this.tv_descriptionTitle.setVisibility(View.INVISIBLE);
+
+        this.itemInfoWidgetsVisible = false;
     }
 
     @Override

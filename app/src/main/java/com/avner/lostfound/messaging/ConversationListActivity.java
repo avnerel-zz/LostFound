@@ -11,19 +11,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.ConversationListAdapter;
 import com.avner.lostfound.structs.Conversation;
+import com.avner.lostfound.structs.Item;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,10 @@ public class ConversationListActivity extends Activity {
     private List<Conversation> filteredConversations;
     private SearchView sv_search;
     private String currentFilter = "";
+    private ImageView iv_itemImage;
+    private TextView tv_lossTime;
+    private TextView tv_location;
+    private TextView tv_descriptionContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +56,40 @@ public class ConversationListActivity extends Activity {
 
         filteredConversations = new ArrayList<>();
         initConversationList();
+        initItemInfoWidgets();
+    }
+
+    private void initItemInfoWidgets() {
+        this.iv_itemImage = (ImageView)findViewById(R.id.iv_itemImage);
+        this.tv_lossTime = (TextView)findViewById(R.id.tv_lossTime);
+        this.tv_location = (TextView)findViewById(R.id.tv_location);
+        this.tv_descriptionContent = (TextView)findViewById(R.id.tv_descriptionContent);
+
+        if (null == iv_itemImage) {
+            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            return;
+        }
+
+        if (null == tv_lossTime) {
+            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            return;
+        }
+
+        if (null == tv_location) {
+            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            return;
+        }
+
+        if (null == tv_descriptionContent) {
+            Log.d(Constants.LOST_FOUND_TAG, "tv_itemImage is null");
+            return;
+        }
+
+        Log.d(Constants.LOST_FOUND_TAG, "init conversation-activity with item-info widgets: " +
+                this.iv_itemImage.getId() + " " +
+                this.tv_lossTime.getId() + " " +
+                this.tv_location.getId() + " " +
+                this.tv_descriptionContent.getId());
     }
 
 
@@ -249,5 +291,23 @@ public class ConversationListActivity extends Activity {
         Conversation conversation = conversations.get(pos);
         conversation.setUnreadCount(0);
         conversationAdapter.notifyDataSetChanged();
+    }
+
+    public void setDisplayedItem(final Item item) {
+        if (null != this.iv_itemImage) {
+            Picasso.with(this).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
+        }
+
+        if (null != this.tv_lossTime) {
+            this.tv_lossTime.setText(item.getTimeAsString());
+        }
+
+        if (null != this.tv_location) {
+            this.tv_location.setText(item.getLocationString());
+        }
+
+        if (null != this.tv_descriptionContent) {
+            this.tv_descriptionContent.setText(item.getDescription());
+        }
     }
 }
