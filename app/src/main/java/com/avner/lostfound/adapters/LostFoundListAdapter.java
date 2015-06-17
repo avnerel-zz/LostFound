@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
-import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.fragments.ListingFragment;
@@ -213,7 +211,6 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     private void setDialogContents(Dialog dialog, final Item item) {
         TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
         itemLocation.setText(item.getLocationString());
-        itemLocation.setMaxLines(2);
 
         TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
         itemTime.setText(item.getTimeAsString());

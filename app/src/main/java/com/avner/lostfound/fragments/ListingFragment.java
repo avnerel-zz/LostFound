@@ -87,13 +87,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.myActivity = (MainActivity) getActivity();
     }
 
-//    private void initItemInfoWidgets() {
-//        this.iv_itemImage = (ImageView) myActivity.findViewById(R.id.iv_itemImage);
-//        this.tv_lossTime = (TextView) myActivity.findViewById(R.id.tv_lossTime);
-//        this.tv_location = (TextView) myActivity.findViewById(R.id.tv_location);
-//        this.tv_descriptionContent = (TextView) myActivity.findViewById(R.id.tv_descriptionContent);
-//    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -377,18 +370,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
         this.itemInfoWidgetsVisible = true;
         return true;
-    }
-
-    private void hideItemInfoWidgets() {
-        this.iv_itemImage.setVisibility(View.INVISIBLE);
-        this.ib_sendMessage.setVisibility(View.INVISIBLE);
-        this.ib_showMap.setVisibility(View.INVISIBLE);
-        this.tv_lossTime.setVisibility(View.INVISIBLE);
-        this.tv_location.setVisibility(View.INVISIBLE);
-        this.tv_descriptionContent.setVisibility(View.INVISIBLE);
-        this.tv_descriptionTitle.setVisibility(View.INVISIBLE);
-
-        this.itemInfoWidgetsVisible = false;
     }
 
     @Override

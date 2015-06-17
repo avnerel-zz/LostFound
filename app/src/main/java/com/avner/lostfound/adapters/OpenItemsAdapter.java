@@ -226,7 +226,6 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     private void setDialogContents(Dialog dialog, final Item item) {
         TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
         itemLocation.setText(item.getLocationString());
-        itemLocation.setMaxLines(2);
 
         TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
         itemTime.setText(item.getTimeAsString());

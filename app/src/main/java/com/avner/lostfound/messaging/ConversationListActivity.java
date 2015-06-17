@@ -91,12 +91,6 @@ public class ConversationListActivity extends Activity {
             Log.d(Constants.LOST_FOUND_TAG, "tv_descriptionTitle is null");
             return;
         }
-
-//        Log.d(Constants.LOST_FOUND_TAG, "init conversation-activity with item-info widgets: " +
-//                this.iv_itemImage.getId() + " " +
-//                this.tv_lossTime.getId() + " " +
-//                this.tv_location.getId() + " " +
-//                this.tv_descriptionContent.getId());
     }
 
 
@@ -330,14 +324,11 @@ public class ConversationListActivity extends Activity {
         }
 
         this.iv_itemImage.setVisibility(View.VISIBLE);
-//        this.ib_sendMessage.setVisibility(View.VISIBLE);
-//        this.ib_showMap.setVisibility(View.VISIBLE);
         this.tv_lossTime.setVisibility(View.VISIBLE);
         this.tv_location.setVisibility(View.VISIBLE);
         this.tv_descriptionContent.setVisibility(View.VISIBLE);
         this.tv_descriptionTitle.setVisibility(View.VISIBLE);
 
-//        this.itemInfoWidgetsVisible = true;
         return true;
     }
 }

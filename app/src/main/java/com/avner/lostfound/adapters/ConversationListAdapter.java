@@ -1,10 +1,8 @@
 package com.avner.lostfound.adapters;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Paint;
 import android.location.Location;
 import android.util.Log;
@@ -165,7 +163,6 @@ public class ConversationListAdapter extends BaseAdapter {
     private void setDialogContents(Dialog dialog, final Item item) {
         TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
         itemLocation.setText(item.getLocationString());
-        itemLocation.setMaxLines(2);
 
         TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
         itemTime.setText(item.getTimeAsString());

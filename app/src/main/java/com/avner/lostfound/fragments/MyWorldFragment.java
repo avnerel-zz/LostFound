@@ -1,6 +1,5 @@
 package com.avner.lostfound.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -54,14 +53,12 @@ public class MyWorldFragment extends Fragment {
 
     private ListView lv_openListings;
     // item info widgets
-    private ImageButton ib_sendMessage;
     private ImageButton ib_showMap;
     private TextView tv_lossTime;
     private TextView tv_location;
     private TextView tv_descriptionContent;
     private ImageView iv_itemImage;
     private TextView tv_descriptionTitle;
-    private boolean itemInfoWidgetsVisible = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,7 +91,6 @@ public class MyWorldFragment extends Fragment {
         this.tv_lossTime = (TextView) item_info.findViewById(R.id.tv_lossTime);
         this.tv_location = (TextView) item_info.findViewById(R.id.tv_location);
         this.tv_descriptionContent = (TextView) item_info.findViewById(R.id.tv_descriptionContent);
-        this.ib_sendMessage = (ImageButton) item_info.findViewById(R.id.ib_sendMessage);
         this.ib_showMap = (ImageButton) item_info.findViewById(R.id.ib_showMap);
         this.tv_descriptionTitle = (TextView) item_info.findViewById(R.id.tv_descriptionTitle);
     }
@@ -213,7 +209,6 @@ public class MyWorldFragment extends Fragment {
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                // TODO Auto-generated method stub
                 return false;
             }
         });
@@ -287,14 +282,12 @@ public class MyWorldFragment extends Fragment {
         }
 
         this.iv_itemImage.setVisibility(View.VISIBLE);
-//        this.ib_sendMessage.setVisibility(View.VISIBLE);
         this.ib_showMap.setVisibility(View.VISIBLE);
         this.tv_lossTime.setVisibility(View.VISIBLE);
         this.tv_location.setVisibility(View.VISIBLE);
         this.tv_descriptionContent.setVisibility(View.VISIBLE);
         this.tv_descriptionTitle.setVisibility(View.VISIBLE);
 
-        this.itemInfoWidgetsVisible = true;
         return true;
     }
 

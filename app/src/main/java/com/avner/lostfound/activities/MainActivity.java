@@ -221,7 +221,6 @@ public class MainActivity extends FragmentActivity implements
         this.sv_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-//                Toast.makeText(getApplicationContext(), String.format("searched '%s'", query), Toast.LENGTH_SHORT).show();
                 Log.d(Constants.LOST_FOUND_TAG, String.format("searched for '%s'", query));
 
                 if (!isListingFragment(selectedTabIndex)) {
@@ -409,9 +408,6 @@ public class MainActivity extends FragmentActivity implements
                 startActivity(conversationIntent);
                 break;
         }
-
-
-
         return false;
     }
 
