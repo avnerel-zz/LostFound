@@ -63,7 +63,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
      */
     private void initMembers() {
         this.isLostFragment = getArguments().getBoolean("isLostFragment");
-        this.myLayoutId =  R.layout.fragment_lost_list;
+        this.myLayoutId =  R.layout.fragment_item_listing;
         this.parseClassName = Constants.ParseObject.PARSE_LOST ;//this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
         this.myActivity = (MainActivity) getActivity();
     }

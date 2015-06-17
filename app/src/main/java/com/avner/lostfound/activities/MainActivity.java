@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
@@ -65,7 +64,6 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -92,7 +90,6 @@ public class MainActivity extends FragmentActivity implements
             textView.setText(tabsStrings[i]);
 
             actionBar.addTab(tab);
-
         }
 
         /**
