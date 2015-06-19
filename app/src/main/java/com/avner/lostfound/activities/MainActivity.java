@@ -23,12 +23,15 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
 import com.avner.lostfound.fragments.ListingFragment;
-import com.avner.lostfound.messaging.ConversationListActivity;
 import com.avner.lostfound.utils.IUIUpdateInterface;
 import com.avner.lostfound.utils.SignalSystem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.parse.CountCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -63,6 +66,7 @@ public class MainActivity extends FragmentActivity implements
     };
     private ActionMode actionMode;
     private List<View> itemInfoViews;
+    private TextView messageCount;
 
 
     @Override
@@ -79,6 +83,7 @@ public class MainActivity extends FragmentActivity implements
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setHomeButtonEnabled(false);
         addTabs();
+        SignalSystem.getInstance().registerUIUpdateChange(this);
 
         /**
          * on swiping the viewpager make respective tab selected
@@ -128,6 +133,12 @@ public class MainActivity extends FragmentActivity implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+    }
+
+    @Override
+    protected void onDestroy() {
+        SignalSystem.getInstance().unRegisterUIUpdateChange(this);
+        super.onDestroy();
     }
 
     private void addTabs() {
@@ -195,9 +206,60 @@ public class MainActivity extends FragmentActivity implements
         settings.setOnMenuItemClickListener(this);
 
         MenuItem messaging = menu.findItem(R.id.messaging);
+        messageCount = (TextView) messaging.getActionView().findViewById(R.id.tv_notificationCount);
+        messaging.getActionView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startConversationListActivity();
+            }
+        });
+        updateNotificationCount();
         messaging.setOnMenuItemClickListener(this);
 
+
         return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this,SettingsActivity.class);
+                startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
+                break;
+            case R.id.messaging:
+                startConversationListActivity();
+                break;
+        }
+        return false;
+    }
+
+    private void startConversationListActivity() {
+        Intent conversationIntent = new Intent(this,ConversationListActivity.class);
+        startActivity(conversationIntent);
+    }
+
+    private void updateNotificationCount() {
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
+        query.whereGreaterThan(Constants.ParseConversation.UNREAD_COUNT, 0);
+        query.fromLocalDatastore();
+        query.countInBackground(new CountCallback() {
+            @Override
+            public void done(int count, ParseException e) {
+
+                if(count > 0){
+
+                    messageCount.setVisibility(View.VISIBLE);
+                    messageCount.setText("" + count);
+
+                }else{
+
+                    messageCount.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
     }
 
     private void initSearchBar(Menu menu) {
@@ -330,7 +392,6 @@ public class MainActivity extends FragmentActivity implements
         super.onStart();
         this.googleApiClient.connect();
         setInitLocation();
-        SignalSystem.getInstance().registerUIUpdateChange(this);
 
     }
 
@@ -405,6 +466,9 @@ public class MainActivity extends FragmentActivity implements
         switch(action){
             case uiaMessageSaved:
                 //TODO mark conversation menu item with flag
+                break;
+            case uiaConversationSaved:
+                updateNotificationCount();
                 break;
         }
     }

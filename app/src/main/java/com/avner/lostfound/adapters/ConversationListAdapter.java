@@ -17,8 +17,8 @@ import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
+import com.avner.lostfound.activities.ConversationListActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
-import com.avner.lostfound.messaging.ConversationListActivity;
 import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
 import com.parse.GetCallback;
@@ -118,6 +118,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
         if (conversation.getUnreadCount() != 0) {
             viewHolder.unreadCount.setText(String.valueOf(conversation.getUnreadCount()));
+            viewHolder.unreadCount.setVisibility(TextView.VISIBLE);
         } else {
             viewHolder.unreadCount.setVisibility(TextView.INVISIBLE);
         }

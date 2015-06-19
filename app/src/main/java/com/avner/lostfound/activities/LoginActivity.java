@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
-import com.avner.lostfound.messaging.MessageService;
 import com.avner.lostfound.utils.ImageUtils;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
@@ -82,11 +81,6 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
      * @param updateDB if true, then the local datastore will be updated
      */
     private void finishLogin(boolean updateDB) {
-
-        // start messaging service.
-        final Intent serviceIntent = new Intent(getApplicationContext(), MessageService.class);
-
-        startService(serviceIntent);
 
         if (updateDB) {
 

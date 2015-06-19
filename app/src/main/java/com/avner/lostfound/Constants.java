@@ -127,7 +127,6 @@ public class Constants {
         public static final String SENDER_ID = "senderId";
         public static final String RECIPIENT_ID = "recipientId";
         public static final String MESSAGE_TEXT = "messageText";
-        public static final String SINCH_ID = "sinchId";
         public static final String ITEM_ID = "itemId";
         public static final String CREATED_AT = "createdAt";
     }
@@ -137,10 +136,6 @@ public class Constants {
         public static final String IS_LOST_FORM = "lost";
         public static final String IS_EDIT_FORM = "edit";
         public static final String ITEM = "item";
-    }
-
-    public class SinchMessage {
-        public static final String ITEM_ID = "itemId";
     }
 
     public class Geocoder {

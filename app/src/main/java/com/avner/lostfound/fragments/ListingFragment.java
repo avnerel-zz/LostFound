@@ -23,10 +23,10 @@ import android.widget.TextView;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.MainActivity;
+import com.avner.lostfound.activities.MessagingActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
-import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.structs.ListFilter;
 import com.avner.lostfound.utils.IUIUpdateInterface;
@@ -77,18 +77,14 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initMembers();
-    }
-
-    @Override
-    public void onStart() {
         SignalSystem.getInstance().registerUIUpdateChange(this);
-        super.onStart();
     }
 
+
     @Override
-    public void onStop() {
+    public void onDestroy() {
         SignalSystem.getInstance().unRegisterUIUpdateChange(this);
-        super.onStop();
+        super.onDestroy();
     }
 
     /**

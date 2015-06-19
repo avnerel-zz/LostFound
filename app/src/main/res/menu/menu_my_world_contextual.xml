@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.avner.lostfound.messaging.MessagingActivity">
+    tools:context="com.avner.lostfound.activities.MessagingActivity">
     <item android:id="@+id/edit" android:title="@string/action_edit"
         android:orderInCategory="1" android:showAsAction="ifRoom|collapseActionView"
         android:icon="@android:drawable/ic_menu_edit"/>

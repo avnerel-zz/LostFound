@@ -28,6 +28,7 @@ public class Conversation  implements Parcelable{
         this.item = new Item(parseItem);
         this.conversationId = parseConversation.getObjectId();
         this.unreadCount = (int) parseConversation.get(Constants.ParseConversation.UNREAD_COUNT);
+        Log.d("Conversation", "unread count for conversation with userName: " + userName + " is: " + unreadCount);
     }
 
     public Item getItem() {

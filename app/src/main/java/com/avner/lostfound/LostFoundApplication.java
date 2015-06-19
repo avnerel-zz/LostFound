@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.avner.lostfound.activities.MainActivity;
-import com.avner.lostfound.messaging.MessagingActivity;
+import com.avner.lostfound.activities.MessagingActivity;
 import com.avner.lostfound.utils.SignalSystem;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;

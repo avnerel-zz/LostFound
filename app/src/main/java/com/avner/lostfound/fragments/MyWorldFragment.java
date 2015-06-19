@@ -67,18 +67,13 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface {
         super.onCreate(savedInstanceState);
 
         this.myActivity = (MainActivity) getActivity();
-    }
-
-    @Override
-    public void onStart() {
         SignalSystem.getInstance().registerUIUpdateChange(this);
-        super.onStart();
     }
 
     @Override
-    public void onStop() {
+    public void onDestroy() {
         SignalSystem.getInstance().unRegisterUIUpdateChange(this);
-        super.onStop();
+        super.onDestroy();
     }
 
 

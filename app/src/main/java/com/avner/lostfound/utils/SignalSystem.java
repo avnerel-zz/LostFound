@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.avner.lostfound.Constants;
 
@@ -46,6 +47,9 @@ public class SignalSystem {
     }
 
     public void fireUpdateChange(final Constants.UIActions uiAction, final boolean bSuccess, final Intent data) {
+
+        Log.d("SIGNAL_SYSTEM", "signaling for uiAction: " + uiAction);
+
         if (Looper.myLooper() == Looper.getMainLooper()) {
             // We are on the main GUI thread
             int index;
@@ -75,10 +79,12 @@ public class SignalSystem {
     }
 
     public void fireUpdateChange(Constants.UIActions uiAction, boolean bSuccess) {
+
         fireUpdateChange(uiAction, bSuccess, null);
     }
 
     public void fireUpdateChange(Constants.UIActions uiAction) {
+
         fireUpdateChange(uiAction, true, null);
     }
 }

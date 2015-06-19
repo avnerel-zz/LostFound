@@ -19,10 +19,10 @@ import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
+import com.avner.lostfound.activities.MessagingActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.fragments.ListingFragment;
-import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
