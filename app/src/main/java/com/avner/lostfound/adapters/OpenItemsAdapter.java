@@ -19,11 +19,11 @@ import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
-import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.fragments.MyWorldFragment;
 import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.utils.SignalSystem;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -128,7 +128,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
                                     + " from local data store. " + e.getLocalizedMessage());
                             return;
                         }
-                        ((MainActivity) rootView.getContext()).updateLocalDataInFragments();
+                        SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
                         progressDialog.dismiss();
                         deleteFromParse(item, parseItem);
                     }
@@ -168,7 +168,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             @Override
             public void done(ParseException e) {
                 Toast.makeText(rootView.getContext(), "Couldn't delete item from server, please check your connection.", Toast.LENGTH_SHORT).show();
-                ((MainActivity) rootView.getContext()).updateLocalDataInFragments();
+                SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
             }
         });
     }

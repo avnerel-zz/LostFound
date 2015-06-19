@@ -171,4 +171,12 @@ public class Constants {
         public static final String COMPLETE_CONVERSATION_REQUEST = "completeConversationRequest";
         public static final String COMPLETE_CONVERSATION_REPLY = "completeConversationReply";
     }
+
+    public enum UIActions
+    {
+        uiaItemSaved,
+        uiaConversationSaved,
+        uiaMessageSaved,
+        uiaCompleteConversationSent,
+    }
 }

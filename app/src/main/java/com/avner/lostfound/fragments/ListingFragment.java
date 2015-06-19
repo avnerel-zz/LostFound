@@ -29,7 +29,9 @@ import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.avner.lostfound.messaging.MessagingActivity;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.structs.ListFilter;
+import com.avner.lostfound.utils.IUIUpdateInterface;
 import com.avner.lostfound.utils.ListFilterUtils;
+import com.avner.lostfound.utils.SignalSystem;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -40,7 +42,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListingFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class ListingFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener, IUIUpdateInterface {
 
     // WIDGETS
     private ListView lv_itemList;
@@ -75,6 +77,18 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initMembers();
+    }
+
+    @Override
+    public void onStart() {
+        SignalSystem.getInstance().registerUIUpdateChange(this);
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        SignalSystem.getInstance().unRegisterUIUpdateChange(this);
+        super.onStop();
     }
 
     /**
@@ -420,5 +434,15 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     public void updateData() {
 
         getItemsFromParse();
+    }
+
+    @Override
+    public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
+
+        switch (action){
+            case uiaItemSaved:
+                updateData();
+                break;
+        }
     }
 }

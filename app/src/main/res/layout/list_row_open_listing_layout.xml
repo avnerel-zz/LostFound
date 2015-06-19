@@ -59,7 +59,7 @@
         android:layout_marginRight="10dp"
         android:contentDescription="@string/possible_matches"
         android:scaleType="centerCrop"
-        android:src="@drawable/exclamation_mark_red"
+        android:src="@mipmap/ic_matches"
         android:visibility="visible" />
 
 </RelativeLayout>

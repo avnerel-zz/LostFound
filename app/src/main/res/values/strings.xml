@@ -83,5 +83,7 @@
     <string name="action_share">share</string>
     <string name="item">Item:</string>
     <string name="action_get_matches">Get Matches</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

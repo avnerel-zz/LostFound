@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.messaging.MessagingActivity;
+import com.avner.lostfound.utils.SignalSystem;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -61,6 +62,7 @@ public class LostFoundApplication extends Application {
         }
 
         installation.saveInBackground();
+        SignalSystem.initialize(this);
 
     }
 
@@ -141,14 +143,6 @@ public class LostFoundApplication extends Application {
         }
 
 
-    }
-
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-    }
-
-    public MainActivity getMainActivity() {
-        return mainActivity;
     }
 
     public String getMessagingRecipientId() {

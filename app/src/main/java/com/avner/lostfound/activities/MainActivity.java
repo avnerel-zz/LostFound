@@ -20,12 +20,12 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.TabsPagerAdapter;
 import com.avner.lostfound.fragments.ListingFragment;
-import com.avner.lostfound.fragments.MyWorldFragment;
 import com.avner.lostfound.messaging.ConversationListActivity;
+import com.avner.lostfound.utils.IUIUpdateInterface;
+import com.avner.lostfound.utils.SignalSystem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,7 +34,7 @@ import com.parse.ParseUser;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements
-        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener {
+        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener, IUIUpdateInterface {
 
     private Location lastKnownLocation = null;
     private GoogleApiClient googleApiClient;
@@ -70,7 +70,6 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ((LostFoundApplication)getApplication()).setMainActivity(this);
         // Initialization
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
@@ -146,13 +145,6 @@ public class MainActivity extends FragmentActivity implements
 
             actionBar.addTab(tab);
         }
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ((LostFoundApplication)getApplication()).setMainActivity(null);
     }
 
     private void showSearchView() {
@@ -271,21 +263,12 @@ public class MainActivity extends FragmentActivity implements
         });
     }
 
-    public void updateLocalDataInFragments(){
-
-        Log.d(Constants.LOST_FOUND_TAG, "updating local data store in fragments");
-        ((MyWorldFragment)getFragmentAt(0)).updateData();
-        ((ListingFragment)getFragmentAt(1)).updateData();
-        ((ListingFragment)getFragmentAt(2)).updateData();
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == Constants.REQUEST_CODE_REPORT_FORM && resultCode == RESULT_OK){
-
-            updateLocalDataInFragments();
-        }
+//        if(requestCode == Constants.REQUEST_CODE_REPORT_FORM && resultCode == RESULT_OK){
+//
+//            updateLocalDataInFragments();
+//        }
         if(requestCode == Constants.REQUEST_CODE_SETTINGS && resultCode == Constants.RESULT_CODE_LOGOUT){
 
             ParseUser.logOut();
@@ -347,6 +330,7 @@ public class MainActivity extends FragmentActivity implements
         super.onStart();
         this.googleApiClient.connect();
         setInitLocation();
+        SignalSystem.getInstance().registerUIUpdateChange(this);
 
     }
 
@@ -413,5 +397,15 @@ public class MainActivity extends FragmentActivity implements
 
     public void setActionMode(ActionMode actionMode) {
         this.actionMode = actionMode;
+    }
+
+    @Override
+    public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
+
+        switch(action){
+            case uiaMessageSaved:
+                //TODO mark conversation menu item with flag
+                break;
+        }
     }
 }

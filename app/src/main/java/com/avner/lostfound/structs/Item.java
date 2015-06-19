@@ -142,7 +142,7 @@ public class Item implements Parcelable {
 
     public String getTimeAsString(){
 
-        SimpleDateFormat formatter=new SimpleDateFormat("dd/MM/yyyy hh:mm");
+        SimpleDateFormat formatter=new SimpleDateFormat("dd/MM/yyyy HH:mm");
         return formatter.format(calender.getTime());
     }
 

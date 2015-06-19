@@ -22,6 +22,8 @@ import com.avner.lostfound.R;
 import com.avner.lostfound.adapters.ConversationListAdapter;
 import com.avner.lostfound.structs.Conversation;
 import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.utils.IUIUpdateInterface;
+import com.avner.lostfound.utils.SignalSystem;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ConversationListActivity extends Activity {
+public class ConversationListActivity extends Activity implements IUIUpdateInterface {
 
     private String myUserId;
     private ConversationListAdapter conversationAdapter;
@@ -58,6 +60,18 @@ public class ConversationListActivity extends Activity {
         filteredConversations = new ArrayList<>();
         initConversationList();
         initItemInfoWidgets();
+    }
+
+    @Override
+    public void onStart() {
+        SignalSystem.getInstance().registerUIUpdateChange(this);
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        SignalSystem.getInstance().unRegisterUIUpdateChange(this);
+        super.onStop();
     }
 
     private void initItemInfoWidgets() {
@@ -190,7 +204,12 @@ public class ConversationListActivity extends Activity {
                 openConversation(i);
             }
         });
+        updateFromDataStore();
 
+
+    }
+
+    private void updateFromDataStore() {
         // get all conversations from parse.
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
         query.whereEqualTo(Constants.ParseConversation.MY_USER_ID, myUserId);
@@ -330,5 +349,15 @@ public class ConversationListActivity extends Activity {
         this.tv_descriptionTitle.setVisibility(View.VISIBLE);
 
         return true;
+    }
+
+    @Override
+    public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
+        switch (action){
+            case uiaConversationSaved:
+                updateFromDataStore();
+            case uiaItemSaved:
+                updateFromDataStore();
+        }
     }
 }

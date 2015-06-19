@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.messaging.MessagingActivity;
+import com.avner.lostfound.utils.SignalSystem;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -20,6 +20,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+
+import static com.avner.lostfound.Constants.UIActions.uiaCompleteConversationSent;
+import static com.avner.lostfound.Constants.UIActions.uiaConversationSaved;
+import static com.avner.lostfound.Constants.UIActions.uiaItemSaved;
+import static com.avner.lostfound.Constants.UIActions.uiaMessageSaved;
 
 /**
  * Created by avner on 04/05/2015.
@@ -73,7 +78,13 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 }else{
 
                     Log.d("PUSH_CONVERSATION", "Got the data from server");
-                    parseConversation.pinInBackground();
+                    parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 1);
+                    parseConversation.pinInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            SignalSystem.getInstance().fireUpdateChange(uiaConversationSaved);
+                        }
+                    });
                 }
             }
         });
@@ -92,7 +103,11 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         if (applicationContext.getMessagingActivity()!=null &&
                 itemId.equals(applicationContext.getMessagingActivityItemId())&&
                 senderId.equals(applicationContext.getMessagingRecipientId())){
-            applicationContext.getMessagingActivity().showCompleteConversationDialog();
+
+            Intent intent = new Intent();
+            intent.putExtra(Constants.ParseMessage.RECIPIENT_ID, senderId);
+            intent.putExtra(Constants.ParseMessage.ITEM_ID, itemId);
+            SignalSystem.getInstance().fireUpdateChange(uiaCompleteConversationSent, true, intent);
             return false;
         }
         return true;
@@ -126,18 +141,9 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         parseObject.pinInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                refreshFragments(context);
+                SignalSystem.getInstance().fireUpdateChange(uiaItemSaved);
             }
         });
-    }
-
-    private void refreshFragments(Context context) {
-        LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
-        MainActivity mainActivity = applicationContext.getMainActivity();
-        if(mainActivity!= null){
-            Log.d("REFRESH", "main activity is not null");
-            mainActivity.updateLocalDataInFragments();
-        }
     }
 
     private boolean handlePushOfParseMessage(JSONObject jsonData, Context context) throws JSONException {
@@ -201,12 +207,16 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             final String itemId = parseMessage.getString(Constants.ParsePush.ITEM_ID);
 
             parseMessage.pin();
-            MessagingActivity messagingActivity = applicationContext.getMessagingActivity();
-            String messagingUserId = applicationContext.getMessagingRecipientId();
-            String messagingItemId = applicationContext.getMessagingActivityItemId();
-            if(messagingActivity != null && itemId.equals(messagingItemId) && senderId.equals(messagingUserId)){
-                messagingActivity.updateMessages();
-            }
+//            MessagingActivity messagingActivity = applicationContext.getMessagingActivity();
+//            String messagingUserId = applicationContext.getMessagingRecipientId();
+//            String messagingItemId = applicationContext.getMessagingActivityItemId();
+//            if(messagingActivity != null && itemId.equals(messagingItemId) && senderId.equals(messagingUserId)){
+//                messagingActivity.updateMessages();
+//            }
+            Intent intent = new Intent();
+            intent.putExtra(Constants.ParseMessage.RECIPIENT_ID, senderId);
+            intent.putExtra(Constants.ParseMessage.ITEM_ID, itemId);
+            SignalSystem.getInstance().fireUpdateChange(uiaMessageSaved, true, intent);
         } catch (ParseException e) {
             e.printStackTrace();
             Log.e("PARSE_MESSAGE", e.getLocalizedMessage());
@@ -297,10 +307,10 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             String pushType = (String) jsonData.get(Constants.ParsePush.PUSH_TYPE);
             switch (pushType) {
                 case Constants.ParsePush.TYPE_MESSAGE:
-                    openMessagingActivity(context, jsonData,false);
+                    openMessagingActivity(context, jsonData);
                     break;
                 case Constants.ParsePush.COMPLETE_CONVERSATION_REQUEST:
-                    openMessagingActivity(context, jsonData,true);
+                    openMessagingActivity(context, jsonData);
                     break;
                 default:
                     super.onPushOpen(context, intent);
@@ -312,7 +322,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     }
 
-    private void openMessagingActivity(Context context, JSONObject jsonData,boolean showCompleteRequestDialog) throws JSONException {
+    private void openMessagingActivity(Context context, JSONObject jsonData) throws JSONException {
 
         String senderId = jsonData.getString(Constants.ParsePush.SENDER_ID);
         String senderName = jsonData.getString(Constants.ParsePush.SENDER_NAME);
@@ -322,8 +332,8 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         messagingIntent.putExtra(Constants.Conversation.RECIPIENT_NAME, senderName);
         messagingIntent.putExtra(Constants.Conversation.ITEM_ID, itemId);
         messagingIntent.putExtra(Constants.Conversation.RECIPIENT_ID, senderId);
-        messagingIntent.putExtra(Constants.Conversation.SHOW_COMPLETE_CONVERSATION_REQUEST_DIALOG, showCompleteRequestDialog);
-        messagingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        messagingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
         context.startActivity(messagingIntent);
     }
 

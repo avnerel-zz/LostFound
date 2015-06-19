@@ -30,7 +30,9 @@ import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.avner.lostfound.structs.Item;
+import com.avner.lostfound.utils.IUIUpdateInterface;
 import com.avner.lostfound.utils.ImageUtils;
+import com.avner.lostfound.utils.SignalSystem;
 import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -41,7 +43,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyWorldFragment extends Fragment {
+public class MyWorldFragment extends Fragment implements IUIUpdateInterface {
 
     private MainActivity myActivity;
     private View rootView;
@@ -66,6 +68,19 @@ public class MyWorldFragment extends Fragment {
 
         this.myActivity = (MainActivity) getActivity();
     }
+
+    @Override
+    public void onStart() {
+        SignalSystem.getInstance().registerUIUpdateChange(this);
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        SignalSystem.getInstance().unRegisterUIUpdateChange(this);
+        super.onStop();
+    }
+
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -324,5 +339,15 @@ public class MyWorldFragment extends Fragment {
                 rootView.getContext().startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
+
+        switch(action){
+            case uiaItemSaved:
+                updateData();
+                break;
+        }
     }
 }

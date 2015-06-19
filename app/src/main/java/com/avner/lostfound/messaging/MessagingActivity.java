@@ -2,15 +2,12 @@ package com.avner.lostfound.messaging;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,6 +22,8 @@ import android.widget.Toast;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
+import com.avner.lostfound.utils.IUIUpdateInterface;
+import com.avner.lostfound.utils.SignalSystem;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
@@ -33,12 +32,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import com.sinch.android.rtc.PushPair;
-import com.sinch.android.rtc.messaging.Message;
-import com.sinch.android.rtc.messaging.MessageClient;
-import com.sinch.android.rtc.messaging.MessageClientListener;
-import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
-import com.sinch.android.rtc.messaging.MessageFailureInfo;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
 import java.util.Arrays;
@@ -46,14 +39,14 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class MessagingActivity extends Activity implements TextWatcher, View.OnClickListener, DialogInterface.OnClickListener {
+public class MessagingActivity extends Activity implements TextWatcher, View.OnClickListener, DialogInterface.OnClickListener, IUIUpdateInterface {
     private String recipientId;
     private EditText messageBodyField;
     private String messageBody;
-    private MessageService.MessageServiceInterface messageService;
+//    private MessageService.MessageServiceInterface messageService;
     private String currentUserId;
-    private ServiceConnection serviceConnection = new MyServiceConnection();
-    private MyMessageClientListener messageClientListener;
+//    private ServiceConnection serviceConnection = new MyServiceConnection();
+//    private MyMessageClientListener messageClientListener;
     private ListView messagesList;
     private MessageAdapter messageAdapter;
     private ImageButton sendButton;
@@ -68,7 +61,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
 
         setContentView(R.layout.activity_messaging);
 
-        bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
+//        bindService(new Intent(this, MessageService.class), serviceConnection, BIND_AUTO_CREATE);
 
         //get recipientId from the intent
         Intent intent = getIntent();
@@ -87,10 +80,13 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
     @Override
     protected void onStart() {
         super.onStart();
-        initCompleteConversation();
+        updateCompleteConversation();
+        ((LostFoundApplication)getApplication()).updateMessagingStatus(this,itemId,recipientId);
+        SignalSystem.getInstance().registerUIUpdateChange(this);
+
     }
 
-    private void initCompleteConversation() {
+    private void updateCompleteConversation() {
 
         ParseQuery<ParseObject> innerQuery = new ParseQuery(Constants.ParseObject.PARSE_LOST);
         innerQuery.fromLocalDatastore();
@@ -126,12 +122,12 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         });
     }
 
-    public void showCompleteConversationDialog() {
+    private void showCompleteConversationDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Complete Conversation request has been sent from " + recipientName)
                 .setMessage("Are you sure that the correct item was found?")
-                .setPositiveButton(android.R.string.yes, this)
-                .setNegativeButton(android.R.string.no, this)
+                .setPositiveButton(R.string.yes, this)
+                .setNegativeButton(R.string.no, this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
@@ -144,7 +140,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         updateMessages();
     }
 
-    public void updateMessages() {
+    private void updateMessages() {
         String[] userIds = {currentUserId, recipientId};
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
         query.whereContainedIn(Constants.ParseMessage.SENDER_ID, Arrays.asList(userIds));
@@ -221,7 +217,8 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
 
             if(isConnected){
                 messageBody = messageBodyField.getText().toString();
-                messageService.sendMessage(recipientId, messageBody,itemId);
+//                messageService.sendMessage(recipientId, messageBody,itemId);
+                sendMessage(messageBody);
                 //reset message
                 messageBodyField.setText("");
             }else{
@@ -231,24 +228,47 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         }
     }
 
+    private void sendMessage(String messageBody) {
 
-    @Override
-    protected void onResume() {
-        ((LostFoundApplication)getApplication()).updateMessagingStatus(this,itemId,recipientId);
-        super.onResume();
+        final WritableMessage writableMessage = new WritableMessage(recipientId, messageBody);
+
+        final ParseObject parseMessage = new ParseObject(Constants.ParseObject.PARSE_MESSAGE);
+        parseMessage.put(Constants.ParseMessage.SENDER_ID, currentUserId);
+        parseMessage.put(Constants.ParseMessage.RECIPIENT_ID, recipientId);
+        parseMessage.put(Constants.ParseMessage.MESSAGE_TEXT, messageBody);
+//        parseMessage.put(Constants.ParseMessage.SINCH_ID, writableMessage.getMessageId());
+        parseMessage.put(Constants.ParseMessage.ITEM_ID, itemId);
+        parseMessage.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e== null){
+                    parseMessage.pinInBackground();
+                }else{
+                    Toast.makeText(MessagingActivity.this, "Couldn't send message to " + recipientName + ", please check your connection", Toast.LENGTH_SHORT).show();
+                    // update UI
+                    Intent intent = new Intent();
+                    intent.putExtra(Constants.ParseMessage.RECIPIENT_ID, recipientId);
+                    intent.putExtra(Constants.ParseMessage.ITEM_ID, itemId);
+                    SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaMessageSaved, false, intent);
+                }
+            }
+        });
+
+        messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         ((LostFoundApplication)getApplication()).updateMessagingStatus(null,null,null);
-        super.onPause();
+        SignalSystem.getInstance().unRegisterUIUpdateChange(this);
+        super.onStop();
     }
 
     //unbind the service when the activity is destroyed
     @Override
     public void onDestroy() {
-        serviceConnection.onServiceDisconnected(null);
-        unbindService(serviceConnection);
+//        serviceConnection.onServiceDisconnected(null);
+//        unbindService(serviceConnection);
         super.onDestroy();
     }
 
@@ -289,92 +309,107 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.COMPLETE_CONVERSATION_REPLY, params);
     }
 
+    @Override
+    public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
 
-    private class MyServiceConnection implements ServiceConnection {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            messageService = (MessageService.MessageServiceInterface) iBinder;
-            messageClientListener = new MyMessageClientListener();
-            messageService.addMessageClientListener(messageClientListener);
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            messageService.removeMessageClientListener(messageClientListener);
-            messageService = null;
-        }
-    }
+        switch (action){
 
-    private class MyMessageClientListener implements MessageClientListener {
+            case uiaMessageSaved:
 
-        //Notify the user if their message failed to send
-        @Override
-        public void onMessageFailed(MessageClient client, Message message,
-                                    MessageFailureInfo failureInfo) {
-            //TODO check this failure message is o.k.
-            Toast.makeText(MessagingActivity.this, failureInfo.getSinchError().getMessage(), Toast.LENGTH_SHORT).show();
-        }
-        @Override
-        public void onIncomingMessage(MessageClient client, Message message) {
-//            if (message.getSenderId().equals(recipientId) && message.getHeaders().get(Constants.SinchMessage.ITEM_ID).equals(itemId)) {
-//                WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
-//                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
-//            }
-        }
-        @Override
-        public void onMessageSent(MessageClient client, Message message, String recipientId) {
-
-            final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
-
-            //only add message to parse database if it doesn't already exist there
-            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
-
-            query.whereEqualTo(Constants.ParseMessage.SINCH_ID, message.getMessageId());
-            query.fromLocalDatastore();
-
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> messageList, com.parse.ParseException e) {
-                    if (e == null) {
-                        if (messageList.size() == 0) {
-                            final ParseObject parseMessage = new ParseObject(Constants.ParseObject.PARSE_MESSAGE);
-                            parseMessage.put(Constants.ParseMessage.SENDER_ID, currentUserId);
-                            parseMessage.put(Constants.ParseMessage.RECIPIENT_ID, writableMessage.getRecipientIds().get(0));
-                            parseMessage.put(Constants.ParseMessage.MESSAGE_TEXT, writableMessage.getTextBody());
-                            parseMessage.put(Constants.ParseMessage.SINCH_ID, writableMessage.getMessageId());
-                            parseMessage.put(Constants.ParseMessage.ITEM_ID, itemId);
-                            parseMessage.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    parseMessage.pinInBackground();
-                                }
-                            });
-
-                            messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
-                        }
-                    }
+                String recipientId = data.getStringExtra(Constants.ParseMessage.RECIPIENT_ID);
+                String itemId = data.getStringExtra(Constants.ParseMessage.ITEM_ID);
+                if(recipientId.equals(this.recipientId) && itemId.equals(this.itemId)){
+                    updateMessages();
                 }
-            });
+                break;
 
-            sendPushNotification(recipientId, message);
+            case uiaConversationSaved:
+                updateCompleteConversation();
+                break;
+
+            case uiaCompleteConversationSent:
+                recipientId = data.getStringExtra(Constants.ParseMessage.RECIPIENT_ID);
+                itemId = data.getStringExtra(Constants.ParseMessage.ITEM_ID);
+                if(recipientId.equals(this.recipientId) && itemId.equals(this.itemId)){
+                    showCompleteConversationDialog();
+                }
+                break;
         }
 
-        private void sendPushNotification(String recipientId,Message message) {
-
-//            ParseQuery pushQuery = ParseInstallation.getQuery();
-//            pushQuery.whereEqualTo("user", recipientId);
-//            ParsePush push = new ParsePush();
-//            push.setQuery(pushQuery); // Set our Installation query
-//            push.setMessage("user: " + ((LostFoundApplication) getApplication()).getUserDisplayName() + "sent: " + message.getTextBody());
-//            push.sendInBackground();
-//
-//            Log.d("messaging", "sent " + message.getTextBody() + " to user id: " + recipientId);
-        }
-
-        //Do you want to notify your user when the message is delivered?
-        @Override
-        public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {}
-        //Don't worry about this right now
-        @Override
-        public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {}
     }
+
+
+//    private class MyServiceConnection implements ServiceConnection {
+//        @Override
+//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//            messageService = (MessageService.MessageServiceInterface) iBinder;
+//            messageClientListener = new MyMessageClientListener();
+//            messageService.addMessageClientListener(messageClientListener);
+//        }
+//        @Override
+//        public void onServiceDisconnected(ComponentName componentName) {
+//            messageService.removeMessageClientListener(messageClientListener);
+//            messageService = null;
+//        }
+//    }
+//
+//    private class MyMessageClientListener implements MessageClientListener {
+//
+//        //Notify the user if their message failed to send
+//        @Override
+//        public void onMessageFailed(MessageClient client, Message message,
+//                                    MessageFailureInfo failureInfo) {
+//            //TODO check this failure message is o.k.
+//            Toast.makeText(MessagingActivity.this, failureInfo.getSinchError().getMessage(), Toast.LENGTH_SHORT).show();
+//        }
+//        @Override
+//        public void onIncomingMessage(MessageClient client, Message message) {
+////            if (message.getSenderId().equals(recipientId) && message.getHeaders().get(Constants.SinchMessage.ITEM_ID).equals(itemId)) {
+////                WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+////                messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_INCOMING);
+////            }
+//        }
+//        @Override
+//        public void onMessageSent(MessageClient client, Message message, String recipientId) {
+//
+//            final WritableMessage writableMessage = new WritableMessage(message.getRecipientIds().get(0), message.getTextBody());
+//
+//            //only add message to parse database if it doesn't already exist there
+//            ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
+//
+//            query.whereEqualTo(Constants.ParseMessage.SINCH_ID, message.getMessageId());
+//            query.fromLocalDatastore();
+//
+//            query.findInBackground(new FindCallback<ParseObject>() {
+//                @Override
+//                public void done(List<ParseObject> messageList, com.parse.ParseException e) {
+//                    if (e == null) {
+//                        if (messageList.size() == 0) {
+//                            final ParseObject parseMessage = new ParseObject(Constants.ParseObject.PARSE_MESSAGE);
+//                            parseMessage.put(Constants.ParseMessage.SENDER_ID, currentUserId);
+//                            parseMessage.put(Constants.ParseMessage.RECIPIENT_ID, writableMessage.getRecipientIds().get(0));
+//                            parseMessage.put(Constants.ParseMessage.MESSAGE_TEXT, writableMessage.getTextBody());
+//                            parseMessage.put(Constants.ParseMessage.SINCH_ID, writableMessage.getMessageId());
+//                            parseMessage.put(Constants.ParseMessage.ITEM_ID, itemId);
+//                            parseMessage.saveInBackground(new SaveCallback() {
+//                                @Override
+//                                public void done(ParseException e) {
+//                                    parseMessage.pinInBackground();
+//                                }
+//                            });
+//
+//                            messageAdapter.addMessage(writableMessage, MessageAdapter.DIRECTION_OUTGOING);
+//                        }
+//                    }
+//                }
+//            });
+//        }
+//
+//        //Do you want to notify your user when the message is delivered?
+//        @Override
+//        public void onMessageDelivered(MessageClient client, MessageDeliveryInfo deliveryInfo) {}
+//        //Don't worry about this right now
+//        @Override
+//        public void onShouldSendPushData(MessageClient client, Message message, List<PushPair> pushPairs) {}
+//    }
 }

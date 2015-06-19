@@ -32,6 +32,7 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.utils.ImageUtils;
+import com.avner.lostfound.utils.SignalSystem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -566,7 +567,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                     try {
                         parseReport.pin();
                         progressDialog.dismiss();
-                        setResult(RESULT_OK,null);
+                        setResult(RESULT_OK, null);
+                        SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
                         finish();
                         Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
                     } catch (ParseException e1) {
