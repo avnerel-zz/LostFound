@@ -37,7 +37,7 @@ import com.parse.ParseUser;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements
-        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener, IUIUpdateInterface {
+        ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IUIUpdateInterface {
 
     private Location lastKnownLocation = null;
     private GoogleApiClient googleApiClient;
@@ -202,8 +202,6 @@ public class MainActivity extends FragmentActivity implements
             hideSearchView();
         }
 
-        MenuItem settings = menu.findItem(R.id.action_settings);
-        settings.setOnMenuItemClickListener(this);
 
         MenuItem messaging = menu.findItem(R.id.messaging);
         messageCount = (TextView) messaging.getActionView().findViewById(R.id.tv_notificationCount);
@@ -214,8 +212,6 @@ public class MainActivity extends FragmentActivity implements
             }
         });
         updateNotificationCount();
-        messaging.setOnMenuItemClickListener(this);
-
 
         return true;
     }
@@ -241,6 +237,7 @@ public class MainActivity extends FragmentActivity implements
 
     private void updateNotificationCount() {
 
+        Log.d(Constants.LOST_FOUND_TAG, "updating notification count in main activity.");
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
         query.whereGreaterThan(Constants.ParseConversation.UNREAD_COUNT, 0);
         query.fromLocalDatastore();
@@ -250,11 +247,13 @@ public class MainActivity extends FragmentActivity implements
 
                 if(count > 0){
 
+                    Log.d(Constants.LOST_FOUND_TAG, "notification count: " + count);
                     messageCount.setVisibility(View.VISIBLE);
                     messageCount.setText("" + count);
 
                 }else{
-
+                    Log.d(Constants.LOST_FOUND_TAG, "notification count was reset");
+                    messageCount.setText("");
                     messageCount.setVisibility(View.INVISIBLE);
                 }
             }
@@ -441,20 +440,20 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent intent = new Intent(this,SettingsActivity.class);
-                startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
-                break;
-            case R.id.messaging:
-                Intent conversationIntent = new Intent(this,ConversationListActivity.class);
-                startActivity(conversationIntent);
-                break;
-        }
-        return false;
-    }
+//    @Override
+//    public boolean onMenuItemClick(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.action_settings:
+//                Intent intent = new Intent(this,SettingsActivity.class);
+//                startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
+//                break;
+//            case R.id.messaging:
+//                Intent conversationIntent = new Intent(this,ConversationListActivity.class);
+//                startActivity(conversationIntent);
+//                break;
+//        }
+//        return false;
+//    }
 
     public void setActionMode(ActionMode actionMode) {
         this.actionMode = actionMode;

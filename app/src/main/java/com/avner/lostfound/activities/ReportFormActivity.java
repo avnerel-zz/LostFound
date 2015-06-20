@@ -564,16 +564,16 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                     progressDialog.dismiss();
                     Toast.makeText(activity, "No Connection. Can't upload report", Toast.LENGTH_SHORT).show();
                 }else{
-                    try {
-                        parseReport.pin();
+//                    try {
+//                        parseReport.pin();
                         progressDialog.dismiss();
                         setResult(RESULT_OK, null);
                         SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
                         finish();
                         Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
-                    } catch (ParseException e1) {
-                        e1.printStackTrace();
-                    }
+//                    } catch (ParseException e1) {
+//                        e1.printStackTrace();
+//                    }
                 }
             }
         });

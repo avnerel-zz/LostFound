@@ -120,7 +120,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
 
     private void showCompleteConversationDialog() {
 
-        if(completeConversationDialog != null){
+        if(completeConversationDialog == null){
 
             completeConversationDialog = new AlertDialog.Builder(this)
                     .setTitle("Complete Conversation request has been sent from " + recipientName)
@@ -290,12 +290,15 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
                     Log.e(Constants.LOST_FOUND_TAG, "couldn't retrieve conversation from local data store.");
                     return;
                 }
-
+                Log.d(Constants.LOST_FOUND_TAG, "retrieved conversation from local data store and resetting unread count.");
                 if (conversationObject.get(Constants.ParseConversation.UNREAD_COUNT) != 0) {
+                    Log.d(Constants.LOST_FOUND_TAG, "conversation unread count has to be reset.");
+
                     conversationObject.put(Constants.ParseConversation.UNREAD_COUNT, 0);
                     conversationObject.pinInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
+                            Log.d(Constants.LOST_FOUND_TAG, "conversation unread count was reset.");
                             SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaConversationSaved);
                         }
                     });
