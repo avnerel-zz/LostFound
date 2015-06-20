@@ -195,6 +195,9 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface {
                     case R.id.edit:
                         myOpenListingsAdapter.edit(item_selected);
                         break;
+                    case R.id.get_matches:
+                        myOpenListingsAdapter.getMatches(item_selected);
+                        break;
                     default:
                 }
                 // Close CAB

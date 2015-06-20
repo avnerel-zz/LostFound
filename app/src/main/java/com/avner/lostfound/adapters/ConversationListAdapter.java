@@ -113,6 +113,9 @@ public class ConversationListAdapter extends BaseAdapter {
         viewHolder.itemName.setText(item.getName());
         if (!item.isAlive()) {
             viewHolder.itemName.setPaintFlags(viewHolder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }else{
+            viewHolder.itemName.setPaintFlags(viewHolder.itemName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG)
+            );
         }
         Picasso.with(rootActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 

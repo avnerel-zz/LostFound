@@ -50,6 +50,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
     private String itemId;
     private MenuItem action_complete;
     private String recipientName;
+    private AlertDialog completeConversationDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,13 +119,18 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
     }
 
     private void showCompleteConversationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Complete Conversation request has been sent from " + recipientName)
-                .setMessage("Are you sure that the correct item was found?")
-                .setPositiveButton(R.string.yes, this)
-                .setNegativeButton(R.string.no, this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+
+        if(completeConversationDialog != null){
+
+            completeConversationDialog = new AlertDialog.Builder(this)
+                    .setTitle("Complete Conversation request has been sent from " + recipientName)
+                    .setMessage("Are you sure that the correct item was found?")
+                    .setPositiveButton(R.string.yes, this)
+                    .setNegativeButton(R.string.no, this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .create();
+            completeConversationDialog.show();
+        }
     }
 
     private void initMessageList() {
@@ -322,6 +328,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
         boolean positiveReply = DialogInterface.BUTTON_POSITIVE == which;
         Log.d(Constants.LOST_FOUND_TAG, "sent reply for complete conversation: " + positiveReply + ". which: " + which);
 
+        completeConversationDialog = null;
         // hide complete button.
         if(positiveReply){
             action_complete.setVisible(false);

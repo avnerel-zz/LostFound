@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,18 +20,22 @@ import android.widget.Toast;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
+import com.avner.lostfound.activities.PossibleMatchesActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.fragments.MyWorldFragment;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.utils.SignalSystem;
 import com.parse.GetCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
@@ -78,6 +83,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder.timeAdded = (TextView) view.findViewById(R.id.tv_itemListingAge);
             viewHolder.itemImage = (ImageView) view.findViewById(R.id.iv_itemListingImage);
             viewHolder.lostFoundImage = (ImageView) view.findViewById(R.id.iv_lost_or_found);
+            viewHolder.possibleMatches = (ImageButton) view.findViewById(R.id.ib_potentialMatchImage);
 
             view.setTag(viewHolder);
         } else {
@@ -95,9 +101,27 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             viewHolder.lostFoundImage.setImageResource(Constants.FOUND_ITEM_IMAGE);
         }
 
+        initPossibleMatches(viewHolder, item);
+
         Picasso.with(rootView.getContext()).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(viewHolder.itemImage);
 
         return view;
+    }
+
+    private void initPossibleMatches(ViewHolder viewHolder, final Item item) {
+        if(item.hasPossibleMatches()){
+            viewHolder.possibleMatches.setVisibility(Button.VISIBLE);
+            viewHolder.possibleMatches.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(rootView.getContext(), PossibleMatchesActivity.class);
+                    intent.putExtra(Constants.POSSIBLE_MATCHES, item.getPossibleMatches());
+                    rootView.getContext().startActivity(intent);
+                }
+            });
+        }else{
+            viewHolder.possibleMatches.setVisibility(Button.INVISIBLE);
+        }
     }
 
     public void remove(final Item item) {
@@ -261,9 +285,16 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         return items.get(chosenItemPosition);
     }
 
+    public void getMatches(Item item_selected) {
+        HashMap<String,String> params = new HashMap();
+        params.put(Constants.ParseCloud.REPORT_ID, item_selected.getId());
+        params.put(Constants.ParseCloud.PUBLISHER_ID, ParseUser.getCurrentUser().getObjectId());
+        ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.LOOK_FOR_MATCHES, params);
+    }
+
     public class ViewHolder {
         public ImageView itemImage;
-        public ImageButton deleteReport;
+        public ImageButton possibleMatches;
         TextView itemName;
         TextView timeAdded;
         ImageView lostFoundImage;

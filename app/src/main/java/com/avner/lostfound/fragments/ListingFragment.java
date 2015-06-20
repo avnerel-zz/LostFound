@@ -24,6 +24,7 @@ import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.MessagingActivity;
+import com.avner.lostfound.activities.PossibleMatchesActivity;
 import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
@@ -59,7 +60,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private int myLayoutId;
     private String parseClassName; // used as parse queries identifier
     private ListFilter filters = new ListFilter();
-    private MainActivity myActivity;
+    private MainActivity myMainActivity;
     private MenuItem mi_search_menu_item;
 
     // item info widgets
@@ -71,6 +72,9 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private ImageView iv_itemImage;
     private TextView tv_descriptionTitle;
     private boolean itemInfoWidgetsVisible = false;
+    private boolean isPossibleMatchesFragment;
+    private PossibleMatchesActivity myPossibleMatchesActivity;
+    private ArrayList<String> possibleMatchesIds;
 
 
     @Override
@@ -91,10 +95,17 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
      * Initialize this fragment's instance variables, based on its configuration - Lost of Found listing.
      */
     private void initMembers() {
-        this.isLostFragment = getArguments().getBoolean("isLostFragment");
-        this.myLayoutId = R.layout.fragment_item_listing;
+        if(getArguments() == null){
+            this.isPossibleMatchesFragment = true;
+            this.myPossibleMatchesActivity = (PossibleMatchesActivity) getActivity();
+            this.possibleMatchesIds = (ArrayList<String>) myPossibleMatchesActivity.getIntent().getExtras().get(Constants.POSSIBLE_MATCHES);
+        }else{
+
+            this.isLostFragment = getArguments().getBoolean("isLostFragment");
+            this.myMainActivity = (MainActivity) getActivity();
+        }
         this.parseClassName = Constants.ParseObject.PARSE_LOST ;//this.isLostFragment ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
-        this.myActivity = (MainActivity) getActivity();
+        this.myLayoutId = R.layout.fragment_item_listing;
     }
 
 
@@ -117,13 +128,30 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         rootView = inflater.inflate(this.myLayoutId, container, false);
         lv_itemList = (ListView) rootView.findViewById(R.id.lv_myList);
 
-        initSearchView(myActivity.getSearchView(), myActivity.getSearchViewMenuItem());
-
         FloatingActionButton button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
-        button.setOnClickListener(this);
 
-        initTimeSpinner();
-        initLocationSpinner();
+        if(!isPossibleMatchesFragment){
+
+            initSearchView(myMainActivity.getSearchView(), myMainActivity.getSearchViewMenuItem());
+            initTimeSpinner();
+            initLocationSpinner();
+            button.setOnClickListener(this);
+
+        }
+        //remove filters and button for possible matches fragment.
+        if(isPossibleMatchesFragment) {
+            button.setVisibility(View.INVISIBLE);
+            this.sp_timeSpinner = (Spinner) rootView.findViewById(R.id.s_time_filter);
+            this.sp_locationSpinner = (Spinner) rootView.findViewById(R.id.s_location_filter);
+            TextView spinnerText = (TextView) rootView.findViewById(R.id.tv_filter_text);
+
+            ViewGroup spinnersLayout = (ViewGroup) this.sp_timeSpinner.getParent();
+            spinnersLayout.removeView(sp_timeSpinner);
+            spinnersLayout.removeView(sp_locationSpinner);
+            spinnersLayout.removeView(spinnerText);
+        }
+
+
     }
 
     private void initSearchView(SearchView searchView, MenuItem searchViewMenuItem) {
@@ -159,7 +187,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         if (null == phrase) return;
 
         if (null == this.sv_search) { // don't count on inflation order of activity and fragments
-            initSearchView(((MainActivity)getActivity()).getSearchView(), myActivity.getSearchViewMenuItem());
+            initSearchView(((MainActivity) getActivity()).getSearchView(), myMainActivity.getSearchViewMenuItem());
         }
 
         if (null == this.sv_search) { // still null and couldn't initialize - skip refreshing
@@ -231,9 +259,15 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private void getItemsFromParse() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClassName);
         query.fromLocalDatastore();
-        query.whereEqualTo(Constants.ParseReport.IS_LOST,isLostFragment);
         query.whereEqualTo(Constants.ParseReport.IS_ALIVE, true);
         query.orderByDescending(Constants.ParseQuery.CREATED_AT);
+        if(isPossibleMatchesFragment){
+
+            query.whereContainedIn(Constants.ParseQuery.OBJECT_ID, possibleMatchesIds);
+        }else{
+            query.whereEqualTo(Constants.ParseReport.IS_LOST,isLostFragment);
+
+        }
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
@@ -242,7 +276,10 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                     for (int i = 0; i < itemsList.size(); i++) {
                         convertParseListToItemList(itemsList);
                     }
-                    ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
+                    if(!isPossibleMatchesFragment){
+
+                        ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
+                    }
                     Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
                 }
             }
@@ -316,7 +353,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
             return false;
         }
 
-        Picasso.with(myActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
+        Picasso.with(myMainActivity).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(this.iv_itemImage);
         this.tv_lossTime.setText(item.getTimeAsString());
         this.tv_location.setText(item.getLocationString());
         this.tv_descriptionContent.setText(item.getDescription());

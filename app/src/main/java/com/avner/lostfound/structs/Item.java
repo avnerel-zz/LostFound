@@ -10,6 +10,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -29,6 +30,7 @@ public class Item implements Parcelable {
     private ParseObject parseItem;
     private boolean isLost;
     private boolean isAlive;
+    private ArrayList<String> possibleMatches;
 
     public Item(ParseObject parseItem) {
         this.parseItem = parseItem;
@@ -55,6 +57,7 @@ public class Item implements Parcelable {
         imageUrl = ((ParseFile) parseItem.get(Constants.ParseReport.ITEM_IMAGE)).getUrl();
         isLost = (boolean) parseItem.get(Constants.ParseReport.IS_LOST);
         isAlive = (boolean) parseItem.get(Constants.ParseReport.IS_ALIVE);
+        possibleMatches = (ArrayList<String>) parseItem.get(Constants.ParseReport.POSSIBLE_MATCHES);
     }
 
 
@@ -222,5 +225,12 @@ public class Item implements Parcelable {
 
     public boolean isAlive() {
         return isAlive;
+    }
+
+    public boolean hasPossibleMatches() {
+        return possibleMatches != null && !(possibleMatches.isEmpty());
+    }
+    public ArrayList<String> getPossibleMatches() {
+        return possibleMatches;
     }
 }

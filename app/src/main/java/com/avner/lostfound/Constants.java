@@ -52,6 +52,7 @@ public class Constants {
     public static final int MAX_PASSWORD_LENGTH = 12;
     public static final int LOST_ITEM_IMAGE = R.drawable.lost_item;
     public static final int FOUND_ITEM_IMAGE = R.drawable.found_item;
+    public static final String POSSIBLE_MATCHES = "PossibleMatches";
 
 
     public class TabTexts {
@@ -88,6 +89,7 @@ public class Constants {
         public static final String USER_DISPLAY_NAME = "name";
         public static final String IS_LOST = "isLost";
         public static final String IS_ALIVE = "alive";
+        public static final String POSSIBLE_MATCHES = "possibleMatches";
     }
 
     public class ParseQuery{
@@ -165,6 +167,7 @@ public class Constants {
     public class ParseCloudMethods {
         public static final String COMPLETE_CONVERSATION_REQUEST = "completeConversationRequest";
         public static final String COMPLETE_CONVERSATION_REPLY = "completeConversationReply";
+        public static final String LOOK_FOR_MATCHES = "lookForMatches";
     }
 
     public enum UIActions
@@ -173,5 +176,11 @@ public class Constants {
         uiaConversationSaved,
         uiaMessageSaved,
         uiaCompleteConversationSent,
+    }
+
+    public class ParseCloud {
+
+        public static final String REPORT_ID = "reportId";
+        public static final String PUBLISHER_ID = "publisherId";
     }
 }

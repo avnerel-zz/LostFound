@@ -130,6 +130,10 @@
             android:name=".activities.PickLocationActivity"
             android:label="@string/title_activity_pick_location" >
         </activity>
+        <activity
+            android:name=".activities.PossibleMatchesActivity"
+            android:label="@string/title_activity_possible_matches" >
+        </activity>
     </application>
 
 </manifest>

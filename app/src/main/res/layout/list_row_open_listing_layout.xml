@@ -12,9 +12,9 @@
         android:id="@+id/iv_lost_or_found"
         android:layout_width="@android:dimen/app_icon_size"
         android:layout_height="@android:dimen/app_icon_size"
-        android:layout_alignBottom="@+id/iv_potentialMatchImage"
-        android:layout_toLeftOf="@+id/iv_potentialMatchImage"
-        android:layout_toStartOf="@+id/iv_potentialMatchImage"
+        android:layout_alignBottom="@+id/ib_potentialMatchImage"
+        android:layout_toLeftOf="@+id/ib_potentialMatchImage"
+        android:layout_toStartOf="@+id/ib_potentialMatchImage"
         android:src="@drawable/lost_item" />
 
     <ImageView
@@ -50,7 +50,7 @@
         android:textSize="14sp" />
 
     <ImageButton
-        android:id="@+id/iv_potentialMatchImage"
+        android:id="@+id/ib_potentialMatchImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"

@@ -108,6 +108,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             intent.putExtra(Constants.ParseMessage.RECIPIENT_ID, senderId);
             intent.putExtra(Constants.ParseMessage.ITEM_ID, itemId);
             SignalSystem.getInstance().fireUpdateChange(uiaCompleteConversationSent, true, intent);
+            updateUnreadCount(senderId, itemId);
             return false;
         }
         return true;
