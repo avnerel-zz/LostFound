@@ -46,6 +46,16 @@
             android:clipToPadding="false"
             android:paddingBottom="40dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_no_items_available"
+            android:text="@string/noItemsAvailable"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/abc_text_size_large_material"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible"/>
+
 
         <com.software.shell.fab.FloatingActionButton
             android:id="@+id/b_add_item"

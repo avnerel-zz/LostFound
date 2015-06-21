@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.avner.lostfound.R;
-import com.avner.lostfound.fragments.ListingFragment;
 
 public class PossibleMatchesActivity extends FragmentActivity{
 
@@ -15,8 +14,6 @@ public class PossibleMatchesActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_possible_matches);
-
-        ListingFragment listingFragment = (ListingFragment) getSupportFragmentManager().findFragmentById(R.id.f_listingFragment);
     }
 
 

@@ -75,6 +75,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private boolean isPossibleMatchesFragment;
     private PossibleMatchesActivity myPossibleMatchesActivity;
     private ArrayList<String> possibleMatchesIds;
+    private TextView tv_no_items_available;
 
 
     @Override
@@ -82,6 +83,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         super.onCreate(savedInstanceState);
         initMembers();
         SignalSystem.getInstance().registerUIUpdateChange(this);
+        setRetainInstance(true);
     }
 
 
@@ -114,6 +116,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         initWidgets(inflater, container);
         initItemsList();
         initItemInfoWidgets(); // won't do anything if not shown
+        getItemsFromParse();
 
         return rootView;
     }
@@ -127,6 +130,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private void initWidgets(LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(this.myLayoutId, container, false);
         lv_itemList = (ListView) rootView.findViewById(R.id.lv_myList);
+        tv_no_items_available = (TextView) rootView.findViewById(R.id.tv_no_items_available);
 
         FloatingActionButton button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
 
@@ -137,9 +141,9 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
             initLocationSpinner();
             button.setOnClickListener(this);
 
-        }
         //remove filters and button for possible matches fragment.
-        if(isPossibleMatchesFragment) {
+        }else{
+
             button.setVisibility(View.INVISIBLE);
             this.sp_timeSpinner = (Spinner) rootView.findViewById(R.id.s_time_filter);
             this.sp_locationSpinner = (Spinner) rootView.findViewById(R.id.s_location_filter);
@@ -150,7 +154,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
             spinnersLayout.removeView(sp_locationSpinner);
             spinnersLayout.removeView(spinnerText);
         }
-
 
     }
 
@@ -249,7 +252,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     @Override
     public void onResume() {
         super.onResume();
-        getItemsFromParse();
+//        getItemsFromParse();
     }
 
     /**
@@ -277,8 +280,14 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                         convertParseListToItemList(itemsList);
                     }
                     if(!isPossibleMatchesFragment){
-
                         ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
+                    }else{
+                        adapter.notifyDataSetChanged();
+                    }
+                    if(itemsList.size() == 0){
+                        tv_no_items_available.setVisibility(View.VISIBLE);
+                    }else{
+                        tv_no_items_available.setVisibility(View.INVISIBLE);
                     }
                     Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
                 }

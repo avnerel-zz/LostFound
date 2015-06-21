@@ -344,7 +344,9 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private Fragment getFragmentAt(int position) {
-        return ((TabsPagerAdapter)this.viewPager.getAdapter()).getFragment(position);
+        return getSupportFragmentManager().findFragmentByTag("android:switcher:" + viewPager.getId() + ":"
+                + ((TabsPagerAdapter)viewPager.getAdapter()).getItemId(position));
+//        return ((TabsPagerAdapter)this.viewPager.getAdapter()).getItem(position);
     }
 
     public SearchView getSearchView() {

@@ -18,6 +18,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
             new StatsFragment(),
     };
 
+
     public TabsPagerAdapter(FragmentManager fm) {
         super(fm);
 
