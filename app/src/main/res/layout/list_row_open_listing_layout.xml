@@ -59,7 +59,23 @@
         android:layout_marginRight="10dp"
         android:contentDescription="@string/possible_matches"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_matches"
+        android:src="@drawable/matches"
+        android:text = "@string/possible_matches"
+        android:background="?android:attr/activatedBackgroundIndicator"
         android:visibility="visible" />
+
+    <!--<Button-->
+        <!--android:id="@+id/ib_potentialMatchImage"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_marginLeft="10dp"-->
+        <!--android:layout_marginRight="10dp"-->
+        <!--android:contentDescription="@string/possible_matches"-->
+        <!--android:scaleType="centerCrop"-->
+        <!--android:src="@drawable/matches"-->
+        <!--android:text = "Matches"-->
+        <!--android:visibility="visible" />-->
 
 </RelativeLayout>

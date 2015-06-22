@@ -218,7 +218,8 @@ public class Item implements Parcelable {
         if(location!= null){
             sb.append("Location: ").append(locationAsString).append("\n");
         }
-        sb.append("Time: ").append(getTimeAsString());
+        sb.append("Time: ").append(getTimeAsString()).append("\n");
+        sb.append("Shared by Lost & Found app. Soon in google play");
 
         return sb.toString();
     }

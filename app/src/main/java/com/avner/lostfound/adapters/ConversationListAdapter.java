@@ -78,6 +78,7 @@ public class ConversationListAdapter extends BaseAdapter {
             viewHolder.itemImage = (ImageButton) view.findViewById(R.id.ib_conversation_item_image);
             viewHolder.unreadCount = (TextView) view.findViewById(R.id.tv_unread_count);
             viewHolder.itemName = (TextView) view.findViewById(R.id.tv_item_name);
+            viewHolder.iv_item_done = (ImageView) view.findViewById(R.id.iv_item_done);
 
             viewHolder.itemImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -112,8 +113,10 @@ public class ConversationListAdapter extends BaseAdapter {
         viewHolder.userDisplayName.setText(userName);
         viewHolder.itemName.setText(item.getName());
         if (!item.isAlive()) {
+            viewHolder.iv_item_done.setVisibility(View.VISIBLE);
             viewHolder.itemName.setPaintFlags(viewHolder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }else{
+            viewHolder.iv_item_done.setVisibility(View.INVISIBLE);
             viewHolder.itemName.setPaintFlags(viewHolder.itemName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG)
             );
         }
@@ -234,6 +237,7 @@ public class ConversationListAdapter extends BaseAdapter {
         TextView itemName;
         ImageButton itemImage;
         TextView unreadCount;
+        ImageView iv_item_done;
     }
 
 }
