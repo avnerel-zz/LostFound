@@ -77,8 +77,8 @@
         android:layout_toEndOf="@+id/tv_item_name"
         android:layout_marginLeft="44dp"
         android:layout_marginStart="44dp"
-        android:visibility="invisible"/>
-
+        android:visibility="invisible"
+        android:background="@android:color/transparent"/>
 
 </RelativeLayout>
 
