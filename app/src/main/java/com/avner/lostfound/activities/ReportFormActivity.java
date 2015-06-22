@@ -226,7 +226,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         setDate(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
         setTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
 
-        timeChosen = Calendar.getInstance();
+        timeChosen = calendar;
     }
 
     private void setDate(int day, int month, int year) {
