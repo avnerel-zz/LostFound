@@ -76,7 +76,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = li.inflate(R.layout.list_row_open_listing_layout, (ViewGroup) rootView);
+            view = li.inflate(R.layout.list_row_open_listing_layout, null);
 
             viewHolder = new ViewHolder();
             viewHolder.itemName = (TextView) view.findViewById(R.id.tv_itemListingName);
