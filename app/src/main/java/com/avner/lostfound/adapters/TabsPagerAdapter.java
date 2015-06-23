@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.avner.lostfound.fragments.ListingFragment;
 import com.avner.lostfound.fragments.MyWorldFragment;
-import com.avner.lostfound.fragments.StatsFragment;
 
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 
@@ -15,7 +14,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
             new MyWorldFragment(),
             new ListingFragment(),  // lost, must update argument "isLostFragment" to 'true'
             new ListingFragment(), // found, must update argument "isLostFragment" to 'false'
-            new StatsFragment(),
+//            new StatsFragment(),
     };
 
 

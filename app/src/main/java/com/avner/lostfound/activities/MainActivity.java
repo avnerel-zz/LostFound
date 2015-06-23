@@ -54,7 +54,7 @@ public class MainActivity extends FragmentActivity implements
             Constants.TabTexts.MY_WORLD,
             Constants.TabTexts.LOST,
             Constants.TabTexts.FOUND,
-            Constants.TabTexts.STATS
+//            Constants.TabTexts.STATS
     };
 
     // Tab icons
@@ -62,7 +62,7 @@ public class MainActivity extends FragmentActivity implements
             R.drawable.earth,
             R.drawable.question_mark_red1,
             R.drawable.chequered_flags,
-            R.drawable.graph,
+//            R.drawable.graph,
     };
     private ActionMode actionMode;
     private List<View> itemInfoViews;
@@ -235,6 +235,9 @@ public class MainActivity extends FragmentActivity implements
         startActivity(conversationIntent);
     }
 
+    /**
+     * update method count widget above messages menu item.
+     */
     private void updateNotificationCount() {
 
         Log.d(Constants.LOST_FOUND_TAG, "updating notification count in main activity.");
