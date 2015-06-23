@@ -96,7 +96,8 @@
         android:layout_below="@+id/tv_near_address"
         android:layout_toRightOf="@+id/tv_description_text"
         android:layout_toEndOf="@+id/tv_description_text"
-        android:width="180dp"
+        android:layout_toLeftOf="@+id/ib_editReport"
+        android:layout_toStartOf="@+id/ib_editReport"
         android:hint="@string/itemDescriptionDefaultHint"
         android:singleLine="true" />
 

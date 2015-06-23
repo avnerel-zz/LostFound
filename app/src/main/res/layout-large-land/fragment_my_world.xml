@@ -25,6 +25,7 @@
             android:weightSum="2">
 
             <LinearLayout
+                android:id="@+id/l_listingTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -52,6 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_below="@+id/l_listingTitle"
                 android:clipToPadding="false"
                 android:paddingBottom="40dp" />
 
