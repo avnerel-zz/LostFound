@@ -2,6 +2,7 @@ package com.avner.lostfound.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -159,9 +160,6 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
             try {
                 if (null != parseItem) {
                     item = new Item(parseItem);
-                    if (null == item) {
-                        Log.d(Constants.LOST_FOUND_TAG, "item created as NULL");
-                    }
                     items.add(item);
                 }
             } catch (NullPointerException e) {
@@ -193,7 +191,7 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
                     }
                 }
                 myOpenListingsAdapter.setChosenItemPosition(position);
-                initShareIntent(position);
+                initShareIntent();
             }
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -237,7 +235,7 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
         });
     }
 
-    private void initShareIntent(int position) {
+    private void initShareIntent() {
 
         // save image of item to file.
 //        ImageView imageView = ((OpenItemsAdapter.ViewHolder) lv_openListings.getChildAt(position).getTag()).itemImage;
@@ -275,7 +273,7 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
 
                     // save description to clipboard because facebook don't let you upload a status.
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) rootView.getContext()
-                            .getSystemService(rootView.getContext().CLIPBOARD_SERVICE);
+                            .getSystemService(Context.CLIPBOARD_SERVICE);
                     android.content.ClipData clip = android.content.ClipData
                             .newPlainText("share description", chosenItem.getShareDescription());
                     clipboard.setPrimaryClip(clip);

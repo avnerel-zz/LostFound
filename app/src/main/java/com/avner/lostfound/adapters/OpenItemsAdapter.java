@@ -76,7 +76,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
         if (convertView == null) {
             LayoutInflater li = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = li.inflate(R.layout.list_row_open_listing_layout, null);
+            view = li.inflate(R.layout.list_row_open_listing_layout, (ViewGroup) rootView);
 
             viewHolder = new ViewHolder();
             viewHolder.itemName = (TextView) view.findViewById(R.id.tv_itemListingName);
@@ -126,7 +126,6 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
     public void remove(final Item item) {
 
-        //TODO check connectivity before removing.
         final ProgressDialog progressDialog = new ProgressDialog(rootView.getContext());
         progressDialog.setTitle("Deleting");
         progressDialog.setMessage("Please wait...");
@@ -137,11 +136,13 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         deleteFromLocalQuery.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(final ParseObject parseItem, ParseException e) {
-                if (e != null) {
+                if (e != null || parseItem == null) {
                     Log.e(Constants.LOST_FOUND_TAG, "item" + item.getName()
-                            + " had already been removed from local data store. " + e.getLocalizedMessage());
+                            + " had already been removed from local data store. "
+                            + (e != null ? e.getLocalizedMessage() : "parse item is null."));
                     progressDialog.dismiss();
-                    Toast.makeText(rootView.getContext(), "Couldn't delete item from server, please check your connection.", Toast.LENGTH_SHORT);
+                    Toast.makeText(rootView.getContext(), "Couldn't delete item from server, please check your connection.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 parseItem.put(Constants.ParseReport.IS_ALIVE, false);
                 parseItem.pinInBackground(new SaveCallback() {
@@ -202,7 +203,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         Item item = (Item) getItem(position);
 
         if (!myFragment.setDisplayedItem(item)) {
-            showItemInDialog(item, position);
+            showItemInDialog(item);
             Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
         }
         else {
@@ -210,17 +211,17 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         }
     }
 
-    private void showItemInDialog(Item item, int position) {
+    private void showItemInDialog(Item item) {
         final Dialog dialog = new Dialog(rootView.getContext());
         dialog.setContentView(R.layout.dialog_item_details_layout);
-        initMapButton(item, position, dialog);
+        initMapButton(item, dialog);
         ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
         ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
         setDialogContents(dialog, item);
         dialog.show();
     }
 
-    private void initMapButton(final Item item, final int position, Dialog dialog) {
+    private void initMapButton(final Item item, Dialog dialog) {
 
         final Location location = item.getLocation();
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
@@ -235,10 +236,6 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(rootView.getContext(), ViewLocationActivity.class);
-                if (null == item) {
-                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-                    return;
-                }
                 intent.putExtra(Constants.LATITUDE, location.getLatitude());
                 intent.putExtra(Constants.LONGITUDE, location.getLongitude());
                 rootView.getContext().startActivity(intent);
@@ -286,7 +283,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     }
 
     public void getMatches(Item item_selected) {
-        HashMap<String,Object> params = new HashMap();
+        HashMap<String,Object> params = new HashMap<>();
         params.put(Constants.ParseCloud.REPORT_ID, item_selected.getId());
         params.put(Constants.ParseCloud.PUBLISHER_ID, ParseUser.getCurrentUser().getObjectId());
         params.put(Constants.ParseCloud.IS_LOST, item_selected.isLost());

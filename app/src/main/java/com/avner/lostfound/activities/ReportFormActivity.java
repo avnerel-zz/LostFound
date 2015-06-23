@@ -60,9 +60,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     private Spinner spinner;
     private TextView et_itemName;
-    private ImageButton ib_pick_date;
     private TextView tv_date_picker;
-    private ImageButton ib_pick_time;
     private TextView tv_time_picker;
     private ImageButton ib_pick_location;
     private ImageButton ib_item_photo;
@@ -73,9 +71,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     private EditText et_description;
     private Calendar timeChosen;
 
-    private Button submitButton;
-
-    private ParseFile parseItemImage;
     /**
      * This field indicates if the report is for a lost item or a found item.
      */
@@ -97,7 +92,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         editReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_EDIT_FORM);
 
         if (editReport){
-            itemEdited = (Item) getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
+            itemEdited = getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
             loadFromItem(itemEdited);
         } else {
             setDefaultValues();
@@ -176,7 +171,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         initLocationViews();
         initItemSelector();
 
-        submitButton = (Button) findViewById(R.id.b_submit);
+        Button submitButton = (Button) findViewById(R.id.b_submit);
         submitButton.setOnClickListener(this);
         et_description = (EditText) findViewById(R.id.et_description);
         initItemImage();
@@ -213,11 +208,11 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     private void initTimeViews() {
 
-        ib_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
+        ImageButton ib_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
         ib_pick_date.setOnClickListener(this);
         tv_date_picker = (TextView) findViewById(R.id.tv_date_picker);
 
-        ib_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
+        ImageButton ib_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
         ib_pick_time.setOnClickListener(this);
         tv_time_picker = (TextView) findViewById(R.id.tv_time_picker);
     }
@@ -502,7 +497,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
         if (editReport) {
 
-            ParseQuery query = ParseQuery.getQuery(parseClass);
+            ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
             query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemEdited.getId());
             query.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
@@ -545,7 +540,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         parseReport.put(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
 
         Bitmap itemImage = ((BitmapDrawable)ib_item_photo.getDrawable()).getBitmap();
-        parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME,itemImage);
+        ParseFile parseItemImage = ImageUtils.getImageAsParseFile(ITEM_IMAGE_NAME, itemImage);
         parseReport.put(Constants.ParseReport.ITEM_IMAGE, parseItemImage);
 
         String userLoginName = (String) ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME);

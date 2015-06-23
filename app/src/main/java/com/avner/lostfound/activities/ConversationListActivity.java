@@ -43,7 +43,6 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
     private ConversationListAdapter conversationAdapter;
     private List<Conversation> conversations;
     private List<Conversation> filteredConversations;
-    private SearchView sv_search;
     private String currentFilter = "";
     private ImageView iv_itemImage;
     private TextView tv_lossTime;
@@ -100,7 +99,6 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
 
         if (null == tv_descriptionTitle) {
             Log.d(Constants.LOST_FOUND_TAG, "tv_descriptionTitle is null");
-            return;
         }
     }
 
@@ -114,7 +112,7 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
     }
 
     private void initSearchView(Menu menu) {
-        sv_search = (SearchView) menu.findItem(R.id.search_conversation).getActionView();
+        SearchView sv_search = (SearchView) menu.findItem(R.id.search_conversation).getActionView();
         sv_search.setSubmitButtonEnabled(true);
         sv_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

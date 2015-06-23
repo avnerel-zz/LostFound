@@ -86,10 +86,6 @@ public class Conversation  implements Parcelable{
         return unreadCount;
     }
 
-    public void setUnreadCount(int unreadCount) {
-        this.unreadCount = unreadCount;
-    }
-
     public String getId() {
         return conversationId;
     }

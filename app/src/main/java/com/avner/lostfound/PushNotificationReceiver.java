@@ -24,9 +24,6 @@ import static com.avner.lostfound.Constants.UIActions.uiaConversationSaved;
 import static com.avner.lostfound.Constants.UIActions.uiaItemSaved;
 import static com.avner.lostfound.Constants.UIActions.uiaMessageSaved;
 
-/**
- * Created by avner on 04/05/2015.
- */
 public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     @Override
@@ -45,15 +42,14 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             case Constants.ParsePush.TYPE_MESSAGE:
                 return handlePushOfParseMessage(jsonData,context);
             case Constants.ParsePush.TYPE_LOST:
-                handlePushOfParseLost(jsonData, context);
+                handlePushOfParseLost(jsonData);
                 return false;
             case Constants.ParsePush.COMPLETE_CONVERSATION_REQUEST:
                 return handlePushOfCompleteConversationRequest(jsonData, context);
             case Constants.ParsePush.COMPLETE_CONVERSATION_REPLY:
-                handlePushOfCompleteConversationReply(jsonData, context);
                 return true;
             case Constants.ParsePush.TYPE_CONVERSATION:
-                handlePushOfParseConversation(jsonData, context);
+                handlePushOfParseConversation(jsonData);
                 return false;
             case Constants.ParsePush.TYPE_MY_MESSAGE:
                 saveMyMessage(jsonData);
@@ -68,7 +64,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         pinMessage(messageId);
     }
 
-    private void handlePushOfParseConversation(JSONObject jsonData, final Context context) throws JSONException {
+    private void handlePushOfParseConversation(JSONObject jsonData) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
         Log.d("PUSH_CONVERSATION", reportedItem);
         JSONObject report = new JSONObject(reportedItem);
@@ -97,10 +93,6 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         });
     }
 
-    private void handlePushOfCompleteConversationReply(JSONObject jsonData, Context context) throws JSONException {
-
-    }
-
     private boolean handlePushOfCompleteConversationRequest(JSONObject jsonData, Context context) throws JSONException {
 
         final String senderId = jsonData.getString(Constants.ParsePush.SENDER_ID);
@@ -121,7 +113,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         return true;
     }
 
-    private void handlePushOfParseLost(JSONObject jsonData, final Context context) throws JSONException {
+    private void handlePushOfParseLost(JSONObject jsonData) throws JSONException {
         String reportedItem = (String) jsonData.get(Constants.ParsePush.REPORTED_ITEM);
         Log.d("PUSH_LOST", reportedItem);
         JSONObject report = new JSONObject(reportedItem);
@@ -139,13 +131,13 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 }else{
 
                     Log.d("PUSH_LOST", "Got the data from server");
-                    insertReportInLocalDataStore(parseObject, context);
+                    insertReportInLocalDataStore(parseObject);
                 }
             }
         });
     }
 
-    private void insertReportInLocalDataStore(ParseObject parseObject, final Context context) {
+    private void insertReportInLocalDataStore(ParseObject parseObject) {
         parseObject.pinInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -220,6 +212,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             ParseObject parseMessage = query.getFirst();
             if(parseMessage == null ){
                 Log.e("PARSE_MESSAGE", "couldn't retrieve message from server.");
+                return;
             }
             final String senderId = parseMessage.getString(Constants.ParsePush.SENDER_ID);
             final String itemId = parseMessage.getString(Constants.ParsePush.ITEM_ID);
@@ -248,7 +241,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 Log.d("PUSH_RECEIVED", "jsonData: " + jsonData);
 
                 if (!handlePushes(context, jsonData) ||
-                        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.enable_push_messages),true) == false)
+                        !PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.enable_push_messages), true))
                 return;
 
             } catch (JSONException e) {

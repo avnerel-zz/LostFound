@@ -1,8 +1,8 @@
 package com.avner.lostfound.activities;
 
 import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -78,9 +78,8 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
 
         double latitude = intent.getExtras().getDouble(Constants.LATITUDE);
         double longitude = intent.getExtras().getDouble(Constants.LONGITUDE);
-        MarkerOptions marker = getMarker(latitude, longitude);
 
-        location_chosen_marker = marker;
+        location_chosen_marker = getMarker(latitude, longitude);
     }
 
     private MarkerOptions getMarker(double latitude, double longitude) {
@@ -122,10 +121,8 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
             intent.putExtra(Constants.LATITUDE, 0.0);
             setResult(RESULT_OK, intent);
             finish();
-        }
 
-
-        if (v.getId() == R.id.b_chose_location) {
+        }else if (v.getId() == R.id.b_chose_location) {
 
             if (null == location_chosen_marker) { // no marker selected - create a dummy one
                 Log.d(Constants.LOST_FOUND_TAG, "location_chosen_marker is NULL!");

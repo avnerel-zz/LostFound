@@ -19,13 +19,14 @@ import com.parse.ParseUser;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
+@SuppressWarnings("deprecation")
 public class PreferencesActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        Preference button = (Preference)findPreference(getString(R.string.logout_button));
+        Preference button = findPreference(getString(R.string.logout_button));
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -34,7 +35,7 @@ public class PreferencesActivity extends PreferenceActivity {
                 return true;
             }
         });
-        final Preference userDisplayName = (Preference)findPreference(getString(R.string.user_display_name));
+        final Preference userDisplayName = findPreference(getString(R.string.user_display_name));
         userDisplayName.setSummary((String) ParseUser.getCurrentUser().get("name"));
         userDisplayName.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override

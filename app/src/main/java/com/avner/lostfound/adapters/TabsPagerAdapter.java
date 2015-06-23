@@ -35,15 +35,6 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
         return fragments[index];
     }
 
-    public Fragment getFragment(int position) {
-        if (position < 0 || position > fragments.length) {
-            throw new IllegalArgumentException("invalid fragment index " + position);
-        }
-
-        return this.fragments[position];
-    }
-
-
     @Override
     public int getCount() {
         // get item count - equal to number of tabs

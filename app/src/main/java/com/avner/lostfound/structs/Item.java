@@ -13,9 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by avner on 24/04/2015.
- */
 public class Item implements Parcelable {
 
     private String locationAsString;
@@ -27,13 +24,11 @@ public class Item implements Parcelable {
     private Calendar calender;
     private Location location;
     private String itemId;
-    private ParseObject parseItem;
     private boolean isLost;
     private boolean isAlive;
     private ArrayList<String> possibleMatches;
 
     public Item(ParseObject parseItem) {
-        this.parseItem = parseItem;
 
         name = (String) parseItem.get(Constants.ParseReport.ITEM_NAME);
         description = (String) parseItem.get(Constants.ParseReport.ITEM_DESCRIPTION);
@@ -133,10 +128,6 @@ public class Item implements Parcelable {
 
     public String getImageUrl() {
         return imageUrl;
-    }
-
-    public ParseObject getParseItem() {
-        return parseItem;
     }
 
     public boolean isLost() {

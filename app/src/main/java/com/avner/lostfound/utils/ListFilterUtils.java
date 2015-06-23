@@ -4,7 +4,6 @@ import android.location.Location;
 import android.util.Log;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.adapters.LostFoundListAdapter;
 import com.avner.lostfound.structs.Item;
 import com.avner.lostfound.structs.ListFilter;
@@ -13,9 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by Oded on 24/05/2015.
- */
 public class ListFilterUtils {
 
     public static void applyDistanceFilter(List<Item> items, ListFilter filter, Location lastKnownLocation) {

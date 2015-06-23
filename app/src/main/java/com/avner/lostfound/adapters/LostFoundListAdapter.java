@@ -29,9 +29,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-/**
- * Created by avner on 28/04/2015.
- */
 public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener{
 
     private final ListingFragment myFragment;
@@ -87,7 +84,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         }
 
         setEditReportButton(view, viewHolder, item);
-        setViewHolderFields(position, viewHolder, item);
+        setViewHolderFields(viewHolder, item);
 
         return view;
     }
@@ -110,7 +107,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     }
 
 
-    private void setViewHolderFields(int position, final ViewHolder viewHolder, Item item) {
+    private void setViewHolderFields(final ViewHolder viewHolder, Item item) {
         // Put the content in the view
         viewHolder.itemName.setText(item.getName());
         viewHolder.description.setText(item.getDescription());
@@ -130,11 +127,6 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
         final Item item = (Item) parent.getItemAtPosition(position);
         Log.d(Constants.LOST_FOUND_TAG, "clicked item " + item.getName() + ", at position " + position);
-
-        if (null == item) {
-            Log.d(Constants.LOST_FOUND_TAG, "Failed to retrieve item from adapter list, at position " + position);
-            return;
-        }
 
         if (!myFragment.setDisplayedItem(item)) {
             showItemInDialog(parent, item, position);

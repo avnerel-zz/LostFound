@@ -91,7 +91,7 @@ public class ConversationListAdapter extends BaseAdapter {
                     }
 
                     if (!rootActivity.setDisplayedItem(item)) {
-                        showItemInDialog(item, position);
+                        showItemInDialog(item);
                         Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
                     }
                     else {
@@ -132,17 +132,17 @@ public class ConversationListAdapter extends BaseAdapter {
         return view;
     }
 
-    private void showItemInDialog(Item item, int position) {
+    private void showItemInDialog(Item item) {
         final Dialog dialog = new Dialog(rootActivity);
         dialog.setContentView(R.layout.dialog_item_details_layout);
-        initMapButton(item, position, dialog);
+        initMapButton(item, dialog);
         ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
         ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
         setDialogContents(dialog, item);
         dialog.show();
     }
 
-    private void initMapButton(final Item item, final int position, Dialog dialog) {
+    private void initMapButton(final Item item, Dialog dialog) {
 
         final Location location = item.getLocation();
         ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
@@ -156,10 +156,6 @@ public class ConversationListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(rootActivity, ViewLocationActivity.class);
-                if (null == item) {
-                    Log.d("DEBUG", "Failed to retrieve item from adapter list, at position " + position);
-                    return;
-                }
                 intent.putExtra(Constants.LATITUDE, location.getLatitude());
                 intent.putExtra(Constants.LONGITUDE, location.getLongitude());
                 rootActivity.startActivity(intent);
@@ -216,7 +212,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
     public void selectView(int position, boolean value) {
         if (value)
-            selectedItemIds.put(position, value);
+            selectedItemIds.put(position, true);
 
         else
             selectedItemIds.delete(position);

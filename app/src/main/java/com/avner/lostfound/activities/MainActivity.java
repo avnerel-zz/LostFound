@@ -470,9 +470,6 @@ public class MainActivity extends FragmentActivity implements
     public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
 
         switch(action){
-            case uiaMessageSaved:
-                //TODO mark conversation menu item with flag
-                break;
             case uiaConversationSaved:
                 updateNotificationCount();
                 break;

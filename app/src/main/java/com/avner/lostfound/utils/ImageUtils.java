@@ -20,19 +20,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by avner on 20/05/2015.
- */
 public class ImageUtils {
 
 
     /**
      * saves to default directory - "lostfound"
-     * @param image
-     * @param fileName
+     * @param image - image to be saved.
+     * @param fileName - name of file to write to.
      */
     public static void saveImageToFile(Bitmap image, String fileName) {
 
@@ -64,8 +60,6 @@ public class ImageUtils {
             fo = new FileOutputStream(destination);
             fo.write(bytes.toByteArray());
             fo.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,8 +112,6 @@ public class ImageUtils {
             imageURL = new URL(imageUrl);
             bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

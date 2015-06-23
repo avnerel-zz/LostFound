@@ -3,7 +3,6 @@ package com.avner.lostfound;
 import android.app.Application;
 import android.util.Log;
 
-import com.avner.lostfound.activities.MainActivity;
 import com.avner.lostfound.activities.MessagingActivity;
 import com.avner.lostfound.utils.SignalSystem;
 import com.facebook.FacebookSdk;
@@ -15,23 +14,13 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-/**
- * Created by avner on 25/04/2015.
- */
 public class LostFoundApplication extends Application {
 
     private static final String PARSE_APPLICATION_ID = "63FMI3OgLxnxl938rnjFf6vnmgOFsBlIop9jC6VQ";
 
     private static final String PARSE_CLIENT_KEY = "FWxMwbcifgveMVSo9JliPvunXzshxtchnuz1e9ZE";
 
-    private String userName;
-
-    /**
-     * used to get push notifications
-     */
-    private ParseInstallation installation;
     private String messagingItemId;
-    private MainActivity mainActivity;
     private String messagingRecipientId;
     private MessagingActivity messagingActivity;
 
@@ -48,7 +37,10 @@ public class LostFoundApplication extends Application {
 
         FacebookSdk.sdkInitialize(this);
         // installation used for sending push notifications.
-        installation = ParseInstallation.getCurrentInstallation();
+        /*
+      used to get push notifications
+     */
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 
         ParseUser user = ParseUser.getCurrentUser();
 

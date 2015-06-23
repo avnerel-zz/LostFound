@@ -10,9 +10,6 @@ import com.avner.lostfound.Constants;
 
 import java.util.ArrayList;
 
-/**
- * Created by user on 5/13/2015.
- */
 public class SignalSystem {
     private static SignalSystem ref;
     private static Context ctx;
@@ -31,7 +28,7 @@ public class SignalSystem {
     }
 
     private SignalSystem() {
-        mUIUpdateInterfaces = new ArrayList<IUIUpdateInterface>();
+        mUIUpdateInterfaces = new ArrayList<>();
     }
 
     public void registerUIUpdateChange(IUIUpdateInterface aInterface) {
@@ -58,7 +55,7 @@ public class SignalSystem {
             iSize = mUIUpdateInterfaces.size();
 
             for ( index = 0; index < iSize; index++){
-                ((IUIUpdateInterface)mUIUpdateInterfaces.get(index)).onDataChange(uiAction, bSuccess, data);
+                mUIUpdateInterfaces.get(index).onDataChange(uiAction, bSuccess, data);
             }
         }
         else {

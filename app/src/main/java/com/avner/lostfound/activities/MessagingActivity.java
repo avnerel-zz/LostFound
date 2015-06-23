@@ -42,7 +42,6 @@ import java.util.List;
 public class MessagingActivity extends Activity implements TextWatcher, View.OnClickListener, DialogInterface.OnClickListener, IUIUpdateInterface {
     private String recipientId;
     private EditText messageBodyField;
-    private String messageBody;
     private String currentUserId;
     private ListView messagesList;
     private MessageAdapter messageAdapter;
@@ -216,7 +215,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
             boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
 
             if(isConnected){
-                messageBody = messageBodyField.getText().toString();
+                String messageBody = messageBodyField.getText().toString();
 //                messageService.sendMessage(recipientId, messageBody,itemId);
                 sendMessage(messageBody);
                 //reset message

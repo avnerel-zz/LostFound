@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_margin="0dp"
-        android:contentDescription="bell"
+        android:contentDescription="@string/messages"
         />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
