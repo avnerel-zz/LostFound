@@ -1,5 +1,8 @@
 package com.avner.lostfound.fragments;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,6 +30,7 @@ import android.widget.Toast;
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
 import com.avner.lostfound.activities.MainActivity;
+import com.avner.lostfound.activities.ReportFormActivity;
 import com.avner.lostfound.activities.ViewLocationActivity;
 import com.avner.lostfound.adapters.OpenItemsAdapter;
 import com.avner.lostfound.structs.Item;
@@ -37,13 +41,14 @@ import com.parse.FindCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.software.shell.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyWorldFragment extends Fragment implements IUIUpdateInterface {
+public class MyWorldFragment extends Fragment implements IUIUpdateInterface, View.OnClickListener {
 
     private MainActivity myActivity;
     private View rootView;
@@ -88,6 +93,9 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface {
         initOpenListings();
 
         initItemInfoWidgets(); // won't do anything if not shown
+        FloatingActionButton button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
+        button.setOnClickListener(this);
+
 
         return rootView;
 	}
@@ -349,5 +357,37 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface {
                 updateData();
                 break;
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.b_add_item){
+
+            AlertDialog alertDialog = new AlertDialog.Builder(rootView.getContext()).create(); //Read Update
+            alertDialog.setTitle("Report Type");
+            alertDialog.setMessage("Choose type of report form");
+
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"Lost", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    openReportForm(true);
+                }
+            });
+            alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"Found", new DialogInterface.OnClickListener()    {
+                public void onClick(DialogInterface dialog, int which) {
+                    openReportForm(false);
+                }
+            });
+            alertDialog.show();  //<-- See This!
+        }
+
+    }
+    private void openReportForm(boolean isLost){
+        Intent newItemIntent = new Intent(rootView.getContext(), ReportFormActivity.class);
+        newItemIntent.putExtra(Constants.ReportForm.IS_LOST_FORM, isLost)
+                .putExtra(Constants.ReportForm.IS_EDIT_FORM, false);
+
+        ((Activity) rootView.getContext()).startActivityForResult(newItemIntent, Constants.REQUEST_CODE_REPORT_FORM);
+
     }
 }

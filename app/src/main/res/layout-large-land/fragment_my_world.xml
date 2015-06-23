@@ -18,7 +18,7 @@
             android:layout_marginBottom="5dp"
             android:background="#c0c0c0" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
@@ -51,8 +51,23 @@
                 android:id="@+id/lv_openListings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
-        </LinearLayout>
+                android:layout_gravity="center_horizontal"
+                android:clipToPadding="false"
+                android:paddingBottom="40dp" />
+
+            <com.software.shell.fab.FloatingActionButton
+                android:id="@+id/b_add_item"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="10dp"
+                fab:button_color="@color/fab_material_red_500"
+                fab:image="@drawable/fab_plus_icon" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
