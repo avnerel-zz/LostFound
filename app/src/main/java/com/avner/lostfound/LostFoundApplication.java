@@ -52,33 +52,18 @@ public class LostFoundApplication extends Application {
 
         ParseUser user = ParseUser.getCurrentUser();
 
-        if (user != null) {
+        if (user != null && !user.getObjectId().equals(installation.get("user"))) {
 
             installation.put("user", user.getObjectId());
+            installation.saveInBackground();
 
             Log.d("messaging", "put installation user id: " + user.getObjectId());
         }
 
-        installation.saveInBackground();
         SignalSystem.initialize(this);
 
-    }
 
-//    //TODO need to get userName and password from local DB, if present.
-//    public void setUserName(String username) {
-//
-//        this.userName = username;
-//
-//        ParseUser user = ParseUser.getCurrentUser();
-//
-//        if (user != null) {
-//
-//            installation.put("user", user.getObjectId());
-//            installation.saveInBackground();
-//            Log.d("messaging", "put installation user id: " + user.getObjectId());
-//        }
-//
-//    }
+    }
 
     public void updateMessagingStatus(MessagingActivity messagingActivity, String itemId, String recipientId) {
 

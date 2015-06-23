@@ -241,7 +241,7 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
             @Override
             public void done(ParseException e) {
                 if(e== null){
-                    parseMessage.pinInBackground();
+//                    parseMessage.pinInBackground();
                 }else{
                     Toast.makeText(MessagingActivity.this, "Couldn't send message to " + recipientName + ", please check your connection", Toast.LENGTH_SHORT).show();
                     // update UI
@@ -353,9 +353,9 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
 
             case uiaMessageSaved:
 
-                String recipientId = data.getStringExtra(Constants.ParseMessage.RECIPIENT_ID);
+                String senderId = data.getStringExtra(Constants.ParseMessage.RECIPIENT_ID);
                 String itemId = data.getStringExtra(Constants.ParseMessage.ITEM_ID);
-                if(recipientId.equals(this.recipientId) && itemId.equals(this.itemId)){
+                if((senderId.equals(this.recipientId) || senderId.equals(currentUserId)) && itemId.equals(this.itemId)){
                     updateMessages();
                 }
                 break;
@@ -365,9 +365,9 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
                 break;
 
             case uiaCompleteConversationSent:
-                recipientId = data.getStringExtra(Constants.ParseMessage.RECIPIENT_ID);
+                senderId = data.getStringExtra(Constants.ParseMessage.RECIPIENT_ID);
                 itemId = data.getStringExtra(Constants.ParseMessage.ITEM_ID);
-                if(recipientId.equals(this.recipientId) && itemId.equals(this.itemId)){
+                if(senderId.equals(this.recipientId) && itemId.equals(this.itemId)){
                     showCompleteConversationDialog();
                 }
                 break;

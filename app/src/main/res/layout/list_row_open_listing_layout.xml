@@ -58,10 +58,10 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:contentDescription="@string/possible_matches"
-        android:scaleType="centerCrop"
+        android:scaleType="centerInside"
         android:src="@drawable/matches"
         android:text = "@string/possible_matches"
-        android:background="@android:color/transparent"
+        android:background="?android:attr/activatedBackgroundIndicator"
         android:visibility="visible" />
 
 </RelativeLayout>

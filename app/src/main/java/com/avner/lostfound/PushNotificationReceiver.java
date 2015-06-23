@@ -55,8 +55,17 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
             case Constants.ParsePush.TYPE_CONVERSATION:
                 handlePushOfParseConversation(jsonData, context);
                 return false;
+            case Constants.ParsePush.TYPE_MY_MESSAGE:
+                saveMyMessage(jsonData);
+                return false;
         }
         return true;
+    }
+
+    private void saveMyMessage(JSONObject jsonData) throws JSONException {
+
+        String messageId = (String) jsonData.get(Constants.ParseQuery.OBJECT_ID);
+        pinMessage(messageId);
     }
 
     private void handlePushOfParseConversation(JSONObject jsonData, final Context context) throws JSONException {
