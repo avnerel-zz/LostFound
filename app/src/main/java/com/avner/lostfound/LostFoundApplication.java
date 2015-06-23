@@ -54,8 +54,6 @@ public class LostFoundApplication extends Application {
 
         if (user != null) {
 
-            setUserName(user.getUsername());
-
             installation.put("user", user.getObjectId());
 
             Log.d("messaging", "put installation user id: " + user.getObjectId());
@@ -66,31 +64,21 @@ public class LostFoundApplication extends Application {
 
     }
 
-    //TODO need to get userName and password from local DB, if present.
-    public void setUserName(String username) {
-
-        this.userName = username;
-
-        ParseUser user = ParseUser.getCurrentUser();
-
-        if (user != null) {
-
-            installation.put("user", user.getObjectId());
-            installation.saveInBackground();
-            Log.d("messaging", "put installation user id: " + user.getObjectId());
-        }
-
-    }
-
-    public String getUserDisplayName() {
-
-        return (String) ParseUser.getCurrentUser().get(Constants.ParseUser.USER_DISPLAY_NAME);
-    }
-
-    public String getUserEmail() {
-
-        return (String) ParseUser.getCurrentUser().getEmail();
-    }
+//    //TODO need to get userName and password from local DB, if present.
+//    public void setUserName(String username) {
+//
+//        this.userName = username;
+//
+//        ParseUser user = ParseUser.getCurrentUser();
+//
+//        if (user != null) {
+//
+//            installation.put("user", user.getObjectId());
+//            installation.saveInBackground();
+//            Log.d("messaging", "put installation user id: " + user.getObjectId());
+//        }
+//
+//    }
 
     public void updateMessagingStatus(MessagingActivity messagingActivity, String itemId, String recipientId) {
 
@@ -99,8 +87,6 @@ public class LostFoundApplication extends Application {
         messagingRecipientId = recipientId;
 
     }
-
-
 
     public MessagingActivity getMessagingActivity() {
         return messagingActivity;
@@ -141,8 +127,6 @@ public class LostFoundApplication extends Application {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public String getMessagingRecipientId() {

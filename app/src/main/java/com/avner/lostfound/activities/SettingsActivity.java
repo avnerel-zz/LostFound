@@ -55,7 +55,7 @@ public class SettingsActivity extends Activity implements AdapterView.OnItemSele
 
         userDisplayName = (EditText) findViewById(R.id.et_userName);
         LostFoundApplication app = (LostFoundApplication) getApplication();
-        userDisplayName.setText(app.getUserDisplayName());
+        userDisplayName.setText((String) ParseUser.getCurrentUser().get("name"));
 
         Button b_updateUserName = (Button) findViewById(R.id.b_updateUserName);
         b_updateUserName.setOnClickListener(this);

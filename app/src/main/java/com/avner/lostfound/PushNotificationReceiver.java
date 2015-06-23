@@ -3,11 +3,11 @@ package com.avner.lostfound;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.avner.lostfound.activities.MessagingActivity;
 import com.avner.lostfound.utils.SignalSystem;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -18,8 +18,6 @@ import com.parse.SaveCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 import static com.avner.lostfound.Constants.UIActions.uiaCompleteConversationSent;
 import static com.avner.lostfound.Constants.UIActions.uiaConversationSaved;
@@ -158,7 +156,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
         LostFoundApplication applicationContext = (LostFoundApplication) context.getApplicationContext();
 
-        pinMessage(messageId, applicationContext);
+        pinMessage(messageId);
         if (applicationContext.getMessagingActivity()!=null &&
                 itemId.equals(applicationContext.getMessagingActivityItemId())&&
                 senderId.equals(applicationContext.getMessagingRecipientId())){
@@ -205,7 +203,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     }
 
-    private void pinMessage(String messageId, final LostFoundApplication applicationContext) {
+    private void pinMessage(String messageId) {
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_MESSAGE);
         query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, messageId);
@@ -230,51 +228,6 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
 
     }
 
-    private void addConversationIfNeeded(final String currentUserId, final String senderId, final String senderName, ParseQuery<ParseObject> query) {
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> conversationList, ParseException e) {
-                // Exception thrown from parse.
-                if (e != null) {
-                    return;
-                }
-                // check if conversation exists for this user.
-                boolean foundConversation = false;
-                ParseObject parseItem = null;
-                for (ParseObject conversation : conversationList) {
-                    if (conversation.get(Constants.ParseConversation.RECIPIENT_USER_ID).equals(senderId)) {
-                        foundConversation = true;
-                        int unreadCount = (int) conversation.get(Constants.ParseConversation.UNREAD_COUNT);
-                        conversation.put(Constants.ParseConversation.UNREAD_COUNT, ++unreadCount);
-                        conversation.saveInBackground();
-
-                        // found the other user conversation.
-                    } else {
-                        parseItem = (ParseObject) conversation.get(Constants.ParseConversation.ITEM);
-                    }
-                }
-                if (!foundConversation) {
-                    final ParseObject parseConversation = new ParseObject(Constants.ParseObject.PARSE_CONVERSATION);
-                    parseConversation.put(Constants.ParseConversation.ITEM, parseItem);
-                    parseConversation.put(Constants.ParseConversation.RECIPIENT_USER_ID, senderId);
-                    parseConversation.put(Constants.ParseConversation.MY_USER_ID, currentUserId);
-                    parseConversation.put(Constants.ParseConversation.RECIPIENT_USER_NAME, senderName);
-                    parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 1);
-                    parseConversation.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-
-                            if(e==null){
-                                parseConversation.pinInBackground();
-                            }
-                        }
-                    });
-
-                }
-            }
-        });
-    }
-
     @Override
     protected void onPushReceive(Context context, Intent intent) {
         if (intent.hasExtra(Constants.ParsePush.EXTRA_NAME)) {
@@ -285,7 +238,9 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 jsonData = new JSONObject(stringData);
                 Log.d("PUSH_RECEIVED", "jsonData: " + jsonData);
 
-                if (!handlePushes(context, jsonData)) return;
+                if (!handlePushes(context, jsonData) ||
+                        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.enable_push_messages),true) == false)
+                return;
 
             } catch (JSONException e) {
                 e.printStackTrace();

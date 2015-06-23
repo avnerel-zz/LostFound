@@ -89,5 +89,9 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="noItemsAvailable">No items are available</string>
+    <string name="logout_button">logout_button</string>
+    <string name="user_display_name">userDisplayName</string>
+    <string name="display_name">Display Name</string>
+    <string name="enable_push_messages">EnablePushMessages</string>
 
 </resources>

@@ -14,9 +14,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.avner.lostfound.Constants;
-import com.avner.lostfound.LostFoundApplication;
 import com.avner.lostfound.R;
 import com.avner.lostfound.structs.User;
+import com.parse.ParseUser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,9 +56,8 @@ public class StatsFragment extends Fragment {
     private void setUserDetails() {
 
         TextView userName = (TextView) rootView.findViewById(R.id.et_userName);
-        LostFoundApplication app = (LostFoundApplication) getActivity().getApplication();
 
-        userName.setText(app.getUserDisplayName());
+        userName.setText((String) ParseUser.getCurrentUser().get("name"));
 
         ImageView userPicture = (ImageView) rootView.findViewById(R.id.iv_profileImage);
         File file = new File(Constants.USER_IMAGE_FILE_PATH);

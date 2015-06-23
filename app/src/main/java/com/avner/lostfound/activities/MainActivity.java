@@ -220,7 +220,7 @@ public class MainActivity extends FragmentActivity implements
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(this,SettingsActivity.class);
+                Intent intent = new Intent(this,PreferencesActivity.class);
                 startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
                 break;
             case R.id.messaging:
