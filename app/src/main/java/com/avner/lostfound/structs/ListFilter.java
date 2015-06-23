@@ -46,8 +46,8 @@ public class ListFilter {
         return (this.filter_time != prevFilter);
     }
 
-    public boolean updateContentFilter(Context ctx, String phrase) {
-        if (null == phrase) { // || "".equals(phrase) || phrase.length() < Constants.MIN_CONTENT_FILTER_SIZE) { // invalid filter
+    public boolean updateContentFilter(Context ctx, String phrase, boolean forceUpdate) {
+        if (null == phrase) {
             return false;
         }
 
@@ -56,7 +56,12 @@ public class ListFilter {
             return false;
         }
 
-        if (this.filter_content.equals(phrase)) { // same as previous filter
+        if ("".equals(phrase)) {
+            this.filter_content = "";
+            return true;
+        }
+
+        if (!forceUpdate && this.filter_content.equals(phrase)) { // same as previous filter
             return false;
         }
 
@@ -64,6 +69,9 @@ public class ListFilter {
         return true;
     }
 
+    public boolean updateContentFilter(Context ctx, String phrase) {
+        return updateContentFilter(ctx, phrase, false);
+    }
 
     public boolean updateDistanceFilter(String strDistFilter) {
         long prevFilter = this.filter_dist;
@@ -81,8 +89,5 @@ public class ListFilter {
 
         return (this.filter_dist != prevFilter);
     }
-
-
-
 
 }

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,7 +15,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -49,7 +47,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private ListView lv_itemList;
     private Spinner sp_locationSpinner;
     private Spinner sp_timeSpinner;
-    private SearchView sv_search;
 
     // INSTANCE VARIABLES
     private View rootView;
@@ -61,7 +58,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private String parseClassName; // used as parse queries identifier
     private ListFilter filters = new ListFilter();
     private MainActivity myMainActivity;
-    private MenuItem mi_search_menu_item;
 
     // item info widgets
     private ImageButton ib_sendMessage;
@@ -71,7 +67,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private TextView tv_descriptionContent;
     private ImageView iv_itemImage;
     private TextView tv_descriptionTitle;
-    private boolean itemInfoWidgetsVisible = false;
     private boolean isPossibleMatchesFragment;
     private PossibleMatchesActivity myPossibleMatchesActivity;
     private ArrayList<String> possibleMatchesIds;
@@ -134,16 +129,13 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
         FloatingActionButton button = (FloatingActionButton) rootView.findViewById(R.id.b_add_item);
 
-        if(!isPossibleMatchesFragment){
-
-            initSearchView(myMainActivity.getSearchView(), myMainActivity.getSearchViewMenuItem());
+        if (!isPossibleMatchesFragment) {
             initTimeSpinner();
             initLocationSpinner();
             button.setOnClickListener(this);
 
-        //remove filters and button for possible matches fragment.
-        }else{
-
+            //remove filters and button for possible matches fragment.
+        } else {
             button.setVisibility(View.INVISIBLE);
             this.sp_timeSpinner = (Spinner) rootView.findViewById(R.id.s_time_filter);
             this.sp_locationSpinner = (Spinner) rootView.findViewById(R.id.s_location_filter);
@@ -154,16 +146,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
             spinnersLayout.removeView(sp_locationSpinner);
             spinnersLayout.removeView(spinnerText);
         }
-
     }
-
-    private void initSearchView(SearchView searchView, MenuItem searchViewMenuItem) {
-        if (null == searchView) return;
-
-        this.sv_search = searchView;
-        this.mi_search_menu_item = searchViewMenuItem;
-    }
-
 
     private void initItemInfoWidgets() {
         View item_info = this.rootView.findViewById(R.id.item_info);
@@ -181,33 +164,17 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.tv_descriptionTitle = (TextView) item_info.findViewById(R.id.tv_descriptionTitle);
     }
 
-    /**
-     * Update the search view's contents to what it was the last time this fragment was active.
-     *
-     * @param phrase
-     */
-    public void refreshSearchPhrase(String phrase) {
-        if (null == phrase) return;
-
-        if (null == this.sv_search) { // don't count on inflation order of activity and fragments
-            initSearchView(((MainActivity) getActivity()).getSearchView(), myMainActivity.getSearchViewMenuItem());
-        }
-
-        if (null == this.sv_search) { // still null and couldn't initialize - skip refreshing
-            return;
-        }
-
-        sv_search.setQuery(filters.getContentFilter(), false);
-        sv_search.clearFocus();
-    }
-
-    public void searchPhrase(Context ctx, String phrase) {
-        if (this.filters.updateContentFilter(ctx, phrase)) {
-            ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
-            Log.d(Constants.LOST_FOUND_TAG, "content filter updated to \"" + this.filters.getContentFilter() + "\"");
+    public void searchPhrase(Context ctx, String phrase, boolean forceUpdate) {
+        if (this.filters.updateContentFilter(ctx, phrase, forceUpdate)) {
+            ListFilterUtils.applyListFilters(allItems, adapter, filters, myMainActivity.getLastKnownLocation());
+            Log.d(Constants.LOST_FOUND_TAG, "phrase filter updated to \"" + this.filters.getContentFilter() + "\"");
         }
 
         adapter.notifyDataSetInvalidated();
+    }
+
+    public void searchPhrase(Context ctx, String phrase) {
+        searchPhrase(ctx, phrase, false);
     }
 
     /**
@@ -242,17 +209,11 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.itemsToDisplay = new ArrayList<>();
 
         this.adapter = new LostFoundListAdapter(this.allItems, rootView, this);
-        Log.d(Constants.LOST_FOUND_TAG, "raw items list contains " + this.allItems.size() + " items. filtered items: " + this.itemsToDisplay.size());
+//        Log.d(Constants.LOST_FOUND_TAG, "raw items list contains " + this.allItems.size() + " items. filtered items: " + this.itemsToDisplay.size());
 
         this.lv_itemList.setClickable(true);
         this.lv_itemList.setAdapter(this.adapter);
         this.lv_itemList.setOnItemClickListener(this.adapter);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-//        getItemsFromParse();
     }
 
     /**
@@ -263,14 +224,14 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClassName);
         query.fromLocalDatastore();
         query.whereEqualTo(Constants.ParseReport.IS_ALIVE, true);
-        query.orderByDescending(Constants.ParseReport.TIME);
-        if(isPossibleMatchesFragment){
+        query.orderByDescending(Constants.ParseQuery.CREATED_AT);
 
+        if (isPossibleMatchesFragment) {
             query.whereContainedIn(Constants.ParseQuery.OBJECT_ID, possibleMatchesIds);
-        }else{
-            query.whereEqualTo(Constants.ParseReport.IS_LOST,isLostFragment);
-
+        } else {
+            query.whereEqualTo(Constants.ParseReport.IS_LOST, isLostFragment);
         }
+
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
@@ -279,14 +240,15 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                     for (int i = 0; i < itemsList.size(); i++) {
                         convertParseListToItemList(itemsList);
                     }
-                    if(!isPossibleMatchesFragment){
+                    if (!isPossibleMatchesFragment) {
                         ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
-                    }else{
+                    } else {
                         adapter.notifyDataSetChanged();
                     }
-                    if(itemsList.size() == 0){
+
+                    if (itemsList.isEmpty()) {
                         tv_no_items_available.setVisibility(View.VISIBLE);
-                    }else{
+                    } else {
                         tv_no_items_available.setVisibility(View.INVISIBLE);
                     }
                     Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
@@ -297,7 +259,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     }
 
     private void convertParseListToItemList(List<ParseObject> itemsList) {
-
         allItems.clear();
 
         for (ParseObject parseItem : itemsList){
@@ -394,6 +355,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
     private void initMapButton(Item item) {
         final Location location = item.getLocation();
+
         // no location specified.
         if (location == null) {
             ib_showMap.setVisibility(ImageButton.INVISIBLE);
@@ -424,67 +386,35 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.tv_descriptionContent.setVisibility(View.VISIBLE);
         this.tv_descriptionTitle.setVisibility(View.VISIBLE);
 
-        this.itemInfoWidgetsVisible = true;
         return true;
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {}
 
-    private boolean searchBarExpanded = false;
-    private CharSequence searchBarQuery = "";
-
-    public void saveSearchViewState() {
-        if (null == this.sv_search) return; // wasn't setup yet, no need to save state
-
-        // query
-        this.searchBarQuery = this.sv_search.getQuery();
-
-        // expanded / collapsed
-        this.searchBarExpanded = this.mi_search_menu_item.isActionViewExpanded(); // maybe redundant
-
-        Log.d(Constants.LOST_FOUND_TAG, String.format("saved search bar state (query = '%s', expanded = %s)", this.searchBarQuery, this.searchBarExpanded));
-    }
-
-    public void restoreSearchViewState() {
-        Log.d(Constants.LOST_FOUND_TAG, "restoring search bar state");
-
-        // query
-        if (null == this.sv_search) return; // wasn't setup yet, no need to restore state
-
-        this.sv_search.setQuery(this.searchBarQuery, false);
-
-        // expanded / collapsed
-        if (this.searchBarExpanded) {
-            this.mi_search_menu_item.expandActionView();
-        }
-        else {
-            this.mi_search_menu_item.collapseActionView();
-        }
-
-        Log.d(Constants.LOST_FOUND_TAG, String.format("restored search bar state (query = '%s', expanded = %s)", this.searchBarQuery, this.searchBarExpanded));
-    }
-
-    public void searchBarExpanded() {
-        this.searchBarExpanded = true;
-    }
-
-    public void searchBarCollapsed() {
-        this.searchBarExpanded = false;
-    }
-
     public void updateData() {
-
         getItemsFromParse();
     }
 
     @Override
     public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
-
         switch (action){
             case uiaItemSaved:
                 updateData();
                 break;
         }
+    }
+
+    public String getSearchPhrase() {
+        if (null != filters) {
+            return filters.getContentFilter();
+        }
+
+        return null;
+    }
+
+    public void clearFilters() {
+        filters = new ListFilter();
+        ListFilterUtils.applyListFilters(allItems, adapter, filters, myMainActivity.getLastKnownLocation());
     }
 }

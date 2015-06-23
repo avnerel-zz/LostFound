@@ -35,8 +35,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.util.List;
-
 public class MainActivity extends FragmentActivity implements
         ActionBar.TabListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IUIUpdateInterface {
 
@@ -55,7 +53,6 @@ public class MainActivity extends FragmentActivity implements
             Constants.TabTexts.MY_WORLD,
             Constants.TabTexts.LOST,
             Constants.TabTexts.FOUND,
-//            Constants.TabTexts.STATS
     };
 
     // Tab icons
@@ -63,16 +60,24 @@ public class MainActivity extends FragmentActivity implements
             R.drawable.earth,
             R.drawable.question_mark_red1,
             R.drawable.chequered_flags,
-//            R.drawable.graph,
     };
     private ActionMode actionMode;
-    private List<View> itemInfoViews;
     private TextView messageCount;
+    private String sv_search_phrase_filter;
+    private String sv_search_phrase_display;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (null != savedInstanceState) {
+            this.sv_search_phrase_filter = savedInstanceState.getString("search_query_filter");
+            this.sv_search_phrase_display = savedInstanceState.getString("search_query_display");
+            Log.d(Constants.LOST_FOUND_TAG, "extracted stored search phrase (filter) \"" + this.sv_search_phrase_filter + "\"");
+            Log.d(Constants.LOST_FOUND_TAG, "extracted stored search phrase (display) \"" + this.sv_search_phrase_display + "\"");
+        }
+
         setContentView(R.layout.activity_main);
 
         // Initialization
@@ -106,15 +111,16 @@ public class MainActivity extends FragmentActivity implements
                         prevSelectedTabIndex, isListingFragment(prevSelectedTabIndex) ? "" : "non-",
                         selectedTabIndex, isListingFragment(selectedTabIndex) ? "" : "non-"));
 
+                if (null != mi_search_menu_item) {
+                    mi_search_menu_item.collapseActionView(); // might be null when changing orientation
+                }
+
                 if (isListingFragment(position)) {
                     // switched to a listing tab - enable search view
                     showSearchView();
 
-                    if (isListingFragment(prevSelectedTabIndex)) {
-                        ((ListingFragment)getFragmentAt(prevSelectedTabIndex)).saveSearchViewState();
-                    }
-
-                    ((ListingFragment)getCurrentFragment()).restoreSearchViewState();
+                    ListingFragment frag = (ListingFragment)getCurrentFragment();
+                    frag.clearFilters();
                 }
                 else {
                     // switched to a non-listing tab - disable search view
@@ -134,6 +140,24 @@ public class MainActivity extends FragmentActivity implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+    }
+
+    private void restoreSearchPhrase() {
+        if (null != sv_search) {
+            sv_search.post(new Runnable() {
+                @Override
+                public void run() {
+                    sv_search.setQuery(sv_search_phrase_display, false);
+
+                    if (isListingFragment(selectedTabIndex)) {
+                        Log.d(Constants.LOST_FOUND_TAG, "main activity restoring search phrase (filter)\"" + sv_search_phrase_filter + "\"");
+                        ((ListingFragment)getCurrentFragment()).searchPhrase(getApplicationContext(), sv_search_phrase_filter, true);
+                    }
+                }
+            });
+
+
+        }
     }
 
     @Override
@@ -198,9 +222,14 @@ public class MainActivity extends FragmentActivity implements
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         initSearchBar(menu);
+        Log.d(Constants.LOST_FOUND_TAG, "finished initSearchBar");
 
         if (!isListingFragment(actionBar.getSelectedNavigationIndex())) {
             hideSearchView();
+        }
+        else {
+            restoreSearchPhrase();
+            Log.d(Constants.LOST_FOUND_TAG, "finished restoreSearchPhrase");
         }
 
 
@@ -240,7 +269,6 @@ public class MainActivity extends FragmentActivity implements
      * update method count widget above messages menu item.
      */
     private void updateNotificationCount() {
-
         Log.d(Constants.LOST_FOUND_TAG, "updating notification count in main activity.");
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_CONVERSATION);
         query.whereGreaterThan(Constants.ParseConversation.UNREAD_COUNT, 0);
@@ -248,21 +276,18 @@ public class MainActivity extends FragmentActivity implements
         query.countInBackground(new CountCallback() {
             @Override
             public void done(int count, ParseException e) {
-
-                if(count > 0){
-
+                if (count > 0) {
                     Log.d(Constants.LOST_FOUND_TAG, "notification count: " + count);
                     messageCount.setVisibility(View.VISIBLE);
                     messageCount.setText("" + count);
 
-                }else{
+                } else {
                     Log.d(Constants.LOST_FOUND_TAG, "notification count was reset");
                     messageCount.setText("");
                     messageCount.setVisibility(View.INVISIBLE);
                 }
             }
         });
-
     }
 
     private void initSearchBar(Menu menu) {
@@ -270,7 +295,6 @@ public class MainActivity extends FragmentActivity implements
         this.sv_search = (SearchView) menu.findItem(R.id.search).getActionView();
         this.sv_search.setSubmitButtonEnabled(true);
 
-        initSearchBarExpansionHandling();
         initSearchBarQueryHandling();
     }
 
@@ -287,53 +311,28 @@ public class MainActivity extends FragmentActivity implements
 
                 ListingFragment fragment = (ListingFragment) getCurrentFragment();
                 fragment.searchPhrase(getApplicationContext(), query);
+
+                if (query.length() > 1) {
+                    sv_search_phrase_filter = query;
+                }
+
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if ("".equals(newText) && isListingFragment(selectedTabIndex)) {
-                    ListingFragment fragment = (ListingFragment) getCurrentFragment();
-                    fragment.searchPhrase(getApplicationContext(), newText);
-                }
-                return true;
-            }
-        });
-    }
-
-    private void initSearchBarExpansionHandling() {
-        this.mi_search_menu_item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                Log.d(Constants.LOST_FOUND_TAG, "search bar expanding...");
-                int selectedFragmentIndex = actionBar.getSelectedNavigationIndex();
-
-                if (isListingFragment(selectedFragmentIndex)) {
-                    ((ListingFragment) getFragmentAt(selectedFragmentIndex)).searchBarExpanded();
+                if ("".equals(newText)) {
+                    ((ListingFragment) getCurrentFragment()).searchPhrase(getApplicationContext(), "");
+                    Log.d(Constants.LOST_FOUND_TAG, "onTextChange called with empty string");
                 }
 
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                Log.d(Constants.LOST_FOUND_TAG, "search bar collapsing...");
-                int selectedFragmentIndex = actionBar.getSelectedNavigationIndex();
-
-                if (isListingFragment(selectedFragmentIndex)) {
-                    ((ListingFragment) getFragmentAt(selectedFragmentIndex)).searchBarCollapsed();
-                }
-                return true;
+                return false;
             }
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == Constants.REQUEST_CODE_REPORT_FORM && resultCode == RESULT_OK){
-//
-//            updateLocalDataInFragments();
-//        }
         if(requestCode == Constants.REQUEST_CODE_SETTINGS && resultCode == Constants.RESULT_CODE_LOGOUT){
 
             ParseUser.logOut();
@@ -351,15 +350,6 @@ public class MainActivity extends FragmentActivity implements
     private Fragment getFragmentAt(int position) {
         return getSupportFragmentManager().findFragmentByTag("android:switcher:" + viewPager.getId() + ":"
                 + ((TabsPagerAdapter)viewPager.getAdapter()).getItemId(position));
-//        return ((TabsPagerAdapter)this.viewPager.getAdapter()).getItem(position);
-    }
-
-    public SearchView getSearchView() {
-        return this.sv_search;
-    }
-
-    public MenuItem getSearchViewMenuItem() {
-        return this.mi_search_menu_item;
     }
 
     @Override
@@ -396,9 +386,11 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+
+
+
         this.googleApiClient.connect();
         setInitLocation();
-
     }
 
     private void setInitLocation() {
@@ -410,7 +402,7 @@ public class MainActivity extends FragmentActivity implements
             mockLocation.setAccuracy(50.0f);
 
             this.lastKnownLocation = mockLocation;
-            Log.d(Constants.LOST_FOUND_TAG, "set init mock location: " + mockLocation.toString());
+//            Log.d(Constants.LOST_FOUND_TAG, "set init mock location: " + mockLocation.toString());
         }
     }
 
@@ -438,29 +430,10 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
-    }
+    public void onConnectionSuspended(int i) {}
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-//    @Override
-//    public boolean onMenuItemClick(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.action_settings:
-//                Intent intent = new Intent(this,SettingsActivity.class);
-//                startActivityForResult(intent,Constants.REQUEST_CODE_SETTINGS);
-//                break;
-//            case R.id.messaging:
-//                Intent conversationIntent = new Intent(this,ConversationListActivity.class);
-//                startActivity(conversationIntent);
-//                break;
-//        }
-//        return false;
-//    }
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     public void setActionMode(ActionMode actionMode) {
         this.actionMode = actionMode;
@@ -468,11 +441,28 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onDataChange(Constants.UIActions action, boolean bSuccess, Intent data) {
-
-        switch(action){
+        switch (action) {
+            case uiaMessageSaved:
+                //TODO mark conversation menu item with flag
+                break;
             case uiaConversationSaved:
                 updateNotificationCount();
                 break;
+        }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (isListingFragment(this.selectedTabIndex)) {
+            Log.d(Constants.LOST_FOUND_TAG, "saving search phrase (display) \"" + sv_search.getQuery() + "\"");
+            outState.putString("search_query_display", sv_search.getQuery().toString());
+
+            String searchPhrase = ((ListingFragment)getCurrentFragment()).getSearchPhrase();
+            Log.d(Constants.LOST_FOUND_TAG, "saving search phrase (filter) \"" + searchPhrase + "\"");
+            outState.putString("search_query_filter", searchPhrase);
         }
     }
 }
