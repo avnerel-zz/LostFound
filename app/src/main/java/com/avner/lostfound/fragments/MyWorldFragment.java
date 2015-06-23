@@ -195,10 +195,24 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
             }
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                Item item_selected = (Item) myOpenListingsAdapter.getItem(myOpenListingsAdapter.getChosenItemPosition());
+                final Item item_selected = (Item) myOpenListingsAdapter.getItem(myOpenListingsAdapter.getChosenItemPosition());
                 switch (item.getItemId()) {
                     case R.id.delete:
-                        myOpenListingsAdapter.remove(item_selected);
+
+                        AlertDialog alertDialog = new AlertDialog.Builder(rootView.getContext()).create(); //Read Update
+                        alertDialog.setTitle("Delete Report");
+                        alertDialog.setMessage("Are you sure you want to delete the report?");
+
+                        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                myOpenListingsAdapter.remove(item_selected);
+                            }
+                        });
+                        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"No", new DialogInterface.OnClickListener()    {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        alertDialog.show();  //<-- See This!
                         break;
                     case R.id.edit:
                         myOpenListingsAdapter.edit(item_selected);
@@ -371,7 +385,7 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
                     openReportForm(true);
                 }
             });
-            alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"Found", new DialogInterface.OnClickListener()    {
+            alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Found", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     openReportForm(false);
                 }
