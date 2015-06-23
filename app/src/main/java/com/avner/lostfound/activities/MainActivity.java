@@ -30,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.parse.CountCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -336,6 +337,7 @@ public class MainActivity extends FragmentActivity implements
         if(requestCode == Constants.REQUEST_CODE_SETTINGS && resultCode == Constants.RESULT_CODE_LOGOUT){
 
             ParseUser.logOut();
+            ParseInstallation.getCurrentInstallation().put("user", "");
             Intent intent = new Intent(this,LoginActivity.class);
             startActivity(intent);
             finish();
