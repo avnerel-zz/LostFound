@@ -286,9 +286,10 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     }
 
     public void getMatches(Item item_selected) {
-        HashMap<String,String> params = new HashMap();
+        HashMap<String,Object> params = new HashMap();
         params.put(Constants.ParseCloud.REPORT_ID, item_selected.getId());
         params.put(Constants.ParseCloud.PUBLISHER_ID, ParseUser.getCurrentUser().getObjectId());
+        params.put(Constants.ParseCloud.IS_LOST, item_selected.isLost());
         ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.LOOK_FOR_MATCHES, params);
     }
 

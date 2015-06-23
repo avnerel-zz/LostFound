@@ -132,7 +132,7 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
         // get all my lost items
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Constants.ParseObject.PARSE_LOST);
         query.fromLocalDatastore();
-        query.orderByDescending(Constants.ParseQuery.CREATED_AT);
+        query.orderByDescending(Constants.ParseReport.TIME);
         query.whereEqualTo(Constants.ParseReport.USER_ID, ParseUser.getCurrentUser().getObjectId());
         query.whereEqualTo(Constants.ParseReport.IS_ALIVE, true);
 

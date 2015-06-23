@@ -183,5 +183,6 @@ public class Constants {
 
         public static final String REPORT_ID = "reportId";
         public static final String PUBLISHER_ID = "publisherId";
+        public static final String IS_LOST = "isLost";
     }
 }
