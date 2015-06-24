@@ -24,6 +24,7 @@
         android:layout_toEndOf="@+id/iv_itemListingImage"
         android:layout_toRightOf="@+id/iv_itemListingImage"
         android:width="180dp"
+        android:gravity="left"
         android:hint="Item name long long long long long long"
         android:singleLine="true"
         android:textSize="20sp" />

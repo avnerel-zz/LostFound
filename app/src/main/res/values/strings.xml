@@ -93,5 +93,6 @@
     <string name="user_display_name">userDisplayName</string>
     <string name="display_name">Display Name</string>
     <string name="enable_push_messages">EnablePushMessages</string>
+    <string name="selectItem">Choose Item</string>
 
 </resources>

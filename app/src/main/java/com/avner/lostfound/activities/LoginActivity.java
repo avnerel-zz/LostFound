@@ -102,11 +102,6 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
         }
         if (requestCode == Constants.REQUEST_CODE_FACEBOOK_LOGIN) {
 
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Initializing");
-            progressDialog.setMessage("Please wait...");
-            progressDialog.show();
-
             ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -153,6 +148,10 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
      * This method logs the user in to parse with his facebook credentials.
      */
     private void logInToParseWithFacebook() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Initializing");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
         getUserFacebookProfileDetails();
         finishLogin(true);
     }

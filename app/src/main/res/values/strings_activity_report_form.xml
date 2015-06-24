@@ -7,6 +7,7 @@
         <item>Student ID</item>
         <item>Keys</item>
         <item>Other..</item>
+        <item>Please choose an item</item>
     </string-array>
 
     <string-array name="default_time">

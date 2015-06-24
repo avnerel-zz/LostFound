@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -62,7 +63,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     private TextView et_itemName;
     private TextView tv_date_picker;
     private TextView tv_time_picker;
-    private ImageButton ib_pick_location;
     private ImageButton ib_item_photo;
     private GoogleApiClient googleApiClient;
     private LatLng location_chosen;
@@ -80,6 +80,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
      */
     private boolean editReport;
     private Item itemEdited;
+    private Button b_submit;
+    private MenuItem mi_submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,12 +93,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         lostReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_LOST_FORM);
         editReport = getIntent().getExtras().getBoolean(Constants.ReportForm.IS_EDIT_FORM);
 
-        if (editReport){
-            itemEdited = getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
-            loadFromItem(itemEdited);
-        } else {
-            setDefaultValues();
-        }
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -105,7 +101,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                 .build();
 
     }
-
     private void setDefaultValues() {
         setTime(Calendar.getInstance());
     }
@@ -171,8 +166,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         initLocationViews();
         initItemSelector();
 
-        Button submitButton = (Button) findViewById(R.id.b_submit);
-        submitButton.setOnClickListener(this);
+        b_submit = (Button) findViewById(R.id.b_submit);
+        b_submit.setOnClickListener(this);
         et_description = (EditText) findViewById(R.id.et_description);
         initItemImage();
     }
@@ -185,36 +180,55 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     private void initItemSelector() {
         spinner = (Spinner) findViewById(R.id.s_choose_item);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.default_items, android.R.layout.simple_spinner_item);
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                R.array.default_items, android.R.layout.simple_spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+                return v;
+            }
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+        };
+
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.addAll(getResources().getStringArray(R.array.default_items));
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+        spinner.setSelection(adapter.getCount()); //set the hint the default selection so it appears on launch.
         spinner.setOnItemSelectedListener(this);
 
         et_itemName = (TextView) findViewById(R.id.et_itemName);
     }
 
     private void initLocationViews() {
-        ib_pick_location = (ImageButton) findViewById(R.id.b_pick_location);
-        ib_pick_location.setOnClickListener(this);
 
         cb_with_location = (CheckBox) findViewById(R.id.cb_with_location);
         cb_with_location.setOnCheckedChangeListener(this);
 
         tv_location_picker = (TextView) findViewById(R.id.tv_location_picker);
+        tv_location_picker.setOnClickListener(this);
     }
 
     private void initTimeViews() {
 
-        ImageButton ib_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
-        ib_pick_date.setOnClickListener(this);
+//        ImageButton ib_pick_date = (ImageButton) findViewById(R.id.b_pick_date);
+//        ib_pick_date.setOnClickListener(this);
         tv_date_picker = (TextView) findViewById(R.id.tv_date_picker);
+        tv_date_picker.setOnClickListener(this);
 
-        ImageButton ib_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
-        ib_pick_time.setOnClickListener(this);
+//        ImageButton ib_pick_time = (ImageButton) findViewById(R.id.b_pick_time);
+//        ib_pick_time.setOnClickListener(this);
         tv_time_picker = (TextView) findViewById(R.id.tv_time_picker);
+        tv_time_picker.setOnClickListener(this);
     }
 
     private void setTime(Calendar calendar) {
@@ -237,8 +251,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_report_form, menu);
-        MenuItem submit = menu.findItem(R.id.action_send);
-        submit.setOnMenuItemClickListener(this);
+        mi_submit = menu.findItem(R.id.action_send);
+        mi_submit.setOnMenuItemClickListener(this);
         return true;
     }
 
@@ -246,6 +260,14 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
+        if (editReport){
+            itemEdited = getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
+            loadFromItem(itemEdited);
+        } else {
+            setDefaultValues();
+        }
+
+        spinner.requestFocus();
     }
 
     @Override
@@ -260,13 +282,13 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     public void onClick(View v) {
 
         switch(v.getId()){
-            case  R.id.b_pick_date:
+            case  R.id.tv_date_picker:
                 getDate();
                 break;
-            case  R.id.b_pick_time:
+            case  R.id.tv_time_picker:
                 getTime();
                 break;
-            case  R.id.b_pick_location:
+            case  R.id.tv_location_picker:
                 getLocation();
                 break;
             case  R.id.b_submit:
@@ -426,6 +448,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+        if(position < spinner.getCount()){
+            if(mi_submit!= null){
+                mi_submit.setVisible(true);
+            }
+            b_submit.setEnabled(true);
+        }
         // user chose other.
         if (spinner.getSelectedItemPosition() == spinner.getAdapter().getCount() - 1) {
             et_itemName.setVisibility(View.VISIBLE);
@@ -461,12 +489,10 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked){
-            ib_pick_location.setEnabled(true);
             tv_location_picker.setEnabled(true);
             updateCurrentLocation();
         }
         else {
-            ib_pick_location.setEnabled(false);
             tv_location_picker.setEnabled(false);
             tv_location_picker.setText(Constants.Geocoder.NO_LOCATION_AVAILABLE);
             location_chosen = null;
@@ -492,6 +518,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         }else{
             progressDialog.setTitle("Creating Report");
         }
+        progressDialog.setCancelable(false);
         progressDialog.setMessage("Please wait...");
         progressDialog.show();
 
@@ -534,6 +561,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             parseReport.put(Constants.ParseReport.LOCATION_STRING, tv_location_picker.getText().toString());
         }
         else {
+            parseReport.remove(Constants.ParseReport.LOCATION);
             parseReport.put(Constants.ParseReport.LOCATION_STRING, Constants.Geocoder.NO_LOCATION_AVAILABLE);
         }
 
@@ -559,18 +587,15 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                     progressDialog.dismiss();
                     Toast.makeText(activity, "No Connection. Can't upload report", Toast.LENGTH_SHORT).show();
                 }else{
-//                    try {
-//                        parseReport.pin();
                         progressDialog.dismiss();
                         setResult(RESULT_OK, null);
                         SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
                         finish();
                         Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
-//                    } catch (ParseException e1) {
-//                        e1.printStackTrace();
-//                    }
                 }
             }
         });
     }
+
+
 }

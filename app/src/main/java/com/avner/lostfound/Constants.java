@@ -53,6 +53,7 @@ public class Constants {
     public static final int LOST_ITEM_IMAGE = R.drawable.lost_item;
     public static final int FOUND_ITEM_IMAGE = R.drawable.found_item;
     public static final String POSSIBLE_MATCHES = "PossibleMatches";
+    public static final int MIN_DESCRIPTION_LENGTH = 10;
 
 
     public class TabTexts {

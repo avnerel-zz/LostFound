@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.avner.lostfound.Constants;
 import com.avner.lostfound.R;
@@ -15,7 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class PickLocationActivity extends FragmentActivity implements GoogleMap.OnMapClickListener, View.OnClickListener {
+public class PickLocationActivity extends FragmentActivity implements GoogleMap.OnMapClickListener{
 
     private GoogleMap map; // Might be null if Google Play services APK is not available.
 
@@ -26,8 +26,6 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pick_location);
 
-        Button locationChosenButton = (Button) findViewById(R.id.b_chose_location);
-        locationChosenButton.setOnClickListener(this);
         setUpMapIfNeeded();
     }
 
@@ -35,6 +33,33 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_pick_location, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+
+        switch(item.getItemId()){
+            case R.id.mi_send:
+                if (null == location_chosen_marker) { // no marker selected - create a dummy one
+                    Log.d(Constants.LOST_FOUND_TAG, "location_chosen_marker is NULL!");
+                    location_chosen_marker = getMarker(0.0, 0.0);
+                }
+
+                Intent intent = new Intent();
+                intent.putExtra(Constants.LONGITUDE, location_chosen_marker.getPosition().longitude);
+                intent.putExtra(Constants.LATITUDE, location_chosen_marker.getPosition().latitude);
+                setResult(RESULT_OK, intent);
+                finish();
+        }
+        return true;
     }
 
     /**
@@ -111,29 +136,4 @@ public class PickLocationActivity extends FragmentActivity implements GoogleMap.
         location_chosen_marker = chosenMarker;
     }
 
-    @Override
-    public void onClick(View v) {
-
-        if (null == v) {
-            Log.d(Constants.LOST_FOUND_TAG, "View v is NULL!");
-            Intent intent = new Intent();
-            intent.putExtra(Constants.LONGITUDE, 0.0);
-            intent.putExtra(Constants.LATITUDE, 0.0);
-            setResult(RESULT_OK, intent);
-            finish();
-
-        }else if (v.getId() == R.id.b_chose_location) {
-
-            if (null == location_chosen_marker) { // no marker selected - create a dummy one
-                Log.d(Constants.LOST_FOUND_TAG, "location_chosen_marker is NULL!");
-                location_chosen_marker = getMarker(0.0, 0.0);
-            }
-
-            Intent intent = new Intent();
-            intent.putExtra(Constants.LONGITUDE, location_chosen_marker.getPosition().longitude);
-            intent.putExtra(Constants.LATITUDE, location_chosen_marker.getPosition().latitude);
-            setResult(RESULT_OK, intent);
-            finish();
-        }
-    }
 }

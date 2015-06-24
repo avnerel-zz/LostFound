@@ -81,7 +81,7 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 }else{
 
                     Log.d("PUSH_CONVERSATION", "Got the data from server");
-                    parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 1);
+//                    parseConversation.put(Constants.ParseConversation.UNREAD_COUNT, 1);
                     parseConversation.pinInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {

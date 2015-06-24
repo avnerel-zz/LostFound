@@ -35,6 +35,9 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
                     android:layout_toRightOf="@+id/ib_item_image"
+                    android:prompt="@string/selectItem"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:layout_toEndOf="@+id/ib_item_image" />
 
                 <EditText
@@ -70,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/itemNamePane"
-                android:columnCount="5"
+                android:columnCount="3"
                 android:rowCount="3">
 
                 <TextView
@@ -91,23 +94,24 @@
                     android:layout_marginLeft="@dimen/column_margin_span"
                     android:layout_marginBottom="@dimen/row_margin_span"
                     android:layout_row="0"
-                    android:enabled="false"
+                    android:clickable="true"
                     android:text="@string/today"
                     android:textColor="#dc5a5a5a"
+                    style="@android:style/Widget.Button"
                     android:textSize="@dimen/abc_text_size_medium_material" />
 
-                <ImageButton
-                    android:id="@+id/b_pick_date"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_column="2"
-                    android:layout_marginLeft="@dimen/column_margin_span"
-                    android:layout_marginBottom="@dimen/row_margin_span"
-                    android:layout_row="0"
-                    android:background="#ff001da5"
-                    android:clickable="false"
-                    android:singleLine="false"
-                    android:src="@android:drawable/ic_menu_today" />
+                <!--<ImageButton-->
+                    <!--android:id="@+id/b_pick_date"-->
+                    <!--android:layout_width="30dp"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:layout_column="2"-->
+                    <!--android:layout_marginLeft="@dimen/column_margin_span"-->
+                    <!--android:layout_marginBottom="@dimen/row_margin_span"-->
+                    <!--android:layout_row="0"-->
+                    <!--android:background="#ff001da5"-->
+                    <!--android:clickable="false"-->
+                    <!--android:singleLine="false"-->
+                    <!--android:src="@android:drawable/ic_menu_today" />-->
 
                 <TextView
                     android:id="@+id/textView5"
@@ -127,23 +131,24 @@
                     android:layout_marginLeft="@dimen/column_margin_span"
                     android:layout_marginBottom="@dimen/row_margin_span"
                     android:layout_row="1"
-                    android:enabled="false"
+                    style="@android:style/Widget.Button"
+                    android:clickable="true"
                     android:text="@string/now"
                     android:textColor="#dc5a5a5a"
                     android:textSize="@dimen/abc_text_size_medium_material" />
 
-                <ImageButton
-                    android:id="@+id/b_pick_time"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_column="2"
-                    android:layout_marginLeft="@dimen/column_margin_span"
-                    android:layout_marginBottom="@dimen/row_margin_span"
-                    android:layout_row="1"
-                    android:background="#ff001da5"
-                    android:clickable="false"
-                    android:singleLine="false"
-                    android:src="@android:drawable/ic_menu_recent_history" />
+                <!--<ImageButton-->
+                    <!--android:id="@+id/b_pick_time"-->
+                    <!--android:layout_width="30dp"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:layout_column="2"-->
+                    <!--android:layout_marginLeft="@dimen/column_margin_span"-->
+                    <!--android:layout_marginBottom="@dimen/row_margin_span"-->
+                    <!--android:layout_row="1"-->
+                    <!--android:background="#ff001da5"-->
+                    <!--android:clickable="false"-->
+                    <!--android:singleLine="false"-->
+                    <!--android:src="@android:drawable/ic_menu_recent_history" />-->
 
                 <TextView
                     android:id="@+id/textView4"
@@ -161,33 +166,34 @@
                     android:layout_width="210dp"
                     android:layout_height="wrap_content"
                     android:layout_column="1"
+                    android:clickable="true"
+                    style="@android:style/Widget.Button"
                     android:layout_marginLeft="@dimen/column_margin_span"
                     android:layout_marginBottom="@dimen/row_margin_span"
                     android:layout_row="2"
-                    android:enabled="false"
                     android:text="@string/default_location_here"
                     android:textColor="#dc5a5a5a"
                     android:textSize="@dimen/abc_text_size_medium_material" />
 
-                <ImageButton
-                    android:id="@+id/b_pick_location"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_column="2"
-                    android:layout_marginLeft="@dimen/column_margin_span"
-                    android:layout_marginBottom="@dimen/row_margin_span"
-                    android:layout_row="2"
-                    android:background="#ff001da5"
-                    android:clickable="false"
-                    android:singleLine="false"
-                    android:src="@android:drawable/ic_menu_compass" />
+                <!--<ImageButton-->
+                    <!--android:id="@+id/b_pick_location"-->
+                    <!--android:layout_width="30dp"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:layout_column="2"-->
+                    <!--android:layout_marginLeft="@dimen/column_margin_span"-->
+                    <!--android:layout_marginBottom="@dimen/row_margin_span"-->
+                    <!--android:layout_row="2"-->
+                    <!--android:background="#ff001da5"-->
+                    <!--android:clickable="false"-->
+                    <!--android:singleLine="false"-->
+                    <!--android:src="@android:drawable/ic_menu_compass" />-->
 
                 <CheckBox
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/cb_with_location"
                     android:layout_row="2"
-                    android:layout_column="4"
+                    android:layout_column="2"
                     android:checked="true"/>
 
             </GridLayout>
@@ -224,9 +230,10 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="#ff001da5"
         android:text="Submit"
         android:textColor="#ffffffff"
+        style="@android:style/Widget.Holo.Button"
+        android:enabled="false"
         android:textSize="18sp" />
 
 
