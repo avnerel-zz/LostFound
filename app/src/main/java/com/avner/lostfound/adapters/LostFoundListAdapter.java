@@ -58,9 +58,9 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, final View convertView, final ViewGroup parent) {
 
-        View view;
+        final View view;
         final ViewHolder viewHolder;
         final Item item = (Item)getItem(position);
 
@@ -179,10 +179,10 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
 
     private void initMapButton(final AdapterView<?> parent, final int position, Dialog dialog) {
-
         final Item item = (Item) parent.getItemAtPosition(position);
         final Location location = item.getLocation();
-        ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
+        final ImageButton ib_showMap = (ImageButton) dialog.findViewById(R.id.ib_showMap);
+
         // no location specified.
         if (location == null) {
             ib_showMap.setVisibility(ImageButton.INVISIBLE);
@@ -201,18 +201,17 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     }
 
     private void setDialogContents(Dialog dialog, final Item item) {
-        TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
+        final TextView itemLocation = (TextView) dialog.findViewById(R.id.tv_location);
         itemLocation.setText(item.getLocationString());
 
-        TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
+        final TextView itemTime = (TextView) dialog.findViewById(R.id.tv_lossTime);
         itemTime.setText(item.getTimeAsString());
 
-        final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
-
         // get item image from url.
+        final ImageView itemImage = (ImageView) dialog.findViewById(R.id.iv_itemImage);
         Picasso.with(rootView.getContext()).load(item.getImageUrl()).placeholder(R.drawable.image_unavailable).into(itemImage);
 
-        TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
+        final TextView itemDescription = (TextView) dialog.findViewById(R.id.tv_descriptionContent);
         itemDescription.setText(item.getDescription());
         itemDescription.setMovementMethod(new ScrollingMovementMethod());
 

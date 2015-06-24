@@ -51,7 +51,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     // INSTANCE VARIABLES
     private View rootView;
     private List<Item> allItems;
-    private List<Item> itemsToDisplay;
     private LostFoundListAdapter adapter;
     private boolean isLostFragment;
     private int myLayoutId;
@@ -206,7 +205,6 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
      */
     private void initItemsList() {
         this.allItems = new ArrayList<>();
-        this.itemsToDisplay = new ArrayList<>();
 
         this.adapter = new LostFoundListAdapter(this.allItems, rootView, this);
 //        Log.d(Constants.LOST_FOUND_TAG, "raw items list contains " + this.allItems.size() + " items. filtered items: " + this.itemsToDisplay.size());
