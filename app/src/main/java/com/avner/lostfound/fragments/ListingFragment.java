@@ -415,6 +415,8 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
     public void clearFilters() {
         filters = new ListFilter();
+        this.sp_locationSpinner.setSelection(0);
+        this.sp_timeSpinner.setSelection(0);
         ListFilterUtils.applyListFilters(allItems, adapter, filters, myMainActivity.getLastKnownLocation());
     }
 }
