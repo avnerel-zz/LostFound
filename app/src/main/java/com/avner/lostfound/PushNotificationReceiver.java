@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.avner.lostfound.activities.MessagingActivity;
+import com.avner.lostfound.activities.PossibleMatchesActivity;
 import com.avner.lostfound.utils.SignalSystem;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -16,8 +17,11 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import static com.avner.lostfound.Constants.UIActions.uiaCompleteConversationSent;
 import static com.avner.lostfound.Constants.UIActions.uiaConversationSaved;
@@ -274,6 +278,9 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
                 case Constants.ParsePush.COMPLETE_CONVERSATION_REQUEST:
                     openMessagingActivity(context, jsonData);
                     break;
+                case Constants.ParsePush.TYPE_POTENTIAL_MATCHES:
+                    openPotentialMatchesActivity(context, jsonData);
+                    break;
                 default:
                     super.onPushOpen(context, intent);
         }
@@ -282,6 +289,23 @@ public class PushNotificationReceiver extends ParsePushBroadcastReceiver {
         e.printStackTrace();
         }
 
+    }
+
+    private void openPotentialMatchesActivity(Context context, JSONObject jsonData) throws JSONException {
+
+        ArrayList<String> matchesIds = new ArrayList<String>();
+        JSONArray jsonArray = (JSONArray)jsonData.get("possibleMatches");
+        if (jsonArray != null) {
+            int len = jsonArray.length();
+            for (int i=0;i<len;i++){
+                matchesIds.add(jsonArray.get(i).toString());
+            }
+        }
+        Intent possibleMatchesIntent = new Intent(context, PossibleMatchesActivity.class);
+        possibleMatchesIntent.putExtra(Constants.POSSIBLE_MATCHES, matchesIds);
+        possibleMatchesIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        context.startActivity(possibleMatchesIntent);
     }
 
     private void openMessagingActivity(Context context, JSONObject jsonData) throws JSONException {

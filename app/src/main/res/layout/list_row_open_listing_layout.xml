@@ -34,6 +34,7 @@
         android:layout_toRightOf="@+id/iv_itemListingImage"
         android:layout_toLeftOf="@+id/iv_lost_or_found"
         android:layout_toStartOf="@+id/iv_lost_or_found"
+        android:singleLine="true"
         android:hint="Item name"
         android:gravity="left"
         android:paddingLeft="10dp"

@@ -163,6 +163,7 @@ public class Constants {
         public static final String COMPLETE_CONVERSATION_REPLY = "ParseCompleteConversationReply";
         public static final String TYPE_CONVERSATION = "ParseConversation";
         public static final String TYPE_MY_MESSAGE = "ParseMyMessage";
+        public static final String TYPE_POTENTIAL_MATCHES = "ParsePotentialMatches";
     }
 
 
