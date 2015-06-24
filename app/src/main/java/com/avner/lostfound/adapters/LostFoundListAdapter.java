@@ -114,6 +114,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         viewHolder.locationAdded.setText(item.getLocationString());
         viewHolder.timeAdded.setText("" + item.getDiff() + " ");
 
+        // show edit image button only if the user reported it
         if (item.getUserId().equals(ParseUser.getCurrentUser().getObjectId())) {
             viewHolder.editReport.setVisibility(ImageButton.VISIBLE);
         } else {

@@ -103,7 +103,10 @@ public class MessagingActivity extends Activity implements TextWatcher, View.OnC
                 }
                 if (conversationObject.get(Constants.ParseConversation.SENT_COMPLETE) != true &&
                         ((ParseObject)conversationObject.get(Constants.ParseConversation.ITEM)).get(Constants.ParseReport.IS_ALIVE) == true) {
-                    action_complete.setVisible(true);
+
+                    if (null != action_complete) {
+                        action_complete.setVisible(true);
+                    }
                 }
                 if (conversationObject.get(Constants.ParseConversation.RECEIVED_COMPLETE) == true) {
                     showCompleteConversationDialog();

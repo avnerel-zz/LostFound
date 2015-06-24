@@ -28,8 +28,12 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:textSize="20sp"
+        android:singleLine="true"
         android:layout_toRightOf="@+id/ib_conversation_item_image"
-        android:layout_toEndOf="@+id/ib_conversation_item_image" />
+        android:layout_toEndOf="@+id/ib_conversation_item_image"
+        android:layout_toLeftOf="@+id/iv_item_done"
+        android:layout_toStartOf="@+id/iv_item_done"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,14 +51,16 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="Item name"
         android:id="@+id/tv_item_name"
-        android:textSize="20sp"
-        android:maxLength="8"
+        android:textSize="18sp"
+        android:singleLine="true"
         android:gravity="center_vertical"
         android:layout_alignBottom="@+id/tv_item_header"
         android:layout_toRightOf="@+id/tv_item_header"
         android:layout_toEndOf="@+id/tv_item_header"
+        android:layout_toLeftOf="@+id/iv_item_done"
+        android:layout_toStartOf="@+id/iv_item_done"
         android:textColor="@color/abc_search_url_text" />
 
     <TextView
@@ -73,10 +79,10 @@
         android:id="@+id/iv_item_done"
         android:src="@drawable/done_icon"
         android:layout_alignTop="@+id/tv_unread_count"
-        android:layout_toRightOf="@+id/tv_item_name"
-        android:layout_toEndOf="@+id/tv_item_name"
-        android:layout_marginLeft="44dp"
-        android:layout_marginStart="44dp"
+        android:layout_toLeftOf="@+id/tv_unread_count"
+        android:layout_toStartOf="@+id/tv_unread_count"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:visibility="invisible"
         android:background="@android:color/transparent"/>
 
