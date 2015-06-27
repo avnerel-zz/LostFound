@@ -120,15 +120,22 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
      * This method is called when the facebook login button is pressed and it tries to login to facebook.
      */
     private void loginWithFacebookButton() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Initializing");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.show();
+
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, null, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
                 if(err != null){
                     Toast.makeText(getApplicationContext(), "problem connection to facebook, please check your connection.", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                     return;
                 }
                 if (user == null) {
                     Log.d(Constants.LOST_FOUND_TAG, "Uh oh. The user cancelled the Facebook login.");
+                    progressDialog.dismiss();
                 } else if (user.isNew()) {
                     Log.d(Constants.LOST_FOUND_TAG, "User signed up and logged in through Facebook!");
 
@@ -148,10 +155,6 @@ public class LoginActivity extends Activity implements Button.OnClickListener{
      * This method logs the user in to parse with his facebook credentials.
      */
     private void logInToParseWithFacebook() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Initializing");
-        progressDialog.setMessage("Please wait...");
-        progressDialog.show();
         getUserFacebookProfileDetails();
         finishLogin(true);
     }

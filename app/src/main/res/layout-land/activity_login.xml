@@ -6,17 +6,16 @@
     tools:context="com.avner.lostfound.activities.LoginActivity"
     android:orientation="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ff009ab6">
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/iv_lost_found"
             android:src="@drawable/lf_background"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
 
         <com.facebook.login.widget.LoginButton
@@ -27,9 +26,10 @@
             android:paddingTop="10sp"
             android:paddingBottom="10sp"
             android:id="@+id/b_login_facebook"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             facebook:logout_text="Login Successful"
-            android:layout_marginTop="50dp"/>
-
-    </LinearLayout>
+            />
 
 </RelativeLayout>

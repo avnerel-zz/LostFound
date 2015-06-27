@@ -3,6 +3,7 @@ package com.avner.lostfound.activities;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,11 +12,14 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -55,7 +59,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CompoundButton.OnCheckedChangeListener, MenuItem.OnMenuItemClickListener {
+public class ReportFormActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, CompoundButton.OnCheckedChangeListener, MenuItem.OnMenuItemClickListener, TextWatcher {
 
     private static final String ITEM_IMAGE_NAME = "itemImage.png";
 
@@ -100,6 +104,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
                 .addApi(LocationServices.API)
                 .build();
 
+        if (editReport){
+            itemEdited = getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
+            loadFromItem(itemEdited);
+        } else {
+            setDefaultValues();
+        }
     }
     private void setDefaultValues() {
         setTime(Calendar.getInstance());
@@ -182,7 +192,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         // Create an ArrayAdapter using the string array and a default spinner layout
 //        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 //                R.array.default_items, android.R.layout.simple_spinner_item);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View v = super.getView(position, convertView, parent);
@@ -207,6 +217,8 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         spinner.setOnItemSelectedListener(this);
 
         et_itemName = (TextView) findViewById(R.id.et_itemName);
+        et_itemName.addTextChangedListener(this);
+
     }
 
     private void initLocationViews() {
@@ -253,6 +265,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         getMenuInflater().inflate(R.menu.menu_report_form, menu);
         mi_submit = menu.findItem(R.id.action_send);
         mi_submit.setOnMenuItemClickListener(this);
+        if(spinner.getSelectedItemPosition() < spinner.getCount()){
+            mi_submit.setVisible(true);
+        }
+        if(!editReport){
+            spinner.performClick();
+        }
         return true;
     }
 
@@ -260,14 +278,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
-        if (editReport){
-            itemEdited = getIntent().getExtras().getParcelable(Constants.ReportForm.ITEM);
-            loadFromItem(itemEdited);
-        } else {
-            setDefaultValues();
-        }
-
-        spinner.requestFocus();
     }
 
     @Override
@@ -399,12 +409,14 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 
     private void setImageFromCamera(Intent data) {
         Bitmap imageFromCamera = (Bitmap) data.getExtras().get("data");
+        Picasso.with(this).cancelRequest(ib_item_photo);
         ib_item_photo.setImageBitmap(imageFromCamera);
     }
 
     private void setImageFromGallery(Intent data) {
         try{
             Bitmap imageFromGallery = ImageUtils.decodeUri(getContentResolver(), data.getData());
+            Picasso.with(this).cancelRequest(ib_item_photo);
             ib_item_photo.setImageBitmap(imageFromGallery);
 
         } catch (FileNotFoundException e) {
@@ -440,49 +452,47 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
 //            sb.append(Constants.Geocoder.DESCRIPTION_NOT_AVAILABLE);
             sb.append(location_chosen.toString());
         }
-
-
         return sb.toString();
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        if(position < spinner.getCount()){
-            if(mi_submit!= null){
-                mi_submit.setVisible(true);
-            }
-            b_submit.setEnabled(true);
-        }
         // user chose other.
         if (spinner.getSelectedItemPosition() == spinner.getAdapter().getCount() - 1) {
             et_itemName.setVisibility(View.VISIBLE);
-        } else {
+            et_itemName.requestFocusFromTouch();
+            if(et_itemName.length() == 0){
+                enableSubmit(false);
+//                et_itemName.performClick();
+//                et_itemName.setPressed(true);
+//                et_itemName.invalidate();
+                ((InputMethodManager)this.getSystemService(Service.INPUT_METHOD_SERVICE)).showSoftInput(et_itemName,0);
+            }else {
+                enableSubmit(true);
+            }
+//            et_itemName.requestFocus();
+        } else if(position < spinner.getCount()){
             et_itemName.setVisibility(View.INVISIBLE);
             //reset item name.
             et_itemName.setText("");
+            enableSubmit(true);
         }
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
+    public void onNothingSelected(AdapterView<?> parent) {}
 
     @Override
     public void onConnected(Bundle bundle) {
-
         updateCurrentLocation();
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
-    }
+    public void onConnectionSuspended(int i) {}
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
         tv_location_picker.setText(Constants.Geocoder.NO_LOCATION_AVAILABLE);
     }
 
@@ -597,5 +607,32 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         });
     }
 
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        if(s.length() > 0){
+            enableSubmit(true);
+        }else if(et_itemName.getVisibility() == View.VISIBLE){
+            enableSubmit(false);
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    private void enableSubmit(boolean submit) {
+        if(mi_submit != null){
+            mi_submit.setVisible(submit);
+        }
+        b_submit.setEnabled(submit);
+    }
 
 }

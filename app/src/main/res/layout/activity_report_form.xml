@@ -25,10 +25,12 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:paddingBottom="@dimen/activity_vertical_margin"
+                android:focusableInTouchMode="true"
                 android:paddingTop="@dimen/activity_vertical_margin">
 
                 <Spinner
                     android:id="@+id/s_choose_item"
+                    android:gravity="bottom"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/et_itemName"
@@ -52,7 +54,8 @@
                     android:layout_marginLeft="5dp"
                     android:background="#dcdcdcdc"
                     android:singleLine="true"
-                    android:hint="Item name"
+                    android:hint="Please Enter Item name"
+                    android:focusableInTouchMode="true"
                     android:visibility="invisible" />
 
                 <ImageButton
