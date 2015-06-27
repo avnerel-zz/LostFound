@@ -464,9 +464,6 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             et_itemName.requestFocusFromTouch();
             if(et_itemName.length() == 0){
                 enableSubmit(false);
-//                et_itemName.performClick();
-//                et_itemName.setPressed(true);
-//                et_itemName.invalidate();
                 ((InputMethodManager)this.getSystemService(Service.INPUT_METHOD_SERVICE)).showSoftInput(et_itemName,0);
             }else {
                 enableSubmit(true);
