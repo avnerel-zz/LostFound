@@ -144,17 +144,20 @@ public class MainActivity extends FragmentActivity implements
 
     private void restoreSearchPhrase() {
         if (null != sv_search) {
-            sv_search.post(new Runnable() {
+            sv_search.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    sv_search.setQuery(sv_search_phrase_display, false);
+                    if(!"".equals(sv_search_phrase_display)){
+                        mi_search_menu_item.expandActionView();
+                        sv_search.setQuery(sv_search_phrase_display, false);
 
-                    if (isListingFragment(selectedTabIndex)) {
-                        Log.d(Constants.LOST_FOUND_TAG, "main activity restoring search phrase (filter)\"" + sv_search_phrase_filter + "\"");
-                        ((ListingFragment)getCurrentFragment()).searchPhrase(getApplicationContext(), sv_search_phrase_filter, true);
+                        if (isListingFragment(selectedTabIndex)) {
+                            Log.d(Constants.LOST_FOUND_TAG, "main activity restoring search phrase (filter)\"" + sv_search_phrase_filter + "\"");
+                            ((ListingFragment)getCurrentFragment()).searchPhrase(getApplicationContext(), sv_search_phrase_filter, true);
+                        }
                     }
                 }
-            });
+            },200);
 
 
         }
