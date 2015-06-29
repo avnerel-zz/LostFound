@@ -90,4 +90,9 @@ public class ListFilter {
         return (this.filter_dist != prevFilter);
     }
 
+    public boolean hasFilter() {
+        return !(filter_content.equals(Constants.NO_CONTENT_FILTER)
+                && filter_dist == Constants.NO_DISTANCE_FILTER
+                && filter_time == Constants.NO_TIME_FILTER);
+    }
 }

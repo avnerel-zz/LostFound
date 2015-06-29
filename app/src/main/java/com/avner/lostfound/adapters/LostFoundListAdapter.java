@@ -3,6 +3,7 @@ package com.avner.lostfound.adapters;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.text.method.ScrollingMovementMethod;
@@ -34,6 +35,7 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
     private final ListingFragment myFragment;
     private List<Item> items;
     private View rootView;
+    private int clickedPosition = -1;
 
     public LostFoundListAdapter(List<Item> items, View rootView, ListingFragment myFragment) {
         this.items = items;
@@ -129,22 +131,40 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
         final Item item = (Item) parent.getItemAtPosition(position);
         Log.d(Constants.LOST_FOUND_TAG, "clicked item " + item.getName() + ", at position " + position);
 
+        setClickedPosition(position);
         if (!myFragment.setDisplayedItem(item)) {
             showItemInDialog(parent, item, position);
             Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
-        }
-        else {
+        } else {
             Log.d("BLA BLA BLA", "clicked item in LANDSCAPE & large mode");
         }
     }
 
     private void showItemInDialog(AdapterView<?> parent, Item item, int position) {
         final Dialog dialog = new Dialog(myFragment.getActivity());
-
+        myFragment.setClickedDialog(dialog);
         dialog.setContentView(R.layout.dialog_item_details_layout);
         initMapButton(parent, position, dialog);
         initConversationButton(parent, position, dialog);
         setDialogContents(dialog, item);
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                Log.d(Constants.LOST_FOUND_TAG, "dismissed dialog in listing adapter.");
+                setClickedPosition(-1);
+                myFragment.setClickedDialog(null);
+            }
+        });
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Log.d(Constants.LOST_FOUND_TAG, "cancelled dialog in listing adapter.");
+                setClickedPosition(-1);
+                myFragment.setClickedDialog(null);
+            }
+        });
+
         dialog.show();
     }
 
@@ -221,6 +241,14 @@ public class LostFoundListAdapter extends BaseAdapter implements AdapterView.OnI
 
     public void setList(List<Item> list) {
         this.items = list;
+    }
+
+    public int getClickedPosition() {
+        return clickedPosition;
+    }
+
+    public void setClickedPosition(int clickedPosition) {
+        this.clickedPosition = clickedPosition;
     }
 
     private class ViewHolder {

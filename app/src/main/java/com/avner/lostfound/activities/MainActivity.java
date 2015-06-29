@@ -387,8 +387,6 @@ public class MainActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
 
-
-
         this.googleApiClient.connect();
         setInitLocation();
     }

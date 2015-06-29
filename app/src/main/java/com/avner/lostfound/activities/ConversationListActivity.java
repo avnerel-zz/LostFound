@@ -1,6 +1,7 @@
 package com.avner.lostfound.activities;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,6 +50,9 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
     private TextView tv_location;
     private TextView tv_descriptionContent;
     private TextView tv_descriptionTitle;
+    private int clickedPosition = -1;
+    private ListView lv_conversation;
+    private Dialog clickedDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,9 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
         conversations = new ArrayList<>();
 
         filteredConversations = new ArrayList<>();
+        if(savedInstanceState!= null){
+            clickedPosition = savedInstanceState.getInt("position");
+        }
         initConversationList();
         initItemInfoWidgets();
         SignalSystem.getInstance().registerUIUpdateChange(this);
@@ -67,7 +74,16 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
     @Override
     public void onDestroy() {
         SignalSystem.getInstance().unRegisterUIUpdateChange(this);
+        if(clickedDialog!=null){
+            clickedDialog.dismiss();
+        }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("position", conversationAdapter.getClickedPosition());
     }
 
     private void initItemInfoWidgets() {
@@ -188,12 +204,12 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
 
     private void initConversationList() {
 
-        ListView usersListView = (ListView) findViewById(R.id.lv_user_list);
+        lv_conversation = (ListView) findViewById(R.id.lv_user_list);
 
-        setContextualBar(usersListView);
+        setContextualBar(lv_conversation);
         conversationAdapter = new ConversationListAdapter(filteredConversations, this);
-        usersListView.setAdapter(conversationAdapter);
-        usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lv_conversation.setAdapter(conversationAdapter);
+        lv_conversation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
                 openConversation(i);
@@ -220,6 +236,11 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
                 }
                 // Success in retrieving user list.
                 updateConversations(conversationList);
+
+//                if (clickedPosition != -1) {
+//                    ImageButton button = (ImageButton) lv_conversation.getAdapter().getView(clickedPosition, null, null).findViewById(R.id.ib_conversation_item_image);
+//                    button.performClick();
+//                }
             }
         });
     }
@@ -372,4 +393,9 @@ public class ConversationListActivity extends Activity implements IUIUpdateInter
                 updateFromDataStore();
         }
     }
+
+    public void setClickedDialog(Dialog clickedDialog) {
+        this.clickedDialog = clickedDialog;
+    }
+
 }

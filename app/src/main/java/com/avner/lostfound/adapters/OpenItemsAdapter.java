@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +47,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     private List<Item> items;
     private View rootView;
     private int chosenItemPosition;
+    private int clickedPosition = -1;
 
     public OpenItemsAdapter(List<Item> items, View rootView,MyWorldFragment worldFragment) {
         this.items = items;
@@ -125,6 +129,11 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     }
 
     public void remove(final Item item) {
+        if(! isConnectionAvailable()){
+            Log.d(Constants.LOST_FOUND_TAG, "tried to delete item but no connection.");
+            Toast.makeText(rootView.getContext(), "Can't remove report, Please check your connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         final ProgressDialog progressDialog = new ProgressDialog(rootView.getContext());
         progressDialog.setTitle("Deleting");
@@ -160,6 +169,16 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
                 });
             }
         });
+    }
+
+    private boolean isConnectionAvailable() {
+
+        ConnectivityManager cm =
+                (ConnectivityManager)rootView.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
+
+        return isConnected;
     }
 
     private void deleteFromParse(Item item, final ParseObject localParseItem) {
@@ -201,6 +220,7 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Item item = (Item) getItem(position);
+        setClickedPosition(position);
 
         if (!myFragment.setDisplayedItem(item)) {
             showItemInDialog(item);
@@ -213,11 +233,26 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
     private void showItemInDialog(Item item) {
         final Dialog dialog = new Dialog(rootView.getContext());
+        myFragment.setClickedDialog(dialog);
         dialog.setContentView(R.layout.dialog_item_details_layout);
         initMapButton(item, dialog);
         ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
         ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
         setDialogContents(dialog, item);
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                setClickedPosition(-1);
+                myFragment.setClickedDialog(null);
+            }
+        });
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                setClickedPosition(-1);
+                myFragment.setClickedDialog(null);
+            }
+        });
         dialog.show();
     }
 
@@ -263,9 +298,9 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
 
     public void edit(Item item) {
         Intent editItemIntent = new Intent(rootView.getContext(), ReportFormActivity.class);
-        editItemIntent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost())
-                      .putExtra(Constants.ReportForm.IS_EDIT_FORM, true)
-                      .putExtra(Constants.ReportForm.ITEM, item);
+        editItemIntent.putExtra(Constants.ReportForm.IS_LOST_FORM, item.isLost());
+        editItemIntent.putExtra(Constants.ReportForm.IS_EDIT_FORM, true);
+        editItemIntent.putExtra(Constants.ReportForm.ITEM, item);
 
         ((Activity) rootView.getContext()).startActivityForResult(editItemIntent, Constants.REQUEST_CODE_REPORT_FORM);
     }
@@ -288,6 +323,14 @@ public class OpenItemsAdapter extends BaseAdapter implements AdapterView.OnItemC
         params.put(Constants.ParseCloud.PUBLISHER_ID, ParseUser.getCurrentUser().getObjectId());
         params.put(Constants.ParseCloud.IS_LOST, item_selected.isLost());
         ParseCloud.callFunctionInBackground(Constants.ParseCloudMethods.LOOK_FOR_MATCHES, params);
+    }
+
+    public int getClickedPosition() {
+        return clickedPosition;
+    }
+
+    public void setClickedPosition(int clickedPosition) {
+        this.clickedPosition = clickedPosition;
     }
 
     public class ViewHolder {

@@ -2,6 +2,7 @@ package com.avner.lostfound.adapters;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.location.Location;
@@ -38,6 +39,7 @@ public class ConversationListAdapter extends BaseAdapter {
     private List<Conversation> conversations;
     private ConversationListActivity rootActivity;
     private SparseBooleanArray selectedItemIds;
+    private int clickedPosition;
 
     public ConversationListAdapter(List<Conversation> conversations, ConversationListActivity rootActivity) {
         this.conversations = conversations;
@@ -90,6 +92,8 @@ public class ConversationListAdapter extends BaseAdapter {
                         return;
                     }
 
+
+                    setClickedPosition(position);
                     if (!rootActivity.setDisplayedItem(item)) {
                         showItemInDialog(item);
                         Log.d("BLA BLA BLA", "clicked item in PORTRAIT or non-large mode");
@@ -132,13 +136,34 @@ public class ConversationListAdapter extends BaseAdapter {
         return view;
     }
 
+    private void setClickedPosition(int position) {
+        clickedPosition = position;
+    }
+
     private void showItemInDialog(Item item) {
         final Dialog dialog = new Dialog(rootActivity);
+        rootActivity.setClickedDialog(dialog);
         dialog.setContentView(R.layout.dialog_item_details_layout);
         initMapButton(item, dialog);
         ImageButton ib_sendMessage = (ImageButton) dialog.findViewById(R.id.ib_sendMessage);
         ib_sendMessage.setVisibility(ImageButton.INVISIBLE);
         setDialogContents(dialog, item);
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                setClickedPosition(-1);
+                rootActivity.setClickedDialog(null);
+            }
+        });
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                setClickedPosition(-1);
+                rootActivity.setClickedDialog(null);
+            }
+        });
+
         dialog.show();
     }
 
@@ -226,6 +251,10 @@ public class ConversationListAdapter extends BaseAdapter {
     public void removeSelection() {
         selectedItemIds = new SparseBooleanArray();
         notifyDataSetChanged();
+    }
+
+    public int getClickedPosition() {
+        return clickedPosition;
     }
 
     private class ViewHolder {

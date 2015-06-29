@@ -2,6 +2,7 @@ package com.avner.lostfound.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -67,6 +68,8 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
     private TextView tv_descriptionContent;
     private ImageView iv_itemImage;
     private TextView tv_descriptionTitle;
+    private int clickedPosition = -1;
+    private Dialog clickedDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,10 +126,11 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
 
         items = new ArrayList<>();
         myOpenListingsAdapter = new OpenItemsAdapter(items, rootView, this);
-        updateMyItems(items);
-
         lv_openListings.setAdapter(myOpenListingsAdapter);
         lv_openListings.setOnItemClickListener(myOpenListingsAdapter);
+
+        updateMyItems(items);
+
     }
 
     private void updateMyItems(final List<Item> items) {
@@ -139,7 +143,7 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
+            public void done(final List<ParseObject> itemsList, com.parse.ParseException e) {
                 if (e == null) {
                     items.clear();
                     for (int i = 0; i < itemsList.size(); i++) {
@@ -147,9 +151,16 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
                     }
                     myOpenListingsAdapter.notifyDataSetChanged();
                     tv_openListingsNumber.setText(String.valueOf(itemsList.size()));
+
+//                    if(clickedPosition != -1) {
+//                        lv_openListings.performItemClick(lv_openListings.getAdapter().getView(clickedPosition, null, null), clickedPosition,
+//                                lv_openListings.getAdapter().getItemId(clickedPosition));
+//                    }
                 }
             }
+
         });
+
     }
 
     private void convertParseListToItemList(List<ParseObject> itemsList, List<Item> items) {
@@ -401,5 +412,18 @@ public class MyWorldFragment extends Fragment implements IUIUpdateInterface, Vie
 
         ((Activity) rootView.getContext()).startActivityForResult(newItemIntent, Constants.REQUEST_CODE_REPORT_FORM);
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        this.clickedPosition = myOpenListingsAdapter.getClickedPosition();
+        if(clickedDialog!=null){
+            clickedDialog.dismiss();
+        }
+    }
+
+    public void setClickedDialog(Dialog clickedDialog) {
+        this.clickedDialog = clickedDialog;
     }
 }

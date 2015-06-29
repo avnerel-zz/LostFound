@@ -151,7 +151,7 @@ public class Item implements Parcelable {
 
         dest.writeStringArray(new String[]{locationAsString, imageUrl, userId, userDisplayName, name, description, itemId});
         dest.writeLong(calender.getTimeInMillis());
-        dest.writeBooleanArray(new boolean[]{isLost});
+        dest.writeBooleanArray(new boolean[]{isLost, (location!= null)});
         if(location!= null){
 
             location.writeToParcel(dest, flags);
@@ -173,12 +173,13 @@ public class Item implements Parcelable {
         calender = Calendar.getInstance();
         calender.setTimeInMillis(source.readLong());
 
-        boolean[] booleanField = new boolean[1];
+        boolean[] booleanField = new boolean[2];
         source.readBooleanArray(booleanField);
         isLost = booleanField[0];
+        boolean isLocationValid = booleanField[1];
 
         // location is valid.
-        if(source.dataAvail()!=0){
+        if(isLocationValid){
 
             location = Location.CREATOR.createFromParcel(source);
         }

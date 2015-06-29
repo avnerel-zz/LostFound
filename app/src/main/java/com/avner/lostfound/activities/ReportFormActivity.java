@@ -5,12 +5,15 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -152,7 +155,7 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private void updateCurrentLocation() {
-        if (location_chosen == null){
+        if (location_chosen == null && cb_with_location.isChecked()){
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
             if (null == location) { // failed to get a location
@@ -515,6 +518,13 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
     }
 
     private void submitReport() {
+
+        if(! isConnectionAvailable()){
+            Log.d(Constants.LOST_FOUND_TAG, "tried to delete item but no connection.");
+            Toast.makeText(this, "Can't submit report, Please check your connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ParseObject parseReport;
 //        String parseClass = lostReport ? Constants.ParseObject.PARSE_LOST : Constants.ParseObject.PARSE_FOUND;
         String parseClass = Constants.ParseObject.PARSE_LOST;
@@ -532,10 +542,15 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         if (editReport) {
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery(parseClass);
+            query.fromLocalDatastore();
             query.whereEqualTo(Constants.ParseQuery.OBJECT_ID, itemEdited.getId());
             query.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject parseObject, ParseException e) {
+                    if(e!= null || parseObject == null){
+                        Toast.makeText(ReportFormActivity.this, "No Connection. Can't upload report", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     fillReport(parseObject, progressDialog);
                 }
             });
@@ -547,6 +562,17 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
         }
 
     }
+
+    private boolean isConnectionAvailable() {
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
+
+        return isConnected;
+    }
+
 
     private void fillReport(final ParseObject parseReport, final ProgressDialog progressDialog) {
         parseReport.put(Constants.ParseReport.IS_LOST,lostReport);
@@ -591,14 +617,12 @@ public class ReportFormActivity extends Activity implements View.OnClickListener
             public void done(ParseException e) {
                 progressDialog.dismiss();
                 if(e!=null){
-                    progressDialog.dismiss();
                     Toast.makeText(activity, "No Connection. Can't upload report", Toast.LENGTH_SHORT).show();
                 }else{
-                        progressDialog.dismiss();
-                        setResult(RESULT_OK, null);
-                        SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
-                        finish();
-                        Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK, null);
+                    SignalSystem.getInstance().fireUpdateChange(Constants.UIActions.uiaItemSaved);
+                    finish();
+                    Toast.makeText(activity, "Report has been shipped", Toast.LENGTH_SHORT).show();
                 }
             }
         });

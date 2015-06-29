@@ -1,5 +1,6 @@
 package com.avner.lostfound.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -70,6 +71,8 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
     private PossibleMatchesActivity myPossibleMatchesActivity;
     private ArrayList<String> possibleMatchesIds;
     private TextView tv_no_items_available;
+    private int clickedPosition = -1;
+    private Dialog clickedDialog;
 
 
     @Override
@@ -232,7 +235,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> itemsList, com.parse.ParseException e) {
+            public void done(final List<ParseObject> itemsList, com.parse.ParseException e) {
                 if (e == null) {
                     allItems.clear();
                     for (int i = 0; i < itemsList.size(); i++) {
@@ -249,6 +252,13 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                     } else {
                         tv_no_items_available.setVisibility(View.INVISIBLE);
                     }
+
+//                    if(clickedPosition != -1) {
+//                        lv_itemList.performItemClick(
+//                                lv_itemList.getAdapter().getView(clickedPosition, null, null),
+//                                clickedPosition,
+//                                lv_itemList.getAdapter().getItemId(clickedPosition));
+//                    }
                     Log.d(Constants.LOST_FOUND_TAG, "Fetched " + allItems.size() + " items from Parse");
                 }
             }
@@ -417,4 +427,18 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
         this.sp_timeSpinner.setSelection(0);
         ListFilterUtils.applyListFilters(allItems, adapter, filters, myMainActivity.getLastKnownLocation());
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        this.clickedPosition = adapter.getClickedPosition();
+        if(clickedDialog!=null){
+            clickedDialog.dismiss();
+        }
+    }
+
+    public void setClickedDialog(Dialog clickedDialog) {
+        this.clickedDialog = clickedDialog;
+    }
+
 }
