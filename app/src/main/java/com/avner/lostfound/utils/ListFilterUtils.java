@@ -87,18 +87,15 @@ public class ListFilterUtils {
     public static void applyListFilters(List<Item> rawList, LostFoundListAdapter adapter,
                                         ListFilter filters, Location lastKnownLocation) {
 
-        if(filters.hasFilter()){
+        List<Item> filteredList = new ArrayList<>(rawList);
 
-            List<Item> filteredList = new ArrayList<>(rawList);
+        applyDistanceFilter(filteredList, filters, lastKnownLocation);
+        applyTimeFilter(filteredList, filters);
+        applyContentFilter(filteredList, filters);
 
-            applyDistanceFilter(filteredList, filters, lastKnownLocation);
-            applyTimeFilter(filteredList, filters);
-            applyContentFilter(filteredList, filters);
-
-            Log.d(Constants.LOST_FOUND_TAG, "filtering re-applied, notifying adapter. raw list size: " + rawList.size() + " filtered size: " + filteredList.size());
-            adapter.setList(filteredList);
-        }
-        adapter.notifyDataSetChanged();
+        Log.d(Constants.LOST_FOUND_TAG, "filtering re-applied, notifying adapter. raw list size: " + rawList.size() + " filtered size: " + filteredList.size());
+        adapter.setList(filteredList);
+        adapter.notifyDataSetInvalidated();
     }
 }
 

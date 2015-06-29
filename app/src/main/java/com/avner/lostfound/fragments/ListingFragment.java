@@ -244,7 +244,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
                     if (!isPossibleMatchesFragment) {
                         ListFilterUtils.applyListFilters(allItems, adapter, filters, ((MainActivity) getActivity()).getLastKnownLocation());
                     } else {
-                        adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetInvalidated();
                     }
 
                     if (itemsList.isEmpty()) {
@@ -430,6 +430,7 @@ public class ListingFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onDestroyView() {
+//        clearFilters();
         super.onDestroyView();
         this.clickedPosition = adapter.getClickedPosition();
         if(clickedDialog!=null){
